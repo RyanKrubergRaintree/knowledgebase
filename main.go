@@ -14,6 +14,10 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// TODO: add
+//  https://github.com/unrolled/secure
+//  https://github.com/justinas/nosurf
+
 var (
 	addr      = flag.String("listen", ":80", "http server `address`")
 	clientdir = flag.String("client", "", "client `directory`")

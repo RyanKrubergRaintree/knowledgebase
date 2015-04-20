@@ -114,7 +114,7 @@ func (index *Index) PagesByTag(tag string) ([]*fedwiki.PageHeader, error) {
 	defer session.Close()
 
 	headers := []*fedwiki.PageHeader{}
-	if err := c.Find(bson.M{"tags": tag}).All(&headers); err != nil {
+	if err := c.Find(bson.M{"meta.tags": tag}).All(&headers); err != nil {
 		return nil, translate(err)
 	}
 
