@@ -19,16 +19,18 @@ type FarmConfig struct {
 type Farm struct {
 	Domain    string
 	ClientDir string
-	Context   Context
+	Auth      Auth
+	Admin     Admin
 	// fq domain -> server
 	Servers map[string]*Server
 }
 
-func NewFarm(conf FarmConfig, context Context) (*Farm, error) {
+func NewFarm(conf FarmConfig, auth Auth, admin Admin) (*Farm, error) {
 	farm := &Farm{
 		Domain:    conf.Domain,
 		ClientDir: conf.ClientDir,
-		Context:   context,
+		Auth:      auth,
+		Admin:     admin,
 		Servers:   make(map[string]*Server),
 	}
 
@@ -46,7 +48,7 @@ func NewFarm(conf FarmConfig, context Context) (*Farm, error) {
 
 func (farm *Farm) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Host == "login."+farm.Domain {
-		farm.Context.ServeHTTP(w, r)
+		farm.Auth.ServeHTTP(w, r)
 		return
 	}
 
@@ -63,8 +65,13 @@ func (farm *Farm) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !farm.Context.LoggedIn(w, r) {
-		farm.Context.RequestCredentials(w, r)
+	if !farm.Auth.LoggedIn(w, r) {
+		farm.Auth.RequestCredentials(w, r)
+		return
+	}
+
+	if r.Host == "admin."+farm.Domain {
+		farm.Admin.ServeHTTP(w, r)
 		return
 	}
 

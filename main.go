@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/raintreeinc/knowledgebase/admin"
+	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/oauth"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gorilla/sessions"
@@ -40,15 +41,20 @@ func main() {
 		conf.ClientDir = *clientdir
 	}
 
-	ctx := &oauth.Context{
+	//TODO: move domain initialization inside farm
+	auth := &auth.Context{
 		Domain:      conf.Domain,
-		LoginURL:    "http://login." + conf.Domain + "/login",
-		CallbackURL: "http://login." + conf.Domain + "/callback",
+		LoginURL:    "http://auth." + conf.Domain + "/login",
+		CallbackURL: "http://auth." + conf.Domain + "/callback",
 		Sessions:    sessions.NewFilesystemStore("", []byte("some secret")),
 	}
-	ctx.RegisterProviders()
+	auth.RegisterProviders()
 
-	farm, err := kb.NewFarm(conf, ctx)
+	admin := &admin.Server{
+		Database: conf.Database,
+	}
+
+	farm, err := kb.NewFarm(conf, auth, admin)
 	if err != nil {
 		log.Fatal(err)
 	}

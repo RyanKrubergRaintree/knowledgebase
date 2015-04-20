@@ -1,4 +1,4 @@
-package oauth
+package auth
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-var _ kb.Context = &Context{}
+var _ kb.Auth = &Context{}
 
 type Context struct {
 	Domain      string
