@@ -14,9 +14,9 @@ import (
 	"github.com/egonelbre/fedwiki/pagestore/folderstore"
 	"github.com/egonelbre/fedwiki/pagestore/mongostore"
 
-	"github.com/raintreeinc/kbwiki/pageindex"
-	"github.com/raintreeinc/kbwiki/pageindex/memindex"
-	"github.com/raintreeinc/kbwiki/pageindex/mongoindex"
+	"github.com/raintreeinc/knowledgebase/kb/pageindex"
+	"github.com/raintreeinc/knowledgebase/kb/pageindex/memindex"
+	"github.com/raintreeinc/knowledgebase/kb/pageindex/mongoindex"
 )
 
 type Server struct {
