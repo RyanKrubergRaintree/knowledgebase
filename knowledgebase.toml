@@ -1,0 +1,9 @@
+Domain = "example.com"
+ClientDir = "../kbclient"
+Database = "mongodb://localhost/knowledgebase"
+
+[[Server]]
+Provider = "Alpha"
+
+[[Server]]
+Provider = "Beta"
