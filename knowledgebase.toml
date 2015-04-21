@@ -3,10 +3,10 @@ ClientDir = "../kbclient"
 Database = "mongodb://localhost/knowledgebase"
 
 [[Server]]
-Provider = "Alpha"
+Provider = "Engineering"
 
 [[Server]]
-Provider = "Beta"
+Provider = "Community"
 
 [[Server]]
 Provider = "Help"

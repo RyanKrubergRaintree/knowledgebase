@@ -32,8 +32,8 @@ func main() {
 		*addr = host + ":" + port
 	}
 
-	if os.Getenv("KB_CLIENTDIR") != "" {
-		*clientdir = os.Getenv("KB_CLIENTDIR")
+	if os.Getenv("CLIENTDIR") != "" {
+		*clientdir = os.Getenv("CLIENTDIR")
 	}
 
 	conf := kb.FarmConfig{}
@@ -43,6 +43,13 @@ func main() {
 
 	if conf.ClientDir == "" {
 		conf.ClientDir = *clientdir
+	}
+
+	if os.Getenv("DATABASE") != "" {
+		conf.Database = os.Getenv("DATABASE")
+	}
+	if os.Getenv("DOMAIN") != "" {
+		conf.Domain = os.Getenv("DOMAIN")
 	}
 
 	//TODO: move domain initialization inside farm
