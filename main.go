@@ -32,10 +32,6 @@ func main() {
 		*addr = host + ":" + port
 	}
 
-	if os.Getenv("CLIENTDIR") != "" {
-		*clientdir = os.Getenv("CLIENTDIR")
-	}
-
 	conf := kb.FarmConfig{}
 	if _, err := toml.DecodeFile(*conffile, &conf); err != nil {
 		log.Fatal(err)
@@ -45,12 +41,19 @@ func main() {
 		conf.ClientDir = *clientdir
 	}
 
+	if os.Getenv("CLIENTDIR") != "" {
+		conf.ClientDir = os.Getenv("CLIENTDIR")
+	}
+
 	if os.Getenv("DATABASE") != "" {
 		conf.Database = os.Getenv("DATABASE")
 	}
 	if os.Getenv("DOMAIN") != "" {
 		conf.Domain = os.Getenv("DOMAIN")
 	}
+
+	log.Printf("Starting with database %s\n", conf.Database)
+	log.Printf("Starting with domain %s\n", conf.Domain)
 
 	//TODO: move domain initialization inside farm
 	auth := &auth.Context{

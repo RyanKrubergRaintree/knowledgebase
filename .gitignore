@@ -23,3 +23,9 @@ _testmain.go
 *.test
 *.prof
 *.bat
+
+client/bundle.js
+client/bundle.html
+
+client/vendor/jspm/npm/**
+client/vendor/jspm/github/**

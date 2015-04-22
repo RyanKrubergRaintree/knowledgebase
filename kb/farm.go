@@ -47,7 +47,7 @@ func NewFarm(conf FarmConfig, auth Auth, admin Admin) (*Farm, error) {
 }
 
 func (farm *Farm) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Host == "login."+farm.Domain {
+	if r.Host == "auth."+farm.Domain {
 		farm.Auth.ServeHTTP(w, r)
 		return
 	}
