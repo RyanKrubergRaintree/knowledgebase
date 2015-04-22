@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+  <topicref href="D topicgroup.dita">
+    <topicgroup collection-type="family">
+        <topicref href="D1.dita"></topicref>
+        <topicref href="D2.dita"></topicref>
+    </topicgroup>
+    <topicref href="D3.dita"></topicref>
+  </topicref>
+</map>

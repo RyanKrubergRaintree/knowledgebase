@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+  <topicref href="A default.dita">
+    <topicref href="A1.dita"/>
+    <topicref href="A2.dita"/>
+    <topicref href="A3.dita"/>
+  </topicref>
+
+  <topicref href="B family.dita" collection-type="family">
+    <topicref href="B1.dita"/>
+    <topicref href="B2.dita"/>
+    <topicref href="B3.dita"/>
+  </topicref>
+
+  <topicref href="C sequence.dita" collection-type="sequence">
+    <topicref href="C1.dita"/>
+    <topicref href="C2.dita"/>
+    <topicref href="C3.dita"/>
+  </topicref>
+
+  <topicref href="D topicgroup.dita">
+    <topicgroup collection-type="family">
+        <topicref href="D1.dita"></topicref>
+        <topicref href="D2.dita"></topicref>
+    </topicgroup>
+    <topicref href="D3.dita"></topicref>
+  </topicref>
+
+  <topichead navtitle="E Custom Title">
+    <topicref href="E4.dita"></topicref>
+  </topichead>
+</map>

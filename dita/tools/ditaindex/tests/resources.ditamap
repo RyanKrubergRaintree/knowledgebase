@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
+<map>
+	<topicref href="keywords.ini" processing-role="resource-only" format="other" navtitle="keywords.ini"/>
+	<topicref href="keywords.dat" processing-role="resource-only" format="other" navtitle="keywords.dat"/>
+</map>
