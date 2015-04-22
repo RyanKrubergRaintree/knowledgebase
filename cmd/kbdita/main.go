@@ -22,13 +22,11 @@ import (
 	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
 )
 
-const defaultAddr = ":8001"
-
 var (
-	addr      = flag.String("listen", os.Getenv("KBDITA"), "listening `address`")
-	ditamap   = flag.String("ditamap", os.Getenv("KBDITAMAP"), "main `ditamap`")
-	clientdir = flag.String("client", os.Getenv("KBCLIENT"), "kbclient `directory`")
-	pagesdir  = flag.String("pagesdir", "_pages", "output `directory`")
+	addr      = flag.String("listen", ":80", "listening `address`")
+	ditamap   = flag.String("ditamap", os.Getenv("DITAMAP"), "main `ditamap`")
+	clientdir = flag.String("client", os.Getenv("CLIENT"), "client `directory`")
+	pagesdir  = flag.String("pagesdir", "pages", "output `directory`")
 
 	dirviews = flag.String("views", "views", "`directory` for page templates")
 
@@ -207,14 +205,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	port := os.Getenv("PORT")
-	if *addr == "" && port != "" {
-		*addr = "localhost:" + port
-	} else if *addr == "" {
-		*addr = defaultAddr
+	host, port := os.Getenv("HOST"), os.Getenv("PORT")
+	if host != "" || port != "" {
+		*addr = host + ":" + port
 	}
+
 	if *clientdir == "" {
-		*clientdir = filepath.Join("..", "kbclient")
+		*clientdir = filepath.Join("..", "..", "client")
 	}
 
 	go reloader()

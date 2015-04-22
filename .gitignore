@@ -29,4 +29,4 @@ client/bundle.html
 client/vendor/jspm/npm/**
 client/vendor/jspm/github/**
 
-dita/_pages/**
+cmd/kbdita/pages/**
