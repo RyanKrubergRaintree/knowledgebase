@@ -24,6 +24,8 @@ _testmain.go
 *.prof
 *.bat
 
+*.sublime-workspace
+
 client/bundle.js
 client/bundle.html
 client/vendor/jspm/npm/**

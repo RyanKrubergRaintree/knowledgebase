@@ -7,7 +7,7 @@ import (
 
 	"github.com/egonelbre/fedwiki"
 
-	"github.com/raintreeinc/knowledgebase/kb/pageindex"
+	"github.com/raintreeinc/knowledgebase/pageindex"
 )
 
 var _ pageindex.Index = (*Index)(nil)

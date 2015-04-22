@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/egonelbre/fedwiki"
-	"github.com/raintreeinc/knowledgebase/kb/pageindex"
+	"github.com/raintreeinc/knowledgebase/pageindex"
 
 	//TODO: migrate to v3
 	"gopkg.in/mgo.v2-unstable"

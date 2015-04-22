@@ -4,12 +4,13 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/raintreeinc/knowledgebase/farm"
 	"github.com/raintreeinc/knowledgebase/kb"
 
 	"github.com/gorilla/sessions"
 )
 
-var _ kb.Auth = &Context{}
+var _ farm.Auth = &Context{}
 
 type Context struct {
 	Domain      string

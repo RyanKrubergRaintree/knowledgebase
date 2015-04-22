@@ -1,5 +1,5 @@
 Domain = "example.com"
-ClientDir = "../kbclient"
+ClientDir = "client"
 Database = "mongodb://localhost/knowledgebase"
 
 [[Server]]

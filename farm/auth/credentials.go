@@ -53,6 +53,7 @@ func (ctx *Context) RegisterProviders() {
 
 func (ctx *Context) RequestCredentials(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
+	r.URL.Scheme = "http"
 	r.URL.Host = r.Host
 	r.URL.Fragment = ""
 	q.Add("next", r.URL.String())

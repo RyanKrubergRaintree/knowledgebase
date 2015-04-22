@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/raintreeinc/knowledgebase/admin"
-	"github.com/raintreeinc/knowledgebase/auth"
-	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/farm"
+	"github.com/raintreeinc/knowledgebase/farm/admin"
+	"github.com/raintreeinc/knowledgebase/farm/auth"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gorilla/sessions"
@@ -20,7 +20,7 @@ import (
 
 var (
 	addr      = flag.String("listen", ":80", "http server `address`")
-	clientdir = flag.String("client", "", "client `directory`")
+	clientdir = flag.String("client", "client", "client `directory`")
 	conffile  = flag.String("config", "knowledgebase.toml", "farm configuration")
 )
 
@@ -32,7 +32,7 @@ func main() {
 		*addr = host + ":" + port
 	}
 
-	conf := kb.FarmConfig{}
+	conf := farm.Config{}
 	if _, err := toml.DecodeFile(*conffile, &conf); err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +44,6 @@ func main() {
 	if os.Getenv("CLIENTDIR") != "" {
 		conf.ClientDir = os.Getenv("CLIENTDIR")
 	}
-
 	if os.Getenv("DATABASE") != "" {
 		conf.Database = os.Getenv("DATABASE")
 	}
@@ -64,11 +63,9 @@ func main() {
 	}
 	auth.RegisterProviders()
 
-	admin := &admin.Server{
-		Database: conf.Database,
-	}
+	admin := &admin.Server{Database: conf.Database}
 
-	farm, err := kb.NewFarm(conf, auth, admin)
+	farm, err := farm.New(conf, auth, admin)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -47,6 +47,7 @@ func (s *Server) updateHelp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := session.DB("").C("Help")
+	bulk := c.Bulk()
 	uploadPage := func(f *zip.File) error {
 		if f.FileInfo().IsDir() {
 			return nil
@@ -64,10 +65,7 @@ func (s *Server) updateHelp(w http.ResponseWriter, r *http.Request) {
 			return err
 		}
 
-		if err := c.Insert(page); err != nil {
-			return err
-		}
-
+		bulk.Insert(page)
 		return nil
 	}
 	log.Println(len(z.File))
@@ -80,5 +78,9 @@ func (s *Server) updateHelp(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Fprintf(w, "Completed.")
+	result, err := bulk.Run()
+	if err != nil {
+		fmt.Fprintf(w, "Error inserting %s", err)
+	}
+	fmt.Fprintf(w, "Completed: %#v", result)
 }

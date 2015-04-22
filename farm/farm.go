@@ -1,13 +1,15 @@
-package kb
+package farm
 
 import (
 	"fmt"
 	"net/http"
 	"path"
 	"strings"
+
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-type FarmConfig struct {
+type Config struct {
 	Domain    string
 	ClientDir string
 	Database  string
@@ -22,21 +24,21 @@ type Farm struct {
 	Auth      Auth
 	Admin     Admin
 	// fq domain -> server
-	Servers map[string]*Server
+	Servers map[string]*kb.Server
 }
 
-func NewFarm(conf FarmConfig, auth Auth, admin Admin) (*Farm, error) {
+func New(conf Config, auth Auth, admin Admin) (*Farm, error) {
 	farm := &Farm{
 		Domain:    conf.Domain,
 		ClientDir: conf.ClientDir,
 		Auth:      auth,
 		Admin:     admin,
-		Servers:   make(map[string]*Server),
+		Servers:   make(map[string]*kb.Server),
 	}
 
 	for _, sconf := range conf.Server {
 		sdomain := strings.ToLower(sconf.Provider) + "." + conf.Domain
-		server, err := NewServer(sconf.Provider, sdomain, conf.Database)
+		server, err := kb.NewServer(sconf.Provider, sdomain, conf.Database)
 		if err != nil {
 			return nil, fmt.Errorf("error with \"%s\": %s", sconf.Provider, err)
 		}
