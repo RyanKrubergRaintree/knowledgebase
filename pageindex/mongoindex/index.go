@@ -86,11 +86,11 @@ func (index *Index) All() ([]*fedwiki.PageHeader, error) {
 }
 
 var taglisting = []bson.M{
-	{"$project": bson.M{"tags": 1}},
-	{"$unwind": "$tags"},
+	{"$project": bson.M{"meta.tags": 1}},
+	{"$unwind": "$meta.tags"},
 	{"$group": bson.M{
-		"_id":   "$tags",
-		"name":  bson.M{"$first": "$tags"},
+		"_id":   "$meta.tags",
+		"name":  bson.M{"$first": "$meta.tags"},
 		"count": bson.M{"$sum": 1}},
 	},
 	{"$match": bson.M{"count": bson.M{"$gt": 1}}},
