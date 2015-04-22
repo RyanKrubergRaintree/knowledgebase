@@ -118,6 +118,7 @@ func (conv *convert) run() {
 
 	conv.parse(bodytext)
 	conv.addRelatedLinks()
+	conv.assignIDs()
 }
 
 // splits node recursively into multiple story items
@@ -177,4 +178,11 @@ func (conv *convert) asLink(topic *ditaindex.Topic) string {
 	slug := string(conv.Mapping.ByTopic[topic])
 	title := topic.Title
 	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
+}
+
+func (conv *convert) assignIDs() {
+	s := conv.Page.Story
+	for _, item := range s {
+		item["id"] = fedwiki.NewID()
+	}
 }
