@@ -6,10 +6,10 @@ import (
 	"os"
 	"sort"
 
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
+	"github.com/raintreeinc/knowledgebase/ditaconv"
 )
 
-type TopicByName []*ditaindex.Topic
+type TopicByName []*ditaconv.Topic
 
 func (a TopicByName) Len() int           { return len(a) }
 func (a TopicByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -30,7 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	index, errs := ditaindex.Load(os.Args[1])
+	index, errs := ditaconv.LoadIndex(os.Args[1])
 	if len(errs) > 0 {
 		printcaption("ERRORS")
 		for _, err := range errs {
@@ -43,7 +43,7 @@ func main() {
 
 	printcaption("TOPICS")
 
-	topics := make([]*ditaindex.Topic, 0, len(index.Topics))
+	topics := make([]*ditaconv.Topic, 0, len(index.Topics))
 	for _, topic := range index.Topics {
 		topics = append(topics, topic)
 	}
@@ -88,7 +88,7 @@ func main() {
 	}
 }
 
-func printnav(e *ditaindex.Entry, prefix, indent string) {
+func printnav(e *ditaconv.Entry, prefix, indent string) {
 	link := ""
 	if e.Topic != nil {
 		link = ">"

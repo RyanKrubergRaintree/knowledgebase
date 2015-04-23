@@ -9,12 +9,11 @@ import (
 	"github.com/egonelbre/fedwiki"
 	"github.com/egonelbre/fedwiki/item"
 
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
-	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 // Convert converts a topic to a federated wiki page
-func (mapping *Mapping) Convert(topic *ditaindex.Topic) (page *fedwiki.Page, fatal error, errs []error) {
+func (mapping *Mapping) Convert(topic *Topic) (page *fedwiki.Page, fatal error, errs []error) {
 	// make a shallow copy of rules
 	rules := xmlconv.NewRules()
 	rules.Translate = mapping.Rules.Translate
@@ -47,8 +46,8 @@ type convert struct {
 	Page *fedwiki.Page
 
 	Slug    fedwiki.Slug
-	Topic   *ditaindex.Topic
-	Index   *ditaindex.Index
+	Topic   *Topic
+	Index   *Index
 	Mapping *Mapping
 
 	Rules *xmlconv.Rules
@@ -158,7 +157,7 @@ func (conv *convert) addRelatedLinks() {
 		text := "<h4>Related</h4>"
 		text += "<ul>"
 
-		links := []*ditaindex.Topic{set.Parent, set.Prev, set.Next}
+		links := []*Topic{set.Parent, set.Prev, set.Next}
 		links = append(links, set.Children...)
 		links = append(links, set.Siblings...)
 
@@ -174,7 +173,7 @@ func (conv *convert) addRelatedLinks() {
 	}
 }
 
-func (conv *convert) asLink(topic *ditaindex.Topic) string {
+func (conv *convert) asLink(topic *Topic) string {
 	slug := string(conv.Mapping.ByTopic[topic])
 	title := topic.Title
 	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"

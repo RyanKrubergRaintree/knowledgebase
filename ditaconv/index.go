@@ -1,11 +1,11 @@
-package ditaindex
+package ditaconv
 
 import (
 	"net/url"
 	"path"
 	"path/filepath"
 
-	"github.com/raintreeinc/knowledgebase/dita/dita"
+	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 )
 
 type Topic struct {
@@ -300,7 +300,7 @@ func (index *Index) loadTopic(context Context, filename string) *Topic {
 }
 
 // Load loads the full index and linked maps starting from "filename"
-func Load(filename string) (*Index, []error) {
+func LoadIndex(filename string) (*Index, []error) {
 	index := &Index{
 		Dir:  Dir(filepath.Dir(filename)),
 		Root: filepath.Base(filename),

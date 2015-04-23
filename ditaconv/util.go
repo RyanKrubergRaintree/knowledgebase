@@ -1,4 +1,4 @@
-package ditaindex
+package ditaconv
 
 import (
 	"encoding/xml"
@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/raintreeinc/knowledgebase/dita/dita"
+	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 )
 
 type Dir string

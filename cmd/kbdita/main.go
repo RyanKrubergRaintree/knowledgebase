@@ -17,9 +17,8 @@ import (
 	"github.com/egonelbre/fedwiki/item"
 	"github.com/egonelbre/fedwiki/template"
 
-	"github.com/raintreeinc/knowledgebase/dita/ditaconv"
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
-	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 var (
@@ -115,7 +114,7 @@ func reload() (*Store, error) {
 		Created: time.Now(),
 	}
 
-	index, errs := ditaindex.Load(*ditamap)
+	index, errs := ditaconv.LoadIndex(*ditamap)
 	store.LoadErrs = errs
 
 	mapping, errs := ditaconv.CreateMapping(index)

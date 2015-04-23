@@ -10,7 +10,7 @@ import (
 
 	"github.com/egonelbre/fedwiki/item"
 
-	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 var alwaysHTML = map[string]bool{

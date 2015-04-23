@@ -6,15 +6,6 @@ import (
 	"github.com/egonelbre/fedwiki"
 )
 
-func first(xs ...string) string {
-	for _, x := range xs {
-		if x != "" {
-			return x
-		}
-	}
-	return ""
-}
-
 func convertTags(keywords []string) []string {
 	tags := []string{}
 	for _, tag := range keywords {

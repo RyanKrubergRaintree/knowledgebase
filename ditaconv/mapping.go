@@ -6,19 +6,18 @@ import (
 	"sort"
 
 	"github.com/egonelbre/fedwiki"
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
-	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 type Mapping struct {
-	Index   *ditaindex.Index
-	Topics  map[string]*ditaindex.Topic
-	BySlug  map[fedwiki.Slug]*ditaindex.Topic
-	ByTopic map[*ditaindex.Topic]fedwiki.Slug
+	Index   *Index
+	Topics  map[string]*Topic
+	BySlug  map[fedwiki.Slug]*Topic
+	ByTopic map[*Topic]fedwiki.Slug
 	Rules   *xmlconv.Rules
 }
 
-func (m *Mapping) TopicsSorted() (r []*ditaindex.Topic) {
+func (m *Mapping) TopicsSorted() (r []*Topic) {
 	for _, topic := range m.Topics {
 		r = append(r, topic)
 	}
@@ -26,7 +25,7 @@ func (m *Mapping) TopicsSorted() (r []*ditaindex.Topic) {
 	return r
 }
 
-type byfilename []*ditaindex.Topic
+type byfilename []*Topic
 
 func (a byfilename) Len() int           { return len(a) }
 func (a byfilename) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -44,12 +43,12 @@ func titelize(title string) string {
 	return title
 }
 
-func CreateMapping(index *ditaindex.Index) (*Mapping, []error) {
+func CreateMapping(index *Index) (*Mapping, []error) {
 	topics := index.Topics
 
 	var errors []error
-	byslug := make(map[fedwiki.Slug]*ditaindex.Topic, len(topics))
-	bytopic := make(map[*ditaindex.Topic]fedwiki.Slug, len(topics))
+	byslug := make(map[fedwiki.Slug]*Topic, len(topics))
+	bytopic := make(map[*Topic]fedwiki.Slug, len(topics))
 
 	// assign slugs to the topics
 	for _, topic := range topics {

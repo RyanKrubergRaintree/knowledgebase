@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"strings"
 
-	"github.com/raintreeinc/knowledgebase/dita/xmlconv"
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 // checks wheter dita tag corresponds to some "root element"

@@ -6,8 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/raintreeinc/knowledgebase/dita/ditaconv"
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
+	"github.com/raintreeinc/knowledgebase/ditaconv"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	index, errs := ditaindex.Load(os.Args[1])
+	index, errs := ditaconv.LoadIndex(os.Args[1])
 	if len(errs) > 0 {
 		fmt.Fprintln(os.Stderr, "Loading errors:")
 		for _, err := range errs {

@@ -12,8 +12,7 @@ import (
 
 	"github.com/egonelbre/fedwiki"
 
-	"github.com/raintreeinc/knowledgebase/dita/ditaconv"
-	"github.com/raintreeinc/knowledgebase/dita/ditaindex"
+	"github.com/raintreeinc/knowledgebase/ditaconv"
 )
 
 var (
@@ -33,7 +32,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	index, errs := ditaindex.Load(args[0])
+	index, errs := ditaconv.LoadIndex(args[0])
 	if len(errs) > 0 {
 		fmt.Fprintln(os.Stderr, "Loading errors:")
 		for _, err := range errs {

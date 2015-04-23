@@ -29,6 +29,12 @@ func (ctx *Context) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctx *Context) Authenticated(w http.ResponseWriter, r *http.Request, user kb.User) {
+	if !strings.HasSuffix(user.Email, "@raintreeinc.com") {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprintf(w, "<h1>Access allowed only for @raintreeinc.com gmail accounts.</h1>")
+		return
+	}
+
 	session, err := ctx.session(r)
 	if err != nil {
 		log.Println(err)
