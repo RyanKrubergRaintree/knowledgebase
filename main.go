@@ -20,11 +20,9 @@ import (
 //  https://github.com/justinas/nosurf
 
 var (
-	defaultDir = filepath.Join("assets", "templates", "**")
-
 	addr      = flag.String("listen", ":80", "http server `address`")
 	clientdir = flag.String("client", "client", "client `directory`")
-	templates = flag.String("templates", defaultDir, "templates `glob`")
+	assetsdir = flag.String("assets", "assets", "assets `directory`")
 	conffile  = flag.String("config", "knowledgebase.toml", "farm configuration")
 )
 
@@ -44,9 +42,15 @@ func main() {
 	if conf.ClientDir == "" {
 		conf.ClientDir = *clientdir
 	}
+	if conf.AssetsDir == "" {
+		conf.AssetsDir = *assetsdir
+	}
 
 	if os.Getenv("CLIENTDIR") != "" {
 		conf.ClientDir = os.Getenv("CLIENTDIR")
+	}
+	if os.Getenv("ASSETSDIR") != "" {
+		conf.AssetsDir = os.Getenv("ASSETSDIR")
 	}
 	if os.Getenv("DATABASE") != "" {
 		conf.Database = os.Getenv("DATABASE")
@@ -58,7 +62,8 @@ func main() {
 	log.Printf("Starting with database %s\n", conf.Database)
 	log.Printf("Starting with domain %s\n", conf.Domain)
 
-	renderer, err := farm.NewRenderer(*templates)
+	templates := filepath.Join(conf.AssetsDir, "templates", "**")
+	renderer, err := farm.NewRenderer(templates)
 	if err != nil {
 		log.Fatal(err)
 	}

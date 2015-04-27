@@ -12,8 +12,10 @@ import (
 type Config struct {
 	Domain    string
 	ClientDir string
-	Database  string
-	Server    []struct {
+	AssetsDir string
+
+	Database string
+	Server   []struct {
 		Provider string
 	}
 }
@@ -21,8 +23,10 @@ type Config struct {
 type Farm struct {
 	Domain    string
 	ClientDir string
-	Auth      Auth
-	Admin     Admin
+	AssetsDir string
+
+	Auth  Auth
+	Admin Admin
 	// fq domain -> server
 	Servers map[string]*kb.Server
 }
@@ -31,9 +35,11 @@ func New(conf Config, auth Auth, admin Admin) (*Farm, error) {
 	farm := &Farm{
 		Domain:    conf.Domain,
 		ClientDir: conf.ClientDir,
-		Auth:      auth,
-		Admin:     admin,
-		Servers:   make(map[string]*kb.Server),
+		AssetsDir: conf.AssetsDir,
+
+		Auth:    auth,
+		Admin:   admin,
+		Servers: make(map[string]*kb.Server),
 	}
 
 	for _, sconf := range conf.Server {
@@ -49,6 +55,11 @@ func New(conf Config, auth Auth, admin Admin) (*Farm, error) {
 }
 
 func (farm *Farm) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.HasPrefix(r.URL.Path, "/assets/") {
+		servefile(w, r, farm.AssetsDir, strings.TrimPrefix(r.URL.Path, "/assets"))
+		return
+	}
+
 	if r.Host == "auth."+farm.Domain {
 		farm.Auth.ServeHTTP(w, r)
 		return

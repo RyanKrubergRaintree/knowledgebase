@@ -31,14 +31,12 @@ func init() {
 	}
 }
 
-func (ctx *Context) callbackURL(provider string) string {
-	return ctx.CallbackURL + "/" + provider
-}
-
 func (ctx *Context) RegisterProviders() {
 	gothic.AppKey = os.Getenv("APPKEY")
 
-	cb := ctx.callbackURL
+	cb := func(provider string) string {
+		return ctx.CallbackURL + "/" + provider
+	}
 	if os.Getenv("TWITTER_KEY") != "" {
 		goth.UseProviders(twitter.New(os.Getenv("TWITTER_KEY"), os.Getenv("TWITTER_SECRET"), cb("twitter")))
 	}
@@ -94,7 +92,7 @@ func (ctx *Context) loginPage(w http.ResponseWriter, r *http.Request) {
 		}
 		name = strings.Title(name)
 		logins = append(logins, loginURL{
-			URL:  ctx.callbackURL(provider.Name()),
+			URL:  "/provider/" + provider.Name(),
 			Name: name,
 		})
 	}
