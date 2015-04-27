@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/raintreeinc/knowledgebase/farm"
 	"github.com/raintreeinc/knowledgebase/farm/admin"
@@ -19,8 +20,11 @@ import (
 //  https://github.com/justinas/nosurf
 
 var (
+	defaultDir = filepath.Join("assets", "templates", "**")
+
 	addr      = flag.String("listen", ":80", "http server `address`")
 	clientdir = flag.String("client", "client", "client `directory`")
+	templates = flag.String("templates", defaultDir, "templates `glob`")
 	conffile  = flag.String("config", "knowledgebase.toml", "farm configuration")
 )
 
@@ -54,8 +58,14 @@ func main() {
 	log.Printf("Starting with database %s\n", conf.Database)
 	log.Printf("Starting with domain %s\n", conf.Domain)
 
+	renderer, err := farm.NewRenderer(*templates)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	//TODO: move domain initialization inside farm
 	auth := &auth.Context{
+		Renderer:    renderer,
 		Domain:      conf.Domain,
 		LoginURL:    "http://auth." + conf.Domain + "/login",
 		CallbackURL: "http://auth." + conf.Domain + "/callback",

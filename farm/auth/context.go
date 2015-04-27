@@ -13,6 +13,8 @@ import (
 var _ farm.Auth = &Context{}
 
 type Context struct {
+	Renderer farm.Renderer
+
 	Domain      string
 	LoginURL    string
 	CallbackURL string

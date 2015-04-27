@@ -6,6 +6,10 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
+type Renderer interface {
+	Render(w http.ResponseWriter, name string, data interface{})
+}
+
 type Auth interface {
 	LoggedIn(http.ResponseWriter, *http.Request) bool
 	RequestCredentials(http.ResponseWriter, *http.Request)

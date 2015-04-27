@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 
@@ -30,24 +31,28 @@ func init() {
 	}
 }
 
+func (ctx *Context) callbackURL(provider string) string {
+	return ctx.CallbackURL + "/" + provider
+}
+
 func (ctx *Context) RegisterProviders() {
 	gothic.AppKey = os.Getenv("APPKEY")
 
-	prefix := ctx.CallbackURL + "/"
+	cb := ctx.callbackURL
 	if os.Getenv("TWITTER_KEY") != "" {
-		goth.UseProviders(twitter.New(os.Getenv("TWITTER_KEY"), os.Getenv("TWITTER_SECRET"), prefix+"twitter"))
+		goth.UseProviders(twitter.New(os.Getenv("TWITTER_KEY"), os.Getenv("TWITTER_SECRET"), cb("twitter")))
 	}
 	if os.Getenv("FACEBOOK_KEY") != "" {
-		goth.UseProviders(facebook.New(os.Getenv("FACEBOOK_KEY"), os.Getenv("FACEBOOK_SECRET"), prefix+"facebook"))
+		goth.UseProviders(facebook.New(os.Getenv("FACEBOOK_KEY"), os.Getenv("FACEBOOK_SECRET"), cb("facebook")))
 	}
 	if os.Getenv("GPLUS_KEY") != "" {
-		goth.UseProviders(gplus.New(os.Getenv("GPLUS_KEY"), os.Getenv("GPLUS_SECRET"), prefix+"gplus"))
+		goth.UseProviders(gplus.New(os.Getenv("GPLUS_KEY"), os.Getenv("GPLUS_SECRET"), cb("gplus")))
 	}
 	if os.Getenv("GITHUB_KEY") != "" {
-		goth.UseProviders(github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), prefix+"github"))
+		goth.UseProviders(github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), cb("github")))
 	}
 	if os.Getenv("LINKEDIN_KEY") != "" {
-		goth.UseProviders(linkedin.New(os.Getenv("LINKEDIN_KEY"), os.Getenv("LINKEDIN_SECRET"), prefix+"linkedin"))
+		goth.UseProviders(linkedin.New(os.Getenv("LINKEDIN_KEY"), os.Getenv("LINKEDIN_SECRET"), cb("linkedin")))
 	}
 }
 
@@ -69,14 +74,34 @@ func (ctx *Context) RequestCredentials(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ctx *Context) loginPage(w http.ResponseWriter, r *http.Request) {
-	//TODO: better login page
 	next := r.URL.Query().Get("next")
 	if next != "" {
 		session, _ := ctx.session(r)
 		session.Values["next"] = next
 		session.Save(r, w)
 	}
-	fmt.Fprint(w, `<a href="/provider/gplus">Google</a>`)
+
+	type loginURL struct {
+		URL  string
+		Name string
+	}
+
+	logins := []loginURL{}
+	for _, provider := range goth.GetProviders() {
+		name := provider.Name()
+		if name == "gplus" {
+			name = "google"
+		}
+		name = strings.Title(name)
+		logins = append(logins, loginURL{
+			URL:  ctx.callbackURL(provider.Name()),
+			Name: name,
+		})
+	}
+
+	ctx.Renderer.Render(w, "auth_login.html", map[string]interface{}{
+		"Logins": logins,
+	})
 }
 
 func (ctx *Context) provider(w http.ResponseWriter, r *http.Request) {
