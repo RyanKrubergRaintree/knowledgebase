@@ -1,3 +1,5 @@
+Site = "KnowledgeBase"
+
 Domain = "example.com"
 ClientDir = "client"
 Database = "mongodb://localhost/knowledgebase"

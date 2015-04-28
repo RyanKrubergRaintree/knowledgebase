@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/raintreeinc/knowledgebase/farm"
 	"github.com/raintreeinc/knowledgebase/farm/admin"
@@ -62,8 +61,7 @@ func main() {
 	log.Printf("Starting with database %s\n", conf.Database)
 	log.Printf("Starting with domain %s\n", conf.Domain)
 
-	templates := filepath.Join(conf.AssetsDir, "templates", "**")
-	renderer, err := farm.NewRenderer(templates)
+	renderer, err := farm.NewRenderer(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,7 +76,7 @@ func main() {
 	}
 	auth.RegisterProviders()
 
-	admin := &admin.Server{Database: conf.Database}
+	admin := &admin.Server{Renderer: renderer, Database: conf.Database}
 
 	farm, err := farm.New(conf, auth, admin)
 	if err != nil {

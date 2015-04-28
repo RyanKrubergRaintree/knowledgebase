@@ -4,14 +4,18 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 type renderer struct {
 	template *template.Template
 }
 
-func NewRenderer(glob string) (Renderer, error) {
-	t, err := template.New("").ParseGlob(glob)
+func NewRenderer(config Config) (Renderer, error) {
+	glob := filepath.Join(config.AssetsDir, "templates", "*")
+	t, err := template.New("").Funcs(template.FuncMap{
+		"SiteTitle": func() string { return config.Site },
+	}).ParseGlob(glob)
 	return &renderer{t}, err
 }
 

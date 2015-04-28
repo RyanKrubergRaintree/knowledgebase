@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -31,7 +30,7 @@ func (ctx *Context) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (ctx *Context) Authenticated(w http.ResponseWriter, r *http.Request, user kb.User) {
 	if !strings.HasSuffix(user.Email, "@raintreeinc.com") {
 		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintf(w, "<h1>Access allowed only for @raintreeinc.com gmail accounts.</h1>")
+		ctx.Renderer.Render(w, "auth_forbidden.html", nil)
 		return
 	}
 
@@ -58,6 +57,5 @@ func (ctx *Context) userPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-	//TODO: better user page
-	fmt.Fprintf(w, "%#v", user)
+	ctx.Renderer.Render(w, "auth_user.html", user)
 }

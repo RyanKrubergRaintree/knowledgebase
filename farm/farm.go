@@ -10,6 +10,8 @@ import (
 )
 
 type Config struct {
+	Site string
+
 	Domain    string
 	ClientDir string
 	AssetsDir string
