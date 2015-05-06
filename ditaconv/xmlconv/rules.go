@@ -8,6 +8,7 @@ import (
 )
 
 type Encoder interface {
+	Rules() *Rules
 	WriteRaw(data string) error
 	EncodeToken(token interface{}) error
 	Flush() error
@@ -55,7 +56,7 @@ func (rules *Rules) ConvertString(text string) (string, error) {
 }
 
 func (rules *Rules) Convert(input io.Reader, output io.Writer) error {
-	dec, enc := xml.NewDecoder(input), NewHTMLEncoder(output)
+	dec, enc := xml.NewDecoder(input), NewHTMLEncoder(output, rules)
 
 	dec.AutoClose = xml.HTMLAutoClose
 	dec.Entity = xml.HTMLEntity
@@ -185,6 +186,14 @@ func (rules *Rules) ConvertElement(enc Encoder, dec *xml.Decoder, start *xml.Sta
 		return err
 	}
 
+	if err := rules.ConvertChildren(enc, dec, start); err != nil {
+		return err
+	}
+
+	return enc.EncodeToken(xml.EndElement{startcopy.Name})
+}
+
+func (rules *Rules) ConvertChildren(enc Encoder, dec *xml.Decoder, start *xml.StartElement) error {
 	for {
 		token, err := dec.Token()
 		if err != nil {
@@ -192,14 +201,10 @@ func (rules *Rules) ConvertElement(enc Encoder, dec *xml.Decoder, start *xml.Sta
 		}
 
 		if end, done := token.(xml.EndElement); done {
-			endcopy := end
-			if endcopy.Name != start.Name {
+			if end.Name != start.Name {
 				return fmt.Errorf("invalid end token: start:%v end:%v", start, end)
 			}
-			if newname, ok := rules.Translate[endcopy.Name.Local]; ok {
-				endcopy.Name.Local = newname
-			}
-			return enc.EncodeToken(endcopy)
+			return nil
 		}
 
 		if err := rules.ConvertAny(enc, dec, token); err != nil {

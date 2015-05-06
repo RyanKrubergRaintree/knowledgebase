@@ -67,7 +67,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 
 func (conv *convert) toHTML(decoder *xml.Decoder, start *xml.StartElement) string {
 	buf := bytes.Buffer{}
-	enc := xmlconv.NewHTMLEncoder(&buf)
+	enc := xmlconv.NewHTMLEncoder(&buf, conv.Rules)
 	err := conv.Rules.ConvertElement(enc, decoder, start)
 	conv.check(err)
 

@@ -318,7 +318,20 @@ func CustomRules() *xmlconv.Rules {
 			"settingdefault": func(enc xmlconv.Encoder, dec *xml.Decoder, start *xml.StartElement) error {
 				val, _ := xmlconv.Text(dec, start)
 				if val != "" {
-					_ = enc.WriteRaw("<p>Default value: " + val + "</p>")
+					err := enc.WriteRaw("<p>Default value: " + val + "</p>")
+					if err != nil {
+						return err
+					}
+				}
+				return nil
+			},
+			"settinglevels": func(enc xmlconv.Encoder, dec *xml.Decoder, start *xml.StartElement) error {
+				err := enc.WriteRaw("<p>Levels where it can be defined:</p>")
+				if err != nil {
+					return err
+				}
+				if err := enc.Rules().ConvertChildren(enc, dec, start); err != nil {
+					return err
 				}
 				return nil
 			},

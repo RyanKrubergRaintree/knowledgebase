@@ -12,6 +12,8 @@ import (
 )
 
 type htmlEncoder struct {
+	rules *Rules
+
 	buf bytes.Buffer
 	w   io.Writer
 
@@ -19,13 +21,17 @@ type htmlEncoder struct {
 	invoid bool
 }
 
-func NewHTMLEncoder(out io.Writer) Encoder {
+func NewHTMLEncoder(out io.Writer, rules *Rules) Encoder {
 	return &htmlEncoder{
 		buf:   bytes.Buffer{},
 		w:     out,
 		stack: []xml.Name{},
+
+		rules: rules,
 	}
 }
+
+func (enc *htmlEncoder) Rules() *Rules { return enc.rules }
 
 func (enc *htmlEncoder) writeStart(token *xml.StartElement) error {
 	enc.stack = append(enc.stack, token.Name)
