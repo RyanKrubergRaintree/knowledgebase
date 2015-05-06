@@ -8,6 +8,7 @@ import (
 )
 
 type Encoder interface {
+	WriteRaw(data string) error
 	EncodeToken(token interface{}) error
 	Flush() error
 }

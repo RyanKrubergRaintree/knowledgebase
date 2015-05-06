@@ -75,6 +75,11 @@ func (enc *htmlEncoder) writeEnd(token *xml.EndElement) error {
 	return enc.flush()
 }
 
+func (enc *htmlEncoder) WriteRaw(data string) error {
+	_, err := enc.buf.WriteString(data)
+	return err
+}
+
 func (enc *htmlEncoder) EncodeToken(token interface{}) error {
 	switch token := token.(type) {
 	case xml.StartElement:

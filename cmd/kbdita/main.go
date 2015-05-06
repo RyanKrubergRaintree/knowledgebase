@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -298,11 +299,29 @@ func CustomRules() *xmlconv.Rules {
 
 			"setup-option-name":        "dt",
 			"setup-option-description": "dd",
+
+			"settingdesc": "div",
+			"settingname": "h3",
+		},
+		Remove: map[string]bool{
+			"settinghead": true,
 		},
 		Unwrap: map[string]bool{
 			"ui-item":      true,
 			"faq-item":     true,
 			"setup-option": true,
+
+			"settings": true,
+			"setting":  true,
+		},
+		Callback: map[string]xmlconv.Callback{
+			"settingdefault": func(enc xmlconv.Encoder, dec *xml.Decoder, start *xml.StartElement) error {
+				val, _ := xmlconv.Text(dec, start)
+				if val != "" {
+					_ = enc.WriteRaw("<p>Default value: " + val + "</p>")
+				}
+				return nil
+			},
 		},
 	}
 }

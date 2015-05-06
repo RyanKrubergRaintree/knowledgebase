@@ -139,7 +139,7 @@ func (conv *convert) unwrap(decoder *xml.Decoder, start *xml.StartElement) {
 
 		switch token := token.(type) {
 		case xml.StartElement:
-			if shouldUnwrap(token.Name) {
+			if shouldUnwrap(token.Name) || conv.Rules.Unwrap[token.Name.Local] {
 				conv.unwrap(decoder, &token)
 			} else {
 				conv.convertItem(decoder, &token)

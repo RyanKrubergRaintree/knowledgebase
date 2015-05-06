@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//Raintree Systems//DTD Topic V1.0//EN" "topic.dtd">
+<topic id="Configuration">
+  <title>Configuration</title>
+  <shortdesc>Configuration example</shortdesc>
+  <refbody>
+    <settings>
+      <settinghead>
+        <settingnamehd>Setting name</settingnamehd>
+        <settingdeschd>Description</settingdeschd>
+        <settingsamplehd>Example</settingsamplehd>
+        <settingdefaulthd>Default value</settingdefaulthd>
+        <settinglevelshd>Levels where it can be defined</settinglevelshd>
+      </settinghead>
+      <setting>
+        <settingname>AllowCrashing</settingname>
+        <settingdesc>Controls whether Raintree is allowed to crash.</settingdesc>
+        <settingsample>
+            <codeblock>[General]
+  AllowCrashing=N</codeblock>
+          </settingsample>
+        <settingdefault>Y</settingdefault>
+        <settinglevels>
+            <codeblock>scriptpath/global.ini
+  homedir/global.ini</codeblock>
+          </settinglevels>
+      </setting>
+    </settings>
+  </refbody>
+</topic>
