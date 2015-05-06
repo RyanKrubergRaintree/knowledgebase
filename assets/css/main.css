@@ -1,0 +1,45 @@
+* { box-sizing: border-box; }
+html { background: #FFF; }
+.main {
+	padding-top: 30px;
+	text-align: center;
+}
+
+.logo {
+	margin: 0 auto;
+	width: 463px;
+	height: 136px;
+
+	background-image: url("../img/large_logo.png");
+}
+
+
+.provider {
+	margin: 30px auto;
+	width: 463px;
+	
+	color: #054178;
+	font-size: 2.5em;
+	font-family: Georgia;
+	font-variant: small-caps;
+}
+
+.button {
+	display: block;
+	margin: 30px auto;
+	width: 463px;
+	padding: .5em 1em;
+    border-radius: 4px;
+    font-size: 1.2em;
+    
+    background: rgb(28, 184, 65);
+
+	color: white;
+    text-decoration: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button:hover {
+	background: rgb(42, 200, 80);
+	box-shadow: inset 0px -5px 20px 0px rgba(0,0,0,0.21);
+}
