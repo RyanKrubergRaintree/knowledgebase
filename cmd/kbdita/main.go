@@ -335,6 +335,16 @@ func CustomRules() *xmlconv.Rules {
 				}
 				return nil
 			},
+			"settingsample": func(enc xmlconv.Encoder, dec *xml.Decoder, start *xml.StartElement) error {
+				err := enc.WriteRaw("<p>Example:</p>")
+				if err != nil {
+					return err
+				}
+				if err := enc.Rules().ConvertChildren(enc, dec, start); err != nil {
+					return err
+				}
+				return nil
+			},
 		},
 	}
 }
