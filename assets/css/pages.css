@@ -30,14 +30,18 @@
 	position: absolute;
 	top: 0;
 	right: 10px;
-	z-index: 1;
+	z-index: 2;
 
 	background: #fff;
-	box-shadow: 0 8px 17px 0 rgba(0,0,0,.2),0 6px 20px 0 rgba(0,0,0,.19);	
+	box-shadow: 
+		0 6px 10px 0 rgba(0, 0, 0, 0.3),
+		0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
-.page-buttons div {
+.page-buttons > * {
 	float: left;
+
+	text-decoration: none;
 
 	width: 40px;
 	height: 30px;
@@ -48,12 +52,19 @@
 	font-size: 30px;
 	font-weight: 800;
 
-	transition: background 0.2s ease-in-out;
+	transition: background 0.2s ease-in-out,
+				box-shadow 0.1s ease-in-out;
 }
 
-.page-buttons div:hover {
+.page-buttons > *:hover {
 	background: #F2D7E3;
 	cursor: pointer;
+}
+
+.page-buttons > *:active {
+	box-shadow: 
+		0 6px 10px 0 rgba(0, 0, 0, 0.3),
+		0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .page-close::before { content: "×"; }
@@ -70,12 +81,19 @@
 	font-size: 80%;
 	margin-bottom: 10px;
 	color: #999;
+	background: #fff;
+}
+
+.page-title {
+	position: absolute;
+	top: 0px;
 }
 
 .page {
 	background: #FFF;
 	padding: 15px 15px 10px 15px;
-	box-shadow: 0 1px 6px 0 rgba(0,0,0,.12),0 1px 6px 0 rgba(0,0,0,.12);
+
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
 
 .page h1 {
