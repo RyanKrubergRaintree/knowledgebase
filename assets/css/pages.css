@@ -40,7 +40,6 @@
 
 .page-buttons > * {
 	float: left;
-
 	text-decoration: none;
 
 	width: 40px;
@@ -52,13 +51,16 @@
 	font-size: 30px;
 	font-weight: 800;
 
-	transition: background 0.2s ease-in-out,
+	transition: border 0.2s ease-in-out,
 				box-shadow 0.1s ease-in-out;
+	
+	border: 1px solid #FFF;
 }
 
 .page-buttons > *:hover {
-	background: #F2D7E3;
 	cursor: pointer;
+
+	border: 1px solid #7DC6FF;
 }
 
 .page-buttons > *:active {
