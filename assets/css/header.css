@@ -38,13 +38,43 @@ x=5
 	transition: box-shadow 0.2s ease-in-out;
 }
 
-#header:hover, #header:active, #header:focus {
+#header:hover, #header:active {
 	box-shadow:
 		0 13px 25px 0 rgba(0, 0, 0, 0.3),
 		0 11px 7px 0 rgba(0, 0, 0, 0.19);
 }
 
-#header > .box {
+#header-menu {
+	position: fixed;
+	top: 46px;
+	left: -500px;
+	background: #01579B;
+	padding: 0px 0;
+	transition: left 0.3s ease-in;
+
+	box-shadow:
+		0 13px 25px 0 rgba(0, 0, 0, 0.3),
+		0 11px 7px 0 rgba(0, 0, 0, 0.19);	
+}
+
+#header-menu a {
+	display: block;
+	padding: 0px 20px;
+	line-height: 46px;
+
+	color: #FFF;
+	text-decoration: none;	
+}
+
+#header-menu a:hover {
+	background-color: #0277BD;
+}
+
+#header:hover #header-menu {
+	left: 0;
+}
+
+#header .button {
 	float: left;
 	display: block;
 	
@@ -59,23 +89,26 @@ x=5
 	transition: background-color 0.2s ease-in-out;
 }
 
-#header > .box:hover, #header > .box:focus {
+#header .button:hover {
 	background-color: #0277BD;
 }
 
 #header .logo {
-	width: 68px;
+	position: absolute;
+	display: block;
+	left: 0; width: 46px;
 	background-image: url("../img/icon.png");
 	background-repeat: no-repeat;
 	background-position: center center;
 }
 
 #header .search {
-	float: left;
-	position: relative;
+	position: absolute;
+	left: 56px;
+	right: 120px;
 
-	margin: 10px 10px;
 	padding: 0 10px;
+	margin: 10px 0;
 	
 	background: #005293;
 	color: white;
@@ -85,6 +118,8 @@ x=5
 	transition: background 0.2s ease-in-out;
 	border-radius: 20px;
 	border: 1px solid #0F445F;
+
+	max-width: 400px;
 }
 
 #header .search input {
@@ -114,7 +149,14 @@ x=5
 }
 
 #header .userinfo {
-	float: right;
+	position: absolute;
+	right: 0;
+	max-width: 130px;
+}
+
+@media(max-width: 400px) {
+	#header .search { right: 10px; }
+	#header .userinfo { display: none; }
 }
 
 #content {
@@ -122,4 +164,6 @@ x=5
 	top: 46px;
 	left: 0; right: 0; bottom: 0;
 	background: #fff;
+
+	transition: top 0.5s ease-in-out;
 }
