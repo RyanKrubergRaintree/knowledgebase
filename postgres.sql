@@ -63,14 +63,14 @@ INSERT INTO Memberships Values (0, 1);
 INSERT INTO Pages VALUES (
 	'/home',
 	0,
-	'{"tags":["alpha", "beta"], "synopsis":"Lorem ipsum dolor sit amet, consectetur adipisicing elit."}',
+	'{"title":"world", "tags":["alpha", "beta"], "synopsis":"Lorem ipsum dolor sit amet, consectetur adipisicing elit."}',
 	0
 );
 
 INSERT INTO Pages VALUES (
 	'/work',
 	1,
-	'{"tags":["beta", "gamma"], "synopsis":"Excepteur sint occaecat cupidatat non proident."}',
+	'{"title":"hello", "tags":["beta", "gamma"], "synopsis":"Excepteur sint occaecat cupidatat non proident."}',
 	0
 );
 
@@ -105,6 +105,7 @@ SELECT * FROM Pages;
 UPDATE Pages
 SET Data = '{
 	"tags":["beta", "gamma", "delta"],
+	"title":"hello",
 	"synopsis":"Hello world.",
 	"items":[
 		{"type":"text", "text": "Lorem"},
@@ -116,21 +117,27 @@ WHERE Slug = '/work';
 SELECT * FROM Pages;
 
 -- full text search
--- http://www.postgresql.org/docs/9.4/static/textsearch-controls.html
--- http://www.postgresql.org/docs/9.4/static/functions-textsearch.html
-CREATE INDEX PagesFullText
-  ON Pages
-  USING gin(to_tsvector('english', Data->>'synopsis' ));
+--    http://www.postgresql.org/docs/9.4/static/textsearch-controls.html
+--    http://www.postgresql.org/docs/9.4/static/functions-textsearch.html
 
-SELECT Slug
+-- example full text search
+SELECT
+	Slug
 FROM Pages
-WHERE to_tsvector('english', Data->>'synopsis')
-   @@ to_tsquery('english', 'alpha');
+WHERE	to_tsvector('english', 
+		coalesce(cast(Data->'title' AS TEXT),'') || ' ' || 
+		coalesce(cast(Data->'tags' AS TEXT),'') || ' ' || 
+		coalesce(cast(Data->'items' AS TEXT), '')
+	) @@ to_tsquery('english', 'lorem | alpha');
 
+-- inspect the query
 SELECT
 	Slug,
-	Data->'title' AS Title,
-	Data->'tags'::TEXT AS Tags,
-	Data->'items'::TEXT AS Content
-FROM Pages
-GROUP BY Slug;
+	to_tsvector('english', 
+		coalesce(cast(Data->'title' AS TEXT),'') || ' ' || 
+		coalesce(cast(Data->'tags' AS TEXT),'') || ' ' || 
+		coalesce(cast(Data->'items' AS TEXT), '')
+	)
+FROM Pages;
+
+SELECT plainto_tsquery('english', 'The Fat Rats');
