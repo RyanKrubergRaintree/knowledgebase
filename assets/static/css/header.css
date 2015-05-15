@@ -38,6 +38,14 @@ x=5
 	transition: box-shadow 0.2s ease-in-out;
 }
 
+#header .title {
+	text-align: center;
+	color: #FFF;
+	line-height: 46px;
+	
+	font-size: 28px;
+}
+
 #header:hover, #header:active {
 	box-shadow:
 		0 13px 25px 0 rgba(0, 0, 0, 0.3),

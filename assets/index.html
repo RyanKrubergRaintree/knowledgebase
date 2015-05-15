@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
-	<title>{{ SiteTitle }}</title>
+	<title>{{ .SiteTitle }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="../css/reset.css">
-	<link rel="stylesheet" type="text/css" href="../css/header.css">
-	<link rel="stylesheet" type="text/css" href="../css/pages.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/header.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/pages.css">
+
+	<script src="/static/js/cookies.js"></script>
 </head>
 <body>
+	<script>window.Hash.restore()</script>
 	<div id="header"> 
 		<a class="button logo" href="#" title="Home"></a>
 		<form class="search">

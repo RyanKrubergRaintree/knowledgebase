@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/raintreeinc/knowledgebase/farm"
-	"github.com/raintreeinc/knowledgebase/farm/admin"
-	"github.com/raintreeinc/knowledgebase/farm/auth"
+	"github.com/raintreeinc/knowledgebase/assets"
+	"github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/kb"
 
-	"github.com/BurntSushi/toml"
 	"github.com/gorilla/sessions"
 )
 
@@ -20,8 +19,9 @@ import (
 
 var (
 	addr      = flag.String("listen", ":80", "http server `address`")
-	clientdir = flag.String("client", "client", "client `directory`")
 	assetsdir = flag.String("assets", "assets", "assets `directory`")
+	database  = flag.String("database", "", "database `params`")
+	domain    = flag.String("domain", "", "`domain`")
 	conffile  = flag.String("config", "knowledgebase.toml", "farm configuration")
 )
 
@@ -33,56 +33,66 @@ func main() {
 		*addr = host + ":" + port
 	}
 
-	conf := farm.Config{}
-	if _, err := toml.DecodeFile(*conffile, &conf); err != nil {
-		log.Fatal(err)
-	}
-
-	if conf.ClientDir == "" {
-		conf.ClientDir = *clientdir
-	}
-	if conf.AssetsDir == "" {
-		conf.AssetsDir = *assetsdir
-	}
-
-	if os.Getenv("CLIENTDIR") != "" {
-		conf.ClientDir = os.Getenv("CLIENTDIR")
-	}
 	if os.Getenv("ASSETSDIR") != "" {
-		conf.AssetsDir = os.Getenv("ASSETSDIR")
+		*assetsdir = os.Getenv("ASSETSDIR")
 	}
 	if os.Getenv("DATABASE") != "" {
-		conf.Database = os.Getenv("DATABASE")
+		*database = os.Getenv("DATABASE")
 	}
 	if os.Getenv("DOMAIN") != "" {
-		conf.Domain = os.Getenv("DOMAIN")
+		*domain = os.Getenv("DOMAIN")
 	}
 
-	log.Printf("Starting with database %s\n", conf.Database)
-	log.Printf("Starting with domain %s\n", conf.Domain)
+	log.Printf("Starting with database %s\n", *database)
+	log.Printf("Starting with domain %s\n", *domain)
 
-	renderer, err := farm.NewRenderer(conf)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Printf("Starting %s on %s", *domain, *addr)
 
-	//TODO: move domain initialization inside farm
-	auth := &auth.Context{
-		Renderer:    renderer,
-		Domain:      conf.Domain,
-		LoginURL:    "http://auth." + conf.Domain + "/login",
-		CallbackURL: "http://auth." + conf.Domain + "/callback",
-		Sessions:    sessions.NewFilesystemStore("", []byte("some secret")),
-	}
-	auth.RegisterProviders()
+	// Serve static files
+	files := assets.NewFiles(*assetsdir, []string{".css", ".png", ".ico", ".jpg", ".js"})
+	http.Handle("/static/", files)
 
-	admin := &admin.Server{Renderer: renderer, Database: conf.Database}
+	presenter := assets.NewPresenter(*assetsdir, "*.html", map[string]string{
+		"ShortTitle": "KB",
+		"Title":      "Knowledge Base",
+		"Company":    "Raintree Systems Inc.",
+	})
 
-	farm, err := farm.New(conf, auth, admin)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// context
+	store := sessions.NewFilesystemStore("", []byte("some secret"))
+	context := kb.NewContext(store)
 
-	log.Printf("Starting %s on %s", conf.Domain, *addr)
-	log.Fatal(http.ListenAndServe(*addr, farm))
+	// create KnowledgeBase server
+	server := kb.NewServer(*domain, *database, presenter)
+
+	// protect server with authentication
+	url := "http://" + *domain
+	auth.Register(os.Getenv("APPKEY"), url, auth.ClientsFromEnv())
+	front := auth.New(server, context, presenter)
+
+	http.Handle("/", front)
+
+	log.Fatal(http.ListenAndServe(*addr, nil))
+
+	/*
+		//TODO: move domain initialization inside farm
+		auth := &auth.Context{
+			Renderer:    renderer,
+			Domain:      conf.Domain,
+			LoginURL:    "http://auth." + conf.Domain + "/login",
+			CallbackURL: "http://auth." + conf.Domain + "/callback",
+			Sessions:    sessions.NewFilesystemStore("", []byte("some secret")),
+		}
+		auth.RegisterProviders()
+
+		admin := &admin.Server{Renderer: renderer, Database: conf.Database}
+
+		farm, err := farm.New(conf, auth, admin)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("Starting %s on %s", conf.Domain, *addr)
+		log.Fatal(http.ListenAndServe(*addr, farm))
+	*/
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>{{ Site.Title }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/header.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/auth.css">
+</head>
+<body>
+	<div id="header">
+		<div class="title">{{ Site.Title }}</div>
+	</div>
+
+	<div class="main">
+		<h1 class="logo"></h1>
+	</div>
+
+	<div id="content">
+		<div id="logins">
+			<h2 class="title">Access denied.</h2>
+			<h3>{{.Message}}</h3>
+		</div>
+	</div>
+</body>
