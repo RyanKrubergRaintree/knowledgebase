@@ -52,15 +52,16 @@ func main() {
 	files := assets.NewFiles(*assetsdir, []string{".css", ".png", ".ico", ".jpg", ".js"})
 	http.Handle("/static/", files)
 
+	// context
+	store := sessions.NewFilesystemStore("", []byte("some secret"))
+	context := kb.NewContext(store)
+
+	// presenter
 	presenter := assets.NewPresenter(*assetsdir, "*.html", map[string]string{
 		"ShortTitle": "KB",
 		"Title":      "Knowledge Base",
 		"Company":    "Raintree Systems Inc.",
-	})
-
-	// context
-	store := sessions.NewFilesystemStore("", []byte("some secret"))
-	context := kb.NewContext(store)
+	}, context)
 
 	// create KnowledgeBase server
 	server := kb.NewServer(*domain, *database, presenter)

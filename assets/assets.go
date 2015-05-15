@@ -6,6 +6,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Files struct {
@@ -44,23 +46,31 @@ func (a *Files) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type Presenter struct {
-	dir      string
-	glob     string
-	siteinfo interface{}
+	Dir      string
+	Glob     string
+	SiteInfo interface{}
+	Context  kb.Context
 }
 
-func NewPresenter(dir, glob string, siteinfo interface{}) *Presenter {
+func NewPresenter(dir, glob string, siteinfo interface{}, context kb.Context) *Presenter {
 	return &Presenter{
-		dir, glob, siteinfo,
+		Dir:      dir,
+		Glob:     glob,
+		SiteInfo: siteinfo,
+		Context:  context,
 	}
 }
 
-func (a *Presenter) Present(w http.ResponseWriter, tname string, data interface{}) error {
+func (a *Presenter) Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
-			"Site": func() interface{} { return a.siteinfo },
+			"Site": func() interface{} { return a.SiteInfo },
+			"User": func() kb.User {
+				user, _ := a.Context.CurrentUser(w, r)
+				return user
+			},
 		},
-	).ParseGlob(filepath.Join(a.dir, a.glob))
+	).ParseGlob(filepath.Join(a.Dir, a.Glob))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return err

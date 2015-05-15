@@ -26,7 +26,7 @@ func New(server http.Handler, context kb.Context, presenter kb.Presenter) *Front
 }
 
 func (front *Front) login(w http.ResponseWriter, r *http.Request) {
-	err := front.Present(w, "login.html", map[string]interface{}{
+	err := front.Present(w, r, "login.html", map[string]interface{}{
 		"Logins": getLogins(),
 	})
 	if err != nil {
@@ -36,7 +36,7 @@ func (front *Front) login(w http.ResponseWriter, r *http.Request) {
 
 func (front *Front) forbidden(w http.ResponseWriter, r *http.Request) {
 	message := front.Context.Once(w, r, "error")
-	err := front.Present(w, "forbidden.html", map[string]string{
+	err := front.Present(w, r, "forbidden.html", map[string]string{
 		"Message": message,
 	})
 	if err != nil {

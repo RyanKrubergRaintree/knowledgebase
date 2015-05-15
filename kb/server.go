@@ -6,7 +6,7 @@ import (
 )
 
 type Presenter interface {
-	Present(w http.ResponseWriter, tname string, data interface{}) error
+	Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error
 }
 
 type Server struct {
@@ -24,7 +24,7 @@ func NewServer(domain, database string, presenter Presenter) *Server {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
-		err := s.Present(w, "index.html", map[string]interface{}{
+		err := s.Present(w, r, "index.html", map[string]interface{}{
 			"SiteTitle": "KB",
 		})
 		if err != nil {

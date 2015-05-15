@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
 	<meta charset="utf-8">
-	<title>{{ .SiteTitle }}</title>
+	<title>{{ Site.Title }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/header.css">
@@ -17,13 +17,12 @@
 			<input placeholder="Search..."></input>
 			<button class="search-icon" type="submit" tabindex="-1">&#128269;</button>
 		</form>
-		<a class="button userinfo" href="#">Egon Elbre</a>
+		<a class="button userinfo" id="userinfo" href="#">{{ User.Name }}</a>
 		<div id="header-menu">
 			<a href="#">New Page</a>
-			<a href="#">Personal</a>
 			<a href="#">Company</a>
 			<a href="#">Recent-Changes</a>
-			<a href="#">Logout</a>
+			<a href="/system/auth/logout">Logout</a>
 		</div>
 	</div>
 
