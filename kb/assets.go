@@ -1,4 +1,4 @@
-package assets
+package kb
 
 import (
 	"html/template"
@@ -6,8 +6,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-
-	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Files struct {
@@ -29,15 +27,15 @@ func (a *Files) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path.Join(a.dir, upath[1:]))
 }
 
-type Presenter struct {
+type presenter struct {
 	Dir      string
 	Glob     string
 	SiteInfo interface{}
-	Context  kb.Context
+	Context  Context
 }
 
-func NewPresenter(dir, glob string, siteinfo interface{}, context kb.Context) *Presenter {
-	return &Presenter{
+func NewPresenter(dir, glob string, siteinfo interface{}, context Context) Presenter {
+	return &presenter{
 		Dir:      dir,
 		Glob:     glob,
 		SiteInfo: siteinfo,
@@ -45,11 +43,11 @@ func NewPresenter(dir, glob string, siteinfo interface{}, context kb.Context) *P
 	}
 }
 
-func (a *Presenter) Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error {
+func (a *presenter) Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Site": func() interface{} { return a.SiteInfo },
-			"User": func() kb.User {
+			"User": func() User {
 				user, _ := a.Context.CurrentUser(w, r)
 				return user
 			},

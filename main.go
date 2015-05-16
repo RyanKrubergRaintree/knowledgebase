@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/raintreeinc/knowledgebase/assets"
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kb"
 
@@ -18,11 +17,13 @@ import (
 //  https://github.com/justinas/nosurf
 
 var (
-	addr      = flag.String("listen", ":80", "http server `address`")
-	assetsdir = flag.String("assets", "assets", "assets `directory`")
-	database  = flag.String("database", "", "database `params`")
-	domain    = flag.String("domain", "", "`domain`")
-	conffile  = flag.String("config", "knowledgebase.toml", "farm configuration")
+	addr     = flag.String("listen", ":80", "http server `address`")
+	database = flag.String("database", "", "database `params`")
+	domain   = flag.String("domain", "", "`domain`")
+	conffile = flag.String("config", "knowledgebase.toml", "farm configuration")
+
+	templatesdir = flag.String("templates", "templates", "templates `directory`")
+	assetsdir    = flag.String("assets", "assets", "assets `directory`")
 )
 
 func main() {
@@ -49,15 +50,14 @@ func main() {
 	log.Printf("Starting %s on %s", *domain, *addr)
 
 	// Serve static files
-	files := assets.NewFiles(*assetsdir)
-	http.Handle("/static/", files)
+	http.Handle("/assets/", http.StripPrefix("/assets/", kb.NewFiles(*assetsdir)))
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
 	context := kb.NewContext(store)
 
 	// presenter
-	presenter := assets.NewPresenter(*assetsdir, "*.html", map[string]string{
+	presenter := kb.NewPresenter(*templatesdir, "*.html", map[string]string{
 		"ShortTitle": "KB",
 		"Title":      "Knowledge Base",
 		"Company":    "Raintree Systems Inc.",
