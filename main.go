@@ -49,7 +49,7 @@ func main() {
 	log.Printf("Starting %s on %s", *domain, *addr)
 
 	// Serve static files
-	files := assets.NewFiles(*assetsdir, []string{".css", ".png", ".ico", ".jpg", ".js"})
+	files := assets.NewFiles(*assetsdir)
 	http.Handle("/static/", files)
 
 	// context
@@ -74,26 +74,4 @@ func main() {
 	http.Handle("/", front)
 
 	log.Fatal(http.ListenAndServe(*addr, nil))
-
-	/*
-		//TODO: move domain initialization inside farm
-		auth := &auth.Context{
-			Renderer:    renderer,
-			Domain:      conf.Domain,
-			LoginURL:    "http://auth." + conf.Domain + "/login",
-			CallbackURL: "http://auth." + conf.Domain + "/callback",
-			Sessions:    sessions.NewFilesystemStore("", []byte("some secret")),
-		}
-		auth.RegisterProviders()
-
-		admin := &admin.Server{Renderer: renderer, Database: conf.Database}
-
-		farm, err := farm.New(conf, auth, admin)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		log.Printf("Starting %s on %s", conf.Domain, *addr)
-		log.Fatal(http.ListenAndServe(*addr, farm))
-	*/
 }

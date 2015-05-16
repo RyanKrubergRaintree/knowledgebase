@@ -11,32 +11,16 @@ import (
 )
 
 type Files struct {
-	dir  string
-	exts []string
+	dir string
 }
 
-func NewFiles(dir string, allowedExts []string) *Files {
+func NewFiles(dir string) *Files {
 	return &Files{
-		dir:  dir,
-		exts: allowedExts,
+		dir: dir,
 	}
-}
-
-func (a *Files) allowed(url string) bool {
-	ext := path.Ext(url)
-	for _, v := range a.exts {
-		if v == ext {
-			return true
-		}
-	}
-	return false
 }
 
 func (a *Files) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !a.allowed(r.URL.Path) {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
 	upath := r.URL.Path
 	if !strings.HasPrefix(upath, "/") {
 		upath = "/" + upath

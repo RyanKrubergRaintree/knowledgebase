@@ -3,8 +3,7 @@
 	<meta charset="utf-8">
 	<title>{{ Site.Title }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/header.css">
+	{{ template "includes.html" }}
 	<link rel="stylesheet" type="text/css" href="/static/css/pages.css">
 
 	<script src="/static/js/cookies.js"></script>
@@ -30,9 +29,9 @@
 		<div id="pages">
 			<div class="page-size">
 				<div class="page-buttons">
-					<a class="page-close" title="Add an item." href="#"></a>
-					<a class="page-close" title="Toggle page width." href="#"></a>
-					<a class="page-close" title="Close page." href="#"></a>
+					<a class="mdi mdi-playlist-plus" title="Add an item." href="#"></a>
+					<a class="mdi mdi-arrow-expand" title="Toggle page width." href="#"></a>
+					<a class="mdi mdi-close" title="Close page." href="#"></a>
 				</div>
 				<div class="page-scroll round-scrollbar">
 					<table class="page-meta">

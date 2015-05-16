@@ -3,8 +3,7 @@
 	<meta charset="utf-8">
 	<title>{{ Site.Title }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/header.css">
+	{{ template "includes.html" }}
 	<link rel="stylesheet" type="text/css" href="/static/css/auth.css">
 
 	<script src="/static/js/cookies.js"></script>
@@ -21,7 +20,7 @@
 
 	<div id="content">
 		<div id="logins">
-			<h2 class="title">Select OAuth provider:</h2>
+			<h2 class="title">Login with:</h2>
 			{{ range .Logins }}
 			<a href="{{.URL}}" class='button'>{{.Name}}</a>
 			{{ end }}
