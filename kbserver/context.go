@@ -1,4 +1,4 @@
-package kb
+package kbserver
 
 import (
 	"errors"
@@ -6,13 +6,15 @@ import (
 	"strings"
 
 	"github.com/gorilla/sessions"
+
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Context interface {
-	Login(w http.ResponseWriter, r *http.Request, u User) error
+	Login(w http.ResponseWriter, r *http.Request, u kb.User) error
 	Logout(w http.ResponseWriter, r *http.Request)
 
-	CurrentUser(w http.ResponseWriter, r *http.Request) (User, error)
+	CurrentUser(w http.ResponseWriter, r *http.Request) (kb.User, error)
 
 	Add(w http.ResponseWriter, r *http.Request, key, value string)
 	Once(w http.ResponseWriter, r *http.Request, key string) string
@@ -32,7 +34,7 @@ func (ctx *context) load(r *http.Request) (*sessions.Session, error) {
 	return s, err
 }
 
-func (ctx *context) Login(w http.ResponseWriter, r *http.Request, user User) error {
+func (ctx *context) Login(w http.ResponseWriter, r *http.Request, user kb.User) error {
 	s, _ := ctx.load(r)
 
 	//TODO: validate user in DB
@@ -53,22 +55,22 @@ func (ctx *context) Logout(w http.ResponseWriter, r *http.Request) {
 	s.Save(r, w)
 }
 
-func (ctx *context) CurrentUser(w http.ResponseWriter, r *http.Request) (User, error) {
+func (ctx *context) CurrentUser(w http.ResponseWriter, r *http.Request) (kb.User, error) {
 	s, err := ctx.load(r)
 	if err != nil {
-		return User{}, err
+		return kb.User{}, err
 	}
 
 	v, ok := s.Values["user"]
 	if !ok {
-		return User{}, errors.New("user session missing")
+		return kb.User{}, errors.New("user session missing")
 	}
 
-	user, ok := v.(User)
+	user, ok := v.(kb.User)
 	if !ok {
 		delete(s.Values, "user")
 		s.Save(r, w)
-		return User{}, errors.New("invalid type in session")
+		return kb.User{}, errors.New("invalid type in session")
 	}
 
 	return user, nil

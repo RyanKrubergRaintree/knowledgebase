@@ -1,4 +1,4 @@
-package kb
+package kbserver
 
 import (
 	"log"
@@ -14,7 +14,7 @@ type Server struct {
 	Presenter
 }
 
-func NewServer(domain, database string, presenter Presenter) *Server {
+func New(domain, database string, presenter Presenter) *Server {
 	return &Server{
 		Domain:    domain,
 		Presenter: presenter,
@@ -24,9 +24,7 @@ func NewServer(domain, database string, presenter Presenter) *Server {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
-		err := s.Present(w, r, "index.html", map[string]interface{}{
-			"SiteTitle": "KB",
-		})
+		err := s.Present(w, r, "index.html", nil)
 		if err != nil {
 			log.Println(err)
 		}

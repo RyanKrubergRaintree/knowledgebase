@@ -6,18 +6,18 @@ import (
 	"path"
 	"strings"
 
-	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
 const authPath = "/system/auth"
 
 type Front struct {
-	kb.Presenter
-	Context kb.Context
+	kbserver.Presenter
+	Context kbserver.Context
 	Server  http.Handler
 }
 
-func New(server http.Handler, context kb.Context, presenter kb.Presenter) *Front {
+func New(server http.Handler, context kbserver.Context, presenter kbserver.Presenter) *Front {
 	return &Front{
 		Presenter: presenter,
 		Context:   context,

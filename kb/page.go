@@ -8,7 +8,7 @@ import (
 
 // PageHeader represents minimal useful information about the page
 type PageHeader struct {
-	Slug     Slug   `json:"slug" bson:"_id"`
+	Slug     Slug   `json:"slug"`
 	Title    string `json:"title"`
 	Date     Date   `json:"date"`
 	Synopsis string `json:"synopsis,omitempty"`
@@ -22,9 +22,9 @@ type Meta map[string]interface{}
 
 // Page represents a federated wiki page
 type Page struct {
-	PageHeader `bson:",inline"`
-	Story      Story   `json:"story,omitempty"`
-	Journal    Journal `json:"journal,omitempty"`
+	PageHeader
+	Story   Story   `json:"story,omitempty"`
+	Journal Journal `json:"journal,omitempty"`
 }
 
 // Story is the viewable content of the page

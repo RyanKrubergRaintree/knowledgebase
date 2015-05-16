@@ -1,4 +1,4 @@
-package kb
+package kbserver
 
 import (
 	"html/template"
@@ -6,6 +6,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Files struct {
@@ -47,7 +49,7 @@ func (a *presenter) Present(w http.ResponseWriter, r *http.Request, tname string
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Site": func() interface{} { return a.SiteInfo },
-			"User": func() User {
+			"User": func() kb.User {
 				user, _ := a.Context.CurrentUser(w, r)
 				return user
 			},
