@@ -2,6 +2,7 @@ package kb
 
 import (
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -74,4 +75,12 @@ func Slugify(s string) Slug {
 	}
 
 	return Slug(slug)
+}
+
+func (slug Slug) Split() (owner, page Slug) {
+	i := strings.Index(string(slug), ":")
+	if i < 0 {
+		return "", slug
+	}
+	return slug[:i], slug[i+1:]
 }

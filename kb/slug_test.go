@@ -5,6 +5,8 @@ import "testing"
 var slugcases = []struct {
 	In  string
 	Exp Slug
+
+	Owner, Page Slug
 }{
 	{In: "", Exp: "-"},
 	{In: "Hello  World 90", Exp: "hello-world-90"},
@@ -23,9 +25,9 @@ var slugcases = []struct {
 	{In: "hello+/&world", Exp: "hello-plus/amp-world"},
 	{In: "&Hello_世界/+!", Exp: "amp-hello-世界/plus-excl"},
 
-	{In: "hello :  +/& world", Exp: "hello:plus/amp-world"},
-	{In: "hello : +/&world", Exp: "hello:plus/amp-world"},
-	{In: "&Hello : _世界/+!", Exp: "amp-hello:世界/plus-excl"},
+	{In: "hello :  +/& world", Exp: "hello:plus/amp-world", Owner: "hello", Page: "plus/amp-world"},
+	{In: "hello : +/&world", Exp: "hello:plus/amp-world", Owner: "hello", Page: "plus/amp-world"},
+	{In: "&Hello : _世界/+!", Exp: "amp-hello:世界/plus-excl", Owner: "amp-hello", Page: "世界/plus-excl"},
 }
 
 func TestSlugify(t *testing.T) {
@@ -33,6 +35,17 @@ func TestSlugify(t *testing.T) {
 		got := Slugify(test.In)
 		if got != test.Exp {
 			t.Errorf("Slugify(%q): got %q expected %q", test.In, got, test.Exp)
+		}
+		owner, page := got.Split()
+		if owner != test.Owner {
+			t.Errorf("Slugify(%q): got %q expected %q", test.In, owner, test.Owner)
+		}
+		exppage := test.Page
+		if exppage == "" {
+			exppage = test.Exp
+		}
+		if page != exppage {
+			t.Errorf("Slugify(%q): got %q expected %q", test.In, page, exppage)
 		}
 	}
 }
