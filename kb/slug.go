@@ -24,7 +24,7 @@ func ValidateSlug(slug Slug) error {
 
 // Slugify converts text to a slug
 //
-// * numbers and '/' are left intact
+// * numbers, '/' and ':' are left intact
 // * letters will be lowercased (if possible)
 // * '-', ',', '.', ' ', '_' will be converted to '-'
 // * other symbols or punctuations will be converted to html entity reference name
@@ -51,7 +51,7 @@ func Slugify(s string) Slug {
 			continue
 		}
 		switch r {
-		case '/':
+		case '/', ':':
 			slug = append(slug, r)
 			emitdash = false
 			cutdash = true
