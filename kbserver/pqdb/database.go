@@ -20,12 +20,12 @@ func New(params string) *Database {
 	return Database{db}
 }
 
-func (db *Database) ValidUser(user int) error {
+func (db *Database) ValidUser(user string) error {
 	//TODO
 	return nil
 }
 
-func (db *Database) CanAccess(user, owner int) error {
+func (db *Database) CanAccess(user, owner string) error {
 	if err := db.ValidUser(user); err != nil {
 		return kbserver.ErrInvalidUser
 	}
@@ -34,18 +34,18 @@ func (db *Database) CanAccess(user, owner int) error {
 	return nil
 }
 
-func (db *Database) PagesByOwner(user, owner int) (kbserver.Pages, error) {
+func (db *Database) PagesByOwner(user, owner string) (kbserver.Pages, error) {
 	if err := db.CanAccess(user, owner); err != nil {
 		return nil, err
 	}
-	return &Pages{db, owner}, nil
+	return &Pages{db, 0}, nil
 }
 
-func (db *Database) IndexByUser(user int) (kbserver.Index, error) {
+func (db *Database) IndexByUser(user string) (kbserver.Index, error) {
 	if err := db.ValidUser(user); err != nil {
 		return nil, err
 	}
-	return &Index{db, owner}, nil
+	return &Index{db, 0}, nil
 }
 
 type Pages struct {

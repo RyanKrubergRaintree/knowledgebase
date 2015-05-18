@@ -13,12 +13,12 @@ var (
 )
 
 type Database interface {
-	PagesByOwner(user, owner int) (Pages, error)
-	IndexByUser(user int) (Index, error)
+	PagesByOwner(user, owner string) (Pages, error)
+	IndexByUser(user string) (Index, error)
 }
 
 type Pages interface {
-	All() ([]int, error)
+	All() ([]kb.PageEntry, error)
 	Exists(slug kb.Slug) bool
 	Create(slug kb.Slug, page *kb.Page) error
 	Load(slug kb.Slug) (*kb.Page, error)
