@@ -2,29 +2,17 @@ package kb
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 )
 
-// PageHeader represents minimal useful information about the page
-type PageHeader struct {
-	Slug     Slug   `json:"slug"`
-	Title    string `json:"title"`
-	Date     Date   `json:"date"`
-	Synopsis string `json:"synopsis,omitempty"`
-
-	// may contain extra information specific to client/server
-	Meta Meta `json:"meta,omitempty"`
-}
-
-// Meta is used for additional page properties not in fedwiki spec
-type Meta map[string]interface{}
-
 // Page represents a federated wiki page
 type Page struct {
-	PageHeader
-	Story   Story   `json:"story,omitempty"`
-	Journal Journal `json:"journal,omitempty"`
+	Owner    string  `json:"owner"`
+	Slug     Slug    `json:"slug"`
+	Title    string  `json:"title"`
+	Synopsis string  `json:"synopsis,omitempty"`
+	Story    Story   `json:"story,omitempty"`
+	Journal  Journal `json:"journal,omitempty"`
 }
 
 // Story is the viewable content of the page
@@ -44,27 +32,18 @@ func (page *Page) Apply(action Action) error {
 	if err != nil {
 		return err
 	}
-
-	if t, err := action.Date(); err == nil {
-		page.PageHeader.Date = t
-	}
 	return nil
 }
 
 // LastModified returns the date when the page was last modified
 // if there is no such date it will return a zero time
 func (page *Page) LastModified() time.Time {
-	if !page.Date.IsZero() {
-		return page.Date.Time
-	}
-
 	for i := len(page.Journal) - 1; i >= 0; i-- {
-		if t, err := page.Journal[i].Date(); err == nil && !t.IsZero() {
-			return t.Time
+		if t, err := page.Journal[i].Time(); err == nil && !t.IsZero() {
+			return t
 		}
 	}
-
-	return page.Date.Time
+	return time.Time{}
 }
 
 // IndexOf returns the index of an item with `id`
@@ -154,30 +133,3 @@ func (item Item) Val(key string) string {
 
 // ID returns the `item` identificator
 func (item Item) ID() string { return item.Val("id") }
-
-// Date represents a federated wiki time
-// it's represented by unix time in JSON
-type Date struct{ time.Time }
-
-// NewDate returns a federated wiki Date
-func NewDate(t time.Time) Date { return Date{t} }
-
-// ParseDate parses federated wiki time format
-func ParseDate(data string) (Date, error) {
-	v, err := strconv.Atoi(data)
-	if err != nil {
-		return Date{}, err
-	}
-	return Date{time.Unix(int64(v), 0)}, nil
-}
-
-// MarshalJSON marshals Date as unix timestamp
-func (d Date) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.Itoa(int(d.Unix()))), nil
-}
-
-// UnmarshalJSON unmarshals Date from an unix timestamp
-func (d *Date) UnmarshalJSON(data []byte) (err error) {
-	*d, err = ParseDate(string(data))
-	return
-}

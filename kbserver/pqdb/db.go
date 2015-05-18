@@ -9,7 +9,7 @@ import (
 )
 
 type Database struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 func New(params string) *Database {
@@ -20,19 +20,37 @@ func New(params string) *Database {
 	return Database{db}
 }
 
+func (db *Database) ValidUser(user int) error {
+	//TODO
+	return nil
+}
+
+func (db *Database) CanAccess(user, owner int) error {
+	if err := db.ValidUser(user); err != nil {
+		return kbserver.ErrInvalidUser
+	}
+
+	//TODO: check whether belongs to owner
+	return nil
+}
+
 func (db *Database) PagesByOwner(user, owner int) (kbserver.Pages, error) {
-	// TODO: verify access
+	if err := db.CanAccess(user, owner); err != nil {
+		return nil, err
+	}
 	return &Pages{db, owner}, nil
 }
 
 func (db *Database) IndexByUser(user int) (kbserver.Index, error) {
-	// TODO: verify access
+	if err := db.ValidUser(user); err != nil {
+		return nil, err
+	}
 	return &Index{db, owner}, nil
 }
 
 type Pages struct {
-	db    *sql.DB
-	owner int
+	DB    *sql.DB
+	Owner int
 }
 
 func (pages *Pages) All() ([]int, error) {
@@ -60,8 +78,8 @@ func (pages *Pages) Save(slug kb.Slug, page *kb.Page) error {
 }
 
 type Index struct {
-	db   *sql.DB
-	user int
+	DB   *sql.DB
+	User int
 }
 
 func (index *Index) All() ([]int, error) {

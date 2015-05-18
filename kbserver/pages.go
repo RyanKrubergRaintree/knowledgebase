@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrUserNotExist   = errors.New("user does not exist")
+	ErrInvalidUser    = errors.New("invalid user")
 	ErrUserNotAllowed = errors.New("user does not have sufficient permissions")
 	ErrPageMissing    = errors.New("page does not exist")
 )
@@ -28,11 +28,11 @@ type Pages interface {
 }
 
 type Index interface {
-	All() ([]int, error)
-	Search(text string) ([]int, error)
+	All() ([]kb.PageEntry, error)
+	Search(text string) ([]kb.PageEntry, error)
 
-	Tags() ([]int, error)
-	ByTag(tag string) ([]int, error)
+	Tags() ([]kb.TagEntry, error)
+	ByTag(tag string) ([]kb.PageEntry, error)
 
-	RecentChanges(n int) ([]int, error)
+	RecentChanges(n int) ([]kb.PageEntry, error)
 }

@@ -35,24 +35,22 @@ func (action Action) Item() (Item, bool) {
 	return (Item)(m), true
 }
 
-// Date returns the time when the action occurred
-func (action Action) Date() (t Date, err error) {
-	val, ok := action["date"]
+// Time returns the time when the action occurred
+func (action Action) Time() (t time.Time, err error) {
+	val, ok := action["time"]
 	if !ok {
-		return Date{time.Unix(0, 0)}, fmt.Errorf("date not found")
+		return time.Time{}, fmt.Errorf("time not found")
 	}
-
 	switch val := val.(type) {
 	case string:
-		t, err := time.Parse(time.RFC3339, val)
-		return Date{t}, err
-	case int: // assume date
-		return Date{time.Unix(int64(val), 0)}, nil
-	case int64: // assume date
-		return Date{time.Unix(val, 0)}, nil
+		return time.Parse(time.RFC3339, val)
+	case int: // assume unix timestamp
+		return time.Unix(int64(val), 0), nil
+	case int64: // assume unix timestamp
+		return time.Unix(val, 0), nil
 	}
 
-	return Date{time.Unix(0, 0)}, fmt.Errorf("unknown date format")
+	return time.Time{}, fmt.Errorf("unknown date format")
 }
 
 // actionfns defines how each action type is applied
