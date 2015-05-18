@@ -12,17 +12,19 @@ var (
 	ErrPageMissing    = errors.New("page does not exist")
 )
 
-type Databse interface {
+type Database interface {
 	PagesByOwner(user, owner int) (Pages, error)
 	IndexByUser(user int) (Index, error)
-	IndexByOwner(user, owner int) (Index, error)
 }
 
 type Pages interface {
+	All() ([]int, error)
 	Exists(slug kb.Slug) bool
 	Create(slug kb.Slug, page *kb.Page) error
 	Load(slug kb.Slug) (*kb.Page, error)
+	LoadRaw(slug kb.Slug) ([]byte, error)
 	Save(slug kb.Slug, page *kb.Page) error
+	// SaveRaw(slug kb.Slug, page []byte) error
 }
 
 type Index interface {
