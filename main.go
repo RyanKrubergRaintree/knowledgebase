@@ -54,7 +54,7 @@ func main() {
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
-	context := kbserver.NewContext(store)
+	context := kbserver.NewContext(*domain, store)
 
 	// presenter
 	presenter := kbserver.NewPresenter(*templatesdir, "*.html", map[string]string{
@@ -64,14 +64,17 @@ func main() {
 	}, context)
 
 	// create KnowledgeBase server
-	server := kbserver.New(*domain, *database, presenter)
+	server := kbserver.New(*domain, *database, presenter, context)
 
 	// protect server with authentication
 	url := "http://" + *domain
 	auth.Register(os.Getenv("APPKEY"), url, auth.ClientsFromEnv())
 	front := auth.New(server, context, presenter)
 
-	http.Handle("/", front)
+	// allow cross origin requests on sub-domains
+	cors := kbserver.AllowSubdomainCORS(*domain, front)
+
+	http.Handle("/", cors)
 
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

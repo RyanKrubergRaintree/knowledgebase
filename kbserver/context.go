@@ -21,15 +21,17 @@ type Context interface {
 }
 
 type context struct {
-	store sessions.Store
+	Domain string
+	Store  sessions.Store
 }
 
-func NewContext(store sessions.Store) Context {
-	return &context{store}
+func NewContext(domain string, store sessions.Store) Context {
+	return &context{domain, store}
 }
 
 func (ctx *context) load(r *http.Request) (*sessions.Session, error) {
-	s, err := ctx.store.Get(r, "context")
+	s, err := ctx.Store.Get(r, "context")
+	s.Options.Domain = "." + ctx.Domain
 	s.Options.Path = "/"
 	return s, err
 }

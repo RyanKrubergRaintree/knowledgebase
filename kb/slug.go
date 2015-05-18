@@ -25,7 +25,7 @@ func ValidateSlug(slug Slug) error {
 
 // Slugify converts text to a slug
 //
-// * numbers, '/' and ':' are left intact
+// * numbers, '/' are left intact
 // * letters will be lowercased (if possible)
 // * '-', ',', '.', ' ', '_' will be converted to '-'
 // * other symbols or punctuations will be converted to html entity reference name
@@ -52,7 +52,7 @@ func Slugify(s string) Slug {
 			continue
 		}
 		switch r {
-		case '/', ':':
+		case '/':
 			slug = append(slug, r)
 			emitdash = false
 			cutdash = true
@@ -77,10 +77,15 @@ func Slugify(s string) Slug {
 	return Slug(slug)
 }
 
-func (slug Slug) Split() (owner, page Slug) {
-	i := strings.Index(string(slug), ":")
-	if i < 0 {
-		return "", slug
+func SplitOwner(url string) (owner string, page Slug) {
+	start := 0
+	if strings.HasPrefix(url, "/") {
+		start = 1
 	}
-	return slug[:i], slug[i+1:]
+
+	i := strings.Index(url, ":")
+	if i < 0 {
+		return "", Slugify("/" + url[start:])
+	}
+	return url[start:i], Slugify("/" + url[i+1:])
 }
