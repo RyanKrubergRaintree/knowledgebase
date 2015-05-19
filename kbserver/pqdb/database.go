@@ -54,19 +54,23 @@ type Pages struct {
 }
 
 func (pages *Pages) All() ([]int, error) {
-
+	//TODO
+	return nil, nil
 }
 
 func (pages *Pages) Exists(slug kb.Slug) bool {
-
+	//TODO
+	return false
 }
 
 func (pages *Pages) Create(slug kb.Slug, page *kb.Page) error {
-
+	//TODO
+	return nil
 }
 
 func (pages *Pages) Load(slug kb.Slug) (*kb.Page, error) {
-
+	//TODO
+	return nil
 }
 
 func (pages *Pages) LoadRaw(slug kb.Slug) ([]byte, error) {
