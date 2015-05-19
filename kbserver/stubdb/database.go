@@ -30,13 +30,13 @@ type Database struct {
 
 func New(params string) *Database {
 	db := &Database{
-		Users:  make(map[string]*User),
-		Groups: make(map[string]bool),
+		Users: make(map[string]*User),
 	}
 
 	for _, usergroups := range strings.Split(params, ";") {
 		tokens := strings.Split(usergroups, ":")
 		user := &User{tokens[0], strings.Split(tokens[1], ",")}
+		db.Users[user.Name] = user
 	}
 
 	return db
@@ -45,7 +45,7 @@ func New(params string) *Database {
 func (db *Database) User(username string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrUserNotExist
+		return nil, kbserver.ErrInvalidUser
 	}
 	return user, nil
 }
@@ -53,7 +53,7 @@ func (db *Database) User(username string) (*User, error) {
 func (db *Database) Access(username, groupname string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrUserNotExist
+		return nil, kbserver.ErrInvalidUser
 	}
 
 	if !user.BelongsTo(groupname) {
@@ -63,15 +63,19 @@ func (db *Database) Access(username, groupname string) (*User, error) {
 }
 
 func (db *Database) PagesByOwner(username, groupname string) (kbserver.Pages, error) {
-	user, err := db.Access(username, groupname)
+	_, err := db.Access(username, groupname)
+	if err != nil {
+		return nil, err
+	}
 	return &Pages{groupname}, nil
 }
 
 func (db *Database) IndexByUser(username string) (kbserver.Index, error) {
-	if err := db.ValidUser(user); err != nil {
+	user, err := db.User(username)
+	if err != nil {
 		return nil, err
 	}
-	return &Index{db, 0}, nil
+	return &Index{user}, nil
 }
 
 type Pages struct {
@@ -158,7 +162,7 @@ func (index *Index) Tags() ([]kb.TagEntry, error) {
 
 func (index *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	if tag == "lorem" || tag == "home" {
-		return index.All(), nil
+		return index.All()
 	}
 	return nil, nil
 }

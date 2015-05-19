@@ -1,6 +1,8 @@
 // This package implements common federated wiki types
 package kb
 
+import "strings"
+
 func Paragraph(text string) Item {
 	return Item{
 		"type": "paragraph",
@@ -45,5 +47,13 @@ func Entry(title, synopsis string, slug Slug) Item {
 		"text":  synopsis,
 		"rank":  0,
 		"url":   slug,
+	}
+}
+
+func Tags(tags ...string) Item {
+	return Item{
+		"type": "tags",
+		"id":   NewID(),
+		"text": strings.Join(tags, ", "),
 	}
 }

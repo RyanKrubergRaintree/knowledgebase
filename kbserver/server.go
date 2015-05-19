@@ -1,7 +1,6 @@
 package kbserver
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -15,13 +14,15 @@ type Presenter interface {
 
 type Server struct {
 	Domain string
+	Database
 	Presenter
 	Context
 }
 
-func New(domain, database string, presenter Presenter, context Context) *Server {
+func New(domain string, db Database, presenter Presenter, context Context) *Server {
 	return &Server{
 		Domain:    domain,
+		Database:  db,
 		Presenter: presenter,
 		Context:   context,
 	}
@@ -46,7 +47,23 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 	}
 
-	fmt.Fprintf(w, "<h1>%s</h1><h2>%s</h2>", owner, slug)
+	user, err := server.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	//http.NotFound(w, r)
+	pages, err := server.PagesByOwner(user.Name, owner)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := pages.LoadRaw(slug)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(data)
 }

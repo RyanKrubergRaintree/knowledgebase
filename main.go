@@ -8,6 +8,7 @@ import (
 
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kbserver"
+	"github.com/raintreeinc/knowledgebase/kbserver/stubdb"
 
 	"github.com/gorilla/sessions"
 )
@@ -52,6 +53,8 @@ func main() {
 	// Serve static files
 	http.Handle("/assets/", http.StripPrefix("/assets/", kbserver.NewFiles(*assetsdir)))
 
+	db := stubdb.New("Egon Elbre:Egon Elbre,Community,Help,Engineering")
+
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
 	context := kbserver.NewContext(*domain, store)
@@ -64,7 +67,7 @@ func main() {
 	}, context)
 
 	// create KnowledgeBase server
-	server := kbserver.New(*domain, *database, presenter, context)
+	server := kbserver.New(*domain, db, presenter, context)
 
 	// protect server with authentication
 	url := "http://" + *domain
