@@ -1,28 +1,11 @@
-import React from "react";
+//import "/global/polyfills.js"
+//import "/view/App.js"
 
-import {Pages} from 'view/Pages';
-import {Header} from 'view/Header';
+Global = {
+	User: ""
+};
 
-import {global} from 'global';
-
-export function init() {
-	global.History.updateFromURL();
+function initialize(mountNode){
+	React.initializeTouchEvents(true);
+	React.render(React.createElement(View.App, null), mountNode);
 }
-
-var App = React.createClass({
-	displayName: "App",
-	render: function () {
-		return (
-			React.DOM.div({ id: "root" },
-				React.createElement(Pages, global),
-				React.createElement(Header, global)
-			)
-		)
-	}
-});
-
-React.initializeTouchEvents(true);
-React.render(
-	React.createElement(App),
-	document.getElementById("app")
-);

@@ -1,35 +1,15 @@
-'use strict';
+//import "/view/Page.js"
+//import "/view/View.js"
 
-import React from 'react';
-import {Page} from './Page';
+View.Pages = (function(){
+	var Pages = React.createClass({
+		displayName: "Pages",
+		render: function(){
+			return React.DOM.div({
+				className: "pages"
+			}, React.createElement(View.Page, {}))
+		}
+	});
 
-export var Pages = React.createClass({
-	displayName: 'Pages',
-
-	getInitialState: function(){
-		return {
-			pagerefs: this.props.Lineup.pagerefs
-		};
-	},
-	componentDidMount: function(){
-		this.props.Lineup.listen(this.changed);
-	},
-	componentWillUnmount: function() {
-		this.props.Lineup.unlisten(this.changed);
-	},
-	changed: function(pagerefs){
-		this.setState({pagerefs: pagerefs});
-	},
-	render: function(){
-		var self = this;
-		return React.DOM.div({id: 'pages'},
-			this.state.pagerefs.map(function(pageref){
-				return React.createElement(Page, {
-					key: pageref.key,
-					pageref: pageref,
-					Store: self.props.Store,
-					Lineup: self.props.Lineup
-				});
-			}));
-	}
-});
+	return Pages;
+})();

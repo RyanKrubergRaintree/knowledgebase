@@ -26,7 +26,7 @@ var (
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
 	//todo replace clientx with client
-	clientdir = flag.String("client", "clientx", "client `directory`")
+	clientdir = flag.String("client", "client", "client `directory`")
 )
 
 func main() {
