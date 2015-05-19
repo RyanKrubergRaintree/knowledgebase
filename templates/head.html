@@ -2,11 +2,13 @@
 	<meta charset="utf-8">
 	<title>{{ Site.Title }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
 	<!-- styles -->
 	<link rel="stylesheet" type="text/css" href="/assets/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/assets/css/header.css">
 	<link rel="stylesheet" type="text/css" href="/assets/css/materialdesignicons.css" async>
-	<!-- ICONS -->
+	
+	<!-- icons -->
 	<link rel="apple-touch-icon" sizes="57x57" href="/assets/ico/apple-touch-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="/assets/ico/apple-touch-icon-60x60.png">
 	<link rel="apple-touch-icon" sizes="72x72" href="/assets/ico/apple-touch-icon-72x72.png">
@@ -26,3 +28,11 @@
 	<meta name="msapplication-TileImage" content="/assets/ico/mstile-144x144.png">
 	<meta name="msapplication-config" content="/assets/ico/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
+	
+
+	<script src="/assets/js/React.js"></script>
+	<script src="http://example.com:35729/livereload.js"></script>
+
+	<!-- source -->
+	{{ range $file := SourceFiles }}<script src="/lib{{$file}}"></script>
+	{{ end }}

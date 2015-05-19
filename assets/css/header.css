@@ -50,7 +50,7 @@ x=5
 		0 11px 7px 0 rgba(0, 0, 0, 0.19);
 }
 
-#header-menu {
+.header-menu {
 	position: fixed;
 	top: 46px;
 	left: -500px;
@@ -63,7 +63,7 @@ x=5
 		0 11px 7px 0 rgba(0, 0, 0, 0.19);	
 }
 
-#header-menu a {
+.header-menu a {
 	display: block;
 	padding: 0px 20px;
 	line-height: 46px;
@@ -72,11 +72,11 @@ x=5
 	text-decoration: none;	
 }
 
-#header-menu a:hover {
+.header-menu a:hover {
 	background-color: #0277BD;
 }
 
-#header:hover #header-menu {
+#header:hover .header-menu {
 	left: 0;
 }
 

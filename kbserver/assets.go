@@ -3,9 +3,7 @@ package kbserver
 import (
 	"html/template"
 	"net/http"
-	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 )
@@ -21,12 +19,7 @@ func NewFiles(dir string) *Files {
 }
 
 func (a *Files) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	upath := r.URL.Path
-	if !strings.HasPrefix(upath, "/") {
-		upath = "/" + upath
-	}
-	upath = path.Clean(upath)
-	http.ServeFile(w, r, path.Join(a.dir, upath[1:]))
+	http.ServeFile(w, r, SafeFile(a.dir, r.URL.Path))
 }
 
 type presenter struct {
@@ -34,14 +27,16 @@ type presenter struct {
 	Glob     string
 	SiteInfo interface{}
 	Context  Context
+	Source   *Source
 }
 
-func NewPresenter(dir, glob string, siteinfo interface{}, context Context) Presenter {
+func NewPresenter(dir, glob string, siteinfo interface{}, source *Source, context Context) Presenter {
 	return &presenter{
 		Dir:      dir,
 		Glob:     glob,
 		SiteInfo: siteinfo,
 		Context:  context,
+		Source:   source,
 	}
 }
 
@@ -53,6 +48,7 @@ func (a *presenter) Present(w http.ResponseWriter, r *http.Request, tname string
 				user, _ := a.Context.CurrentUser(w, r)
 				return user
 			},
+			"SourceFiles": func() []string { return a.Source.Files() },
 		},
 	).ParseGlob(filepath.Join(a.Dir, a.Glob))
 	if err != nil {

@@ -1,3 +1,4 @@
+// stubdb implements a Database with a single page "/home" for each group.
 package stubdb
 
 import (
@@ -28,6 +29,7 @@ type Database struct {
 	Users map[string]*User
 }
 
+// params is a string "username:group1,group2;username2:group2,group3"
 func New(params string) *Database {
 	db := &Database{
 		Users: make(map[string]*User),

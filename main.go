@@ -25,6 +25,8 @@ var (
 
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
+	//todo replace clientx with client
+	clientdir = flag.String("client", "clientx", "client `directory`")
 )
 
 func main() {
@@ -37,6 +39,9 @@ func main() {
 
 	if os.Getenv("ASSETSDIR") != "" {
 		*assetsdir = os.Getenv("ASSETSDIR")
+	}
+	if os.Getenv("CLIENTDIR") != "" {
+		*clientdir = os.Getenv("CLIENTDIR")
 	}
 	if os.Getenv("DATABASE") != "" {
 		*database = os.Getenv("DATABASE")
@@ -51,8 +56,15 @@ func main() {
 	log.Printf("Starting %s on %s", *domain, *addr)
 
 	// Serve static files
-	http.Handle("/assets/", http.StripPrefix("/assets/", kbserver.NewFiles(*assetsdir)))
+	assets := kbserver.NewFiles(*assetsdir)
+	http.Handle("/assets/", http.StripPrefix("/assets/", assets))
 
+	// Serve javascript source
+	source := kbserver.NewSource(*clientdir, true)
+	http.Handle("/lib/", http.StripPrefix("/lib/", source))
+
+	// Load database
+	//TODO: replace with real database
 	db := stubdb.New("Egon Elbre:Egon Elbre,Community,Help,Engineering")
 
 	// context
@@ -64,7 +76,7 @@ func main() {
 		"ShortTitle": "KB",
 		"Title":      "Knowledge Base",
 		"Company":    "Raintree Systems Inc.",
-	}, context)
+	}, source, context)
 
 	// create KnowledgeBase server
 	server := kbserver.New(*domain, db, presenter, context)
@@ -78,6 +90,5 @@ func main() {
 	cors := kbserver.AllowSubdomainCORS(*domain, front)
 
 	http.Handle("/", cors)
-
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
