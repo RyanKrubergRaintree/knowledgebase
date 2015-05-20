@@ -1,12 +1,13 @@
 package kbserver
 
 import (
-	"bufio"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -72,29 +73,18 @@ func (s *Source) monitorChanges() {
 }
 
 func (s *Source) extractDeps(path string) []string {
-	deps := []string{}
 	filename := filepath.Join(s.Dir, filepath.FromSlash(path))
 
-	file, err := os.Open(filename)
+	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Printf("Extracting deps from %s: %s", path, err)
 		return nil
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if !strings.HasPrefix(line, "//import ") {
-			break
-		}
-		line = strings.TrimPrefix(line, "//import ")
-		line = strings.Trim(line, "\"")
-		deps = append(deps, line)
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	deps := []string{}
+	rx := regexp.MustCompile(`//\s*import\s+"([^"]*)"`)
+	for _, match := range rx.FindAllStringSubmatch(string(file), -1) {
+		deps = append(deps, match[1])
 	}
 
 	return deps

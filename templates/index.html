@@ -8,6 +8,13 @@
 </head>
 <body><div id="site"></div></body>
 <script>
+Global.HomePage = {
+	url: "/{{User.Name}}:Home",
+	title: "Home",
+	link: "{{User.Name}}:Home"
+};
+
 Global.User = "{{User.Name}}";
+
+initialize(document.getElementById("site"));
 </script>
-<script>initialize(document.getElementById("site"));</script>

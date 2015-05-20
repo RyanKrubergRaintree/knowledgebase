@@ -14,7 +14,7 @@ var App = React.createClass({
 	render: function () {
 		return (
 			React.DOM.div({ id: "root" },
-				React.createElement(Pages, global),
+				React.createElement(Pages,  global),
 				React.createElement(Header, global)
 			)
 		)

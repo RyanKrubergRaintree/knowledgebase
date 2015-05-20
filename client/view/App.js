@@ -24,7 +24,7 @@ View.App = (function(){
 			return React.DOM.div({
 				id:"header"
 			},
-				a({className:"button logo", href:"#", title:"Home"}),
+				a({className:"button logo", href:"/", title:"Home"}),
 				React.DOM.form({className:"search"},
 					React.DOM.input({placeholder:"Search..."}),
 					React.DOM.button({

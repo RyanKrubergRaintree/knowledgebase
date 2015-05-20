@@ -1,0 +1,48 @@
+"use strict";
+
+function Notifier(){
+	this.listeners = [];
+	this.lastKey = 0;
+}
+
+Notifier.prototype = {
+	on: function(event, handler, recv){
+		this.listeners.push({
+			event: event,
+			handler: handler,
+			recv: recv,
+			key: this.lastKey++
+		});
+	},
+	off: function(event, handler, recv){
+		this.listeners = this.listeners.filter(
+			function(listener){
+				return !(
+					(listener.event === event) &&
+					(listener.handler === handler) &&
+					(listener.recv === recv)
+				);
+			}
+		);
+	},
+	remove: function(recv){
+		this.listeners = this.listeners.filter(
+			function(listener){
+				return !(listener.recv === recv);
+			}
+		);
+	},
+	emit: function(event){
+		var self = this;
+		window.setTimeout(function(){
+			self.update(event);
+		}, 0);
+	},
+	update: function(event){
+		this.listeners.map(function(listener){
+			if(listener.event == event.type){
+				listener.handler.call(listener.recv, event);
+			}
+		});
+	}
+};
