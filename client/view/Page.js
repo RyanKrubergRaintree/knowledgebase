@@ -1,4 +1,5 @@
 //import "/view/View.js"
+//import "/util/SmoothScroll.js"
 
 View.Page = (function(){
 	var PageButtons = React.createClass({
@@ -55,9 +56,18 @@ View.Page = (function(){
 
 	var Page = React.createClass({
 		displayName: "Page",
+
+		activate: function(ev){
+			if(typeof ev == 'undefined'){
+				SmoothScroll.to(this.getDOMNode());
+			} else if (!ev.defaultPrevented){
+				SmoothScroll.to(this.getDOMNode());
+			}
+		},
+
 		render: function(){
 			return React.DOM.div(
-				{className: "page-size"},
+				{className: "page-size", onClick: this.activate},
 				React.createElement(PageButtons, {}),
 				React.DOM.div(
 					{className:"page-scroll round-scrollbar"},
