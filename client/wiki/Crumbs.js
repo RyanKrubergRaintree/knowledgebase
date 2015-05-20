@@ -9,8 +9,8 @@
 
 	// converts to
 	// #┃ref1┃ref2┃ref3
-	function toHash(pagerefs){
-		return separator + pagerefs.map(function(ref){
+	function toHash(proxies){
+		return separator + proxies.map(function(ref){
 			var loc = Convert.URLToLocation(ref.url);
 			if((loc.origin == "") || (loc.origin == window.location.origin)) {
 				return loc.pathname + loc.search;
@@ -29,7 +29,7 @@
 			hash = hash.substr(1);
 		}
 
-		var pagerefs = [];
+		var proxies = [];
 		hash.split(separator).map(function(token){
 			token = token.trim();
 			if(token.trim() === ''){
@@ -37,14 +37,14 @@
 			}
 
 			var url = token;
-			pagerefs.push(new Wiki.PageRef({
+			proxies.push(new Wiki.PageProxy({
 				url: url,
 				link: Convert.URLToLink(url),
 				title: Convert.URLToTitle(url),
 				key: -1
 			}));
 		});
-		return pagerefs;
+		return proxies;
 	}
 
 	Wiki.Crumbs = Crumbs;
@@ -63,7 +63,7 @@
 
 	Crumbs.prototype = {
 		lineupChanged: function(event){
-			this.navigatingTo_ = toHash(this.lineup_.pagerefs);
+			this.navigatingTo_ = toHash(this.lineup_.proxies);
 			window.location.hash = this.navigatingTo_;
 		},
 		initLineup: function(){

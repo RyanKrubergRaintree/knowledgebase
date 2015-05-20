@@ -22,7 +22,7 @@ View.Page = (function(){
 			 	td = React.DOM.td;
 
 			return table({className:"page-meta"},
-				tr(null, td(null, "Link"), td(null, "Help:Hello World")),
+				tr(null, td(null, "Link"), td(null, this.props.proxy.link)),
 				tr(null, td(null, "Create by"), td(null, "Raintree Systems Help")),
 				tr(null, td(null, "Shared with"), td(null, "Everyone"))
 			);
@@ -54,14 +54,14 @@ View.Page = (function(){
 	});
 
 	var Page = React.createClass({
-		displayName: "Pages",
+		displayName: "Page",
 		render: function(){
 			return React.DOM.div(
 				{className: "page-size"},
 				React.createElement(PageButtons, {}),
 				React.DOM.div(
 					{className:"page-scroll round-scrollbar"},
-					React.createElement(PageMeta, {}),
+					React.createElement(PageMeta, {proxy: this.props.proxy}),
 					React.createElement(PageContent, {})
 				)
 			);

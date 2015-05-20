@@ -1,13 +1,14 @@
 // import "/util/Notifier.js"
 // import "/wiki/Wiki.js"
 // import "/wiki/Convert.js"
+// import "/wiki/PageProxy.js"
 
 (function(Wiki){
 	"use strict";
 
 	Wiki.Lineup = Lineup;
 	function Lineup(){
-		this.pagerefs = [];
+		this.proxies = [];
 		this.lastKey = 0;
 		this.notifier = new Notifier();
 	}
@@ -28,8 +29,8 @@
 			if(typeof key === 'undefined'){
 				return -1;
 			}
-			for(var i = 0; i < this.pagerefs.length; i += 1){
-				if(this.pagerefs[i].key == key){
+			for(var i = 0; i < this.proxies.length; i += 1){
+				if(this.proxies[i].key == key){
 					return i;
 				}
 			}
@@ -42,35 +43,35 @@
 			}
 			var i = this.indexOf_(key);
 			if(i >= 0){
-				this.pagerefs = this.pagerefs.slice(0, i + 1);
+				this.proxies = this.proxies.slice(0, i + 1);
 			}
 		},
 
 		clear: function(){
-			this.pagerefs = [];
+			this.proxies = [];
 			this.changed();
 		},
 
 		close: function(key){
-			this.pagerefs = this.pagerefs.filter(function(pageref){
-				return pageref.key !== key;
+			this.proxies = this.proxies.filter(function(proxy){
+				return proxy.key !== key;
 			});
 			this.changed();
 		},
 
 		closeLast: function(){
-			var pagerefs = this.pagerefs;
-			pagerefs = pagerefs.slice(0, Math.max(pagerefs.length-1, 1));
+			var proxies = this.proxies;
+			proxies = proxies.slice(0, Math.max(proxies.length-1, 1));
 			this.changed();
 		},
 
-		changeRef: function(key, page){
+		changeRef: function(key, proxy){
 			var i = this.indexOf_(key);
 			if(i >= 0){
-				var ref = this.pagerefs[i];
-				ref.url = Convert.URLToReadable(page.url);
-				ref.link = Convert.URLToLink(page.link);
-				ref.title = page.title;
+				var ref = this.proxies[i];
+				ref.url = Convert.URLToReadable(proxy.url);
+				ref.link = Convert.URLToLink(proxy.link);
+				ref.title = proxy.title;
 				this.changed();
 			}
 		},
@@ -85,7 +86,7 @@
 			this.trim_(props.after);
 			var url = Convert.URLToReadable(props.url);
 
-			var pageref = new PageRef({
+			var proxy = new Wiki.PageProxy({
 				url: url,
 				title: props.title || Convert.URLToTitle(url),
 				link: props.link || Convert.URLToLink(url),
@@ -93,52 +94,43 @@
 			});
 
 			if(props.link === ""){
-				pageref.link = "";
+				proxy.link = "";
 			}
 
 			var i = this.indexOf_(props.insteadOf);
 			if(i >= 0){
-				this.pagerefs[i] = pageref;
+				this.proxies[i] = proxy;
 			} else {
-				this.pagerefs.push(pageref);
+				this.proxies.push(proxy);
 			}
 
 			this.changed();
-			return pageref.key;
+			return proxy.key;
 		},
 
 
-		updateRefs: function(nextrefs){
-			var prerefs = this.pagerefs.slice();
+		updateRefs: function(nextproxies){
+			var preproxies = this.proxies.slice();
 			var changed = false;
 
 			var self = this;
-			var newrefs = nextrefs.map(function(pageref){
-				var prev = prerefs.shift();
-				if(prev && (prev.url == pageref.url)){
+			var newproxies = nextproxies.map(function(proxy){
+				var prev = preproxies.shift();
+				if(prev && (prev.url == proxy.url)){
 					return prev;
 				}
 				changed = true;
-				pageref.key = self.lastKey++;
-				return pageref;
+				proxy.key = self.lastKey++;
+				return proxy;
 			});
 
-			if(prerefs.length > 0){
+			if(preproxies.length > 0){
 				changed = true;
 			}
 			if(changed){
-				this.pagerefs = newrefs;
+				this.proxies = newproxies;
 				this.changed();
 			}
 		}
 	};
-
-	Wiki.PageRef = PageRef;
-	function PageRef(props) {
-		this.url = props.url;
-		this.owner = props.owner;
-		this.link = props.link;
-		this.title = props.title;
-		this.key = props.key;
-	}
 })(Wiki);
