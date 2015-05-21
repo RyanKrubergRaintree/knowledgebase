@@ -1,9 +1,17 @@
 .item {
 	position: relative;
-	outline: 1px solid rgba(0,0,0,0.0);
 
 	padding: 0 10px;
+	margin: 0.01px;
 	min-height: 20px;
+
+	transition: outline 0.3s ease-in-out;
+	outline: 5px solid rgba(0,0,0,0.0);
+}
+
+.item:hover {
+	background: rgba(0,0,0,0.02);
+	outline: 5px solid rgba(0,0,0,0.02);
 }
 
 .item-drag {

@@ -173,6 +173,6 @@ func (index *Index) RecentChanges(n int) ([]kb.PageEntry, error) {
 	return index.All()
 }
 
-const loremipsum = `Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-Cum, ex, accusantium. Maiores magnam nostrum, illum inventore, esse odio eveniet
-ipsum architecto impedit fugit sit eaque, aut! Fuga dolorum sunt nisi.`
+const loremipsum = `Lorem ipsum [[dolor]] sit amet, consectetur adipisicing elit. 
+Cum, ex, accusantium. Maiores magnam nostrum, illum [[inventore]], esse odio eveniet
+ipsum architecto impedit fugit sit [[eaque]], aut! Fuga dolorum sunt nisi.`

@@ -52,7 +52,7 @@ KB.Page.View = (function(){
 				{ className: "item" },
 				React.DOM.div({
 					className:"item-drag",
-					title: "Move/Copy the item."
+					title: "Move or copy item."
 				}),
 				React.createElement(view, {
 					stage: stage,
