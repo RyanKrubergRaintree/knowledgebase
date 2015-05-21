@@ -1,14 +1,14 @@
 //import "/util/SmoothScroll.js"
 //import "/kb/Stage.js"
-//import "/kb/Page.js"
+//import "/kb/Page.View.js"
 
 KB.Stage.View = (function(){
-	var PageButtons = React.createClass({
-		displayName: "PageButtons",
+	var StageButtons = React.createClass({
+		displayName: "StageButtons",
 		render: function(){
 			var a = React.DOM.a;
 			return React.DOM.div(
-				{className: "page-buttons"},
+				{className: "stage-buttons"},
 				a({className:"mdi mdi-playlist-plus", href:"#", title:"Add an item."}),
 				a({className:"mdi mdi-arrow-expand", href:"#", title:"Toggle page width."}),
 				a({className:"mdi mdi-close", href:"#", title:"Close page."})
@@ -16,41 +16,17 @@ KB.Stage.View = (function(){
 		}
 	});
 
-	var PageMeta = React.createClass({
-		displayName: "PageMeta",
+	var StageInfo = React.createClass({
+		displayName: "StageInfo",
 		render: function(){
 			var table = React.DOM.table,
 			 	tr = React.DOM.tr,
 			 	td = React.DOM.td;
 
-			return table({className:"page-meta"},
+			return table({className:"stage-info"},
 				tr(null, td(null, "Link"), td(null, this.props.stage.link)),
 				tr(null, td(null, "Create by"), td(null, "Raintree Systems Help")),
 				tr(null, td(null, "Shared with"), td(null, "Everyone"))
-			);
-		}
-	});
-
-	var Page = React.createClass({
-		displayName: "Page",
-		render: function(){
-			return React.DOM.div(
-				{className: "page"},
-				React.DOM.h1(null, "Hello World"),
-				React.createElement(PageStory, {})
-			);
-		}
-	});
-
-	var PageStory = React.createClass({
-		displayName: "PageStory",
-		render: function(){
-			return React.DOM.div(
-				{className: "page-story"},
-				React.DOM.p({}, "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rem accusantium libero eligendi repellat, quae commodi debitis odit animi facere illum! Laboriosam fugiat iste accusamus vitae doloremque corporis, nisi dolor."),
-				React.DOM.p({}, "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rem accusantium libero eligendi repellat, quae commodi debitis odit animi facere illum! Laboriosam fugiat iste accusamus vitae doloremque corporis, nisi dolor."),
-				React.DOM.p({}, "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rem accusantium libero eligendi repellat, quae commodi debitis odit animi facere illum! Laboriosam fugiat iste accusamus vitae doloremque corporis, nisi dolor."),
-				React.DOM.p({}, "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rem accusantium libero eligendi repellat, quae commodi debitis odit animi facere illum! Laboriosam fugiat iste accusamus vitae doloremque corporis, nisi dolor.")
 			);
 		}
 	});
@@ -69,11 +45,11 @@ KB.Stage.View = (function(){
 		render: function(){
 			return React.DOM.div(
 				{className: "stage", onClick: this.activate},
-				React.createElement(PageButtons, {}),
+				React.createElement(StageButtons, {}),
 				React.DOM.div(
 					{className:"stage-scroll round-scrollbar"},
-					React.createElement(PageMeta, {stage: this.props.stage}),
-					React.createElement(Page, {})
+					React.createElement(StageInfo, {stage: this.props.stage}),
+					React.createElement(KB.Page.View, {stage: this.props.stage, page: this.props.stage.page})
 				)
 			);
 		}

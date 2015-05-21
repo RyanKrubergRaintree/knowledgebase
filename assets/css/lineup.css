@@ -26,7 +26,7 @@
 /* 465 * 3.5 ~= 1628 */
 @media(min-width: 1628px) { .stage { width: 24.5%; } }
 
-.page-buttons {
+.stage-buttons {
 	position: absolute;
 	top: 0;
 	right: 10px;
@@ -38,7 +38,7 @@
 		0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
-.page-buttons > * {
+.stage-buttons > * {
 	float: left;
 	text-decoration: none;
 
@@ -56,13 +56,13 @@
 	border: 1px solid #FFF;
 }
 
-.page-buttons > *:hover {
+.stage-buttons > *:hover {
 	cursor: pointer;
 
 	border: 1px solid #7DC6FF;
 }
 
-.page-buttons > *:active {
+.stage-buttons > *:active {
 	box-shadow: 
 		0 6px 10px 0 rgba(0, 0, 0, 0.3),
 		0 2px 2px 0 rgba(0, 0, 0, 0.2);
@@ -78,7 +78,7 @@
 	overflow-y: auto;
 }
 
-.page-meta {
+.stage-info {
 	font-size: 80%;
 	margin-bottom: 10px;
 	color: #999;
