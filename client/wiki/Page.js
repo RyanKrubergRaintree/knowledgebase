@@ -3,8 +3,8 @@
 (function(Wiki){
 	"use strict";
 
+	// Page corresponds to the knowledgebase page structure
 	Wiki.Page = Page;
-
 	function Page(data){
 		data = data || {};
 		this.owner = data.owner || "";

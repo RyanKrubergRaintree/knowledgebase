@@ -6,6 +6,18 @@ function Notifier(){
 }
 
 Notifier.prototype = {
+	mixto: function(obj){
+		var self = this;
+		obj.on = function(event, handler, recv){
+			self.on(event, handler, recv);
+		};
+		obj.off = function(event, handler, recv){
+			self.off(event, handler, recv);
+		};
+		obj.remove = function(recv){
+			self.remove(recv);
+		};
+	},
 	on: function(event, handler, recv){
 		this.listeners.push({
 			event: event,

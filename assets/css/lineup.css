@@ -1,4 +1,4 @@
-.pages {
+.lineup {
 	position: absolute;
 	top: 0; left: 0; right: 0; bottom: 0;
 	overflow-x: scroll;
@@ -12,7 +12,7 @@
 	flex-flow: row;
 }
 
-.page-size {
+.stage {
 	position: relative;
 	flex: none;
 	width: 99%;
@@ -20,11 +20,11 @@
 }
 
 /* 465 * 1.5 ~= 700 */
-@media(min-width:  700px) { .page-size { width: 49%; } }
+@media(min-width:  700px) { .stage { width: 49%; } }
 /* 465 * 2.5 ~= 1163 */
-@media(min-width: 1163px) { .page-size { width: 33%; } }
+@media(min-width: 1163px) { .stage { width: 33%; } }
 /* 465 * 3.5 ~= 1628 */
-@media(min-width: 1628px) { .page-size { width: 24.5%; } }
+@media(min-width: 1628px) { .stage { width: 24.5%; } }
 
 .page-buttons {
 	position: absolute;
@@ -70,7 +70,7 @@
 
 .page-close::before { content: "×"; }
 
-.page-scroll {
+.stage-scroll {
 	position: absolute;
 	top: 0; bottom: 0;
 
@@ -90,14 +90,14 @@
 	top: 0px;
 }
 
-.page-content {
+.page {
 	background: #FFF;
 	padding: 15px 15px 10px 15px;
 
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
 
-.page-content h1 {
+.page h1 {
 	font-size: 24px;
 }
 

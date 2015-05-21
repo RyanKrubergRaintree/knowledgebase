@@ -1,6 +1,7 @@
 // import "/wiki/Lineup.js"
 // import "/wiki/Wiki.js"
 // import "/wiki/Convert.js"
+// import "/wiki/Stage.js"
 
 (function(Wiki){
 	"use strict";
@@ -9,8 +10,8 @@
 
 	// converts to
 	// #┃ref1┃ref2┃ref3
-	function toHash(proxies){
-		return separator + proxies.map(function(ref){
+	function toHash(stages){
+		return separator + stages.map(function(ref){
 			var loc = Convert.URLToLocation(ref.url);
 			if((loc.origin == "") || (loc.origin == window.location.origin)) {
 				return loc.pathname + loc.search;
@@ -29,7 +30,7 @@
 			hash = hash.substr(1);
 		}
 
-		var proxies = [];
+		var stages = [];
 		hash.split(separator).map(function(token){
 			token = token.trim();
 			if(token.trim() === ''){
@@ -37,14 +38,14 @@
 			}
 
 			var url = token;
-			proxies.push(new Wiki.PageProxy({
+			stages.push(new Wiki.Stage({
 				url: url,
 				link: Convert.URLToLink(url),
 				title: Convert.URLToTitle(url),
 				key: -1
 			}));
 		});
-		return proxies;
+		return stages;
 	}
 
 	Wiki.Crumbs = Crumbs;
@@ -63,7 +64,7 @@
 
 	Crumbs.prototype = {
 		lineupChanged: function(event){
-			this.navigatingTo_ = toHash(this.lineup_.proxies);
+			this.navigatingTo_ = toHash(this.lineup_.stages);
 			window.location.hash = this.navigatingTo_;
 		},
 		initLineup: function(){

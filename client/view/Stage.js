@@ -1,7 +1,7 @@
 //import "/view/View.js"
 //import "/util/SmoothScroll.js"
 
-View.Page = (function(){
+View.Stage = (function(){
 	var PageButtons = React.createClass({
 		displayName: "PageButtons",
 		render: function(){
@@ -30,11 +30,11 @@ View.Page = (function(){
 		}
 	});
 
-	var PageContent = React.createClass({
-		displayName: "PageContent",
+	var Page = React.createClass({
+		displayName: "Page",
 		render: function(){
 			return React.DOM.div(
-				{className: "page-content"},
+				{className: "page"},
 				React.DOM.h1(null, "Hello World"),
 				React.createElement(PageStory, {})
 			);
@@ -54,8 +54,8 @@ View.Page = (function(){
 		}
 	});
 
-	var Page = React.createClass({
-		displayName: "Page",
+	var Stage = React.createClass({
+		displayName: "Stage",
 
 		activate: function(ev){
 			if(typeof ev == 'undefined'){
@@ -67,16 +67,16 @@ View.Page = (function(){
 
 		render: function(){
 			return React.DOM.div(
-				{className: "page-size", onClick: this.activate},
+				{className: "stage", onClick: this.activate},
 				React.createElement(PageButtons, {}),
 				React.DOM.div(
-					{className:"page-scroll round-scrollbar"},
+					{className:"stage-scroll round-scrollbar"},
 					React.createElement(PageMeta, {proxy: this.props.proxy}),
-					React.createElement(PageContent, {})
+					React.createElement(Page, {})
 				)
 			);
 		}
 	});
 
-	return Page;
+	return Stage;
 })();

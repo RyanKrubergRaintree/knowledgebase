@@ -1,5 +1,5 @@
 //import "/view/View.js"
-//import "/view/Pages.js"
+//import "/view/Lineup.js"
 
 View.App = (function(){
 	"use strict"
@@ -51,7 +51,7 @@ View.App = (function(){
 			return React.DOM.div({
 				id: "content"
 			},
-				React.createElement(View.Pages, {})
+				React.createElement(View.Lineup, {})
 			);
 		}
 	});

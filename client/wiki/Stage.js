@@ -1,12 +1,13 @@
+//import "/util/Notifier.js"
 //import "/wiki/Wiki.js"
 //import "/wiki/Page.js"
 
-(function(Wiki){
+ (function(Wiki){
 	"use strict";
 
-	Wiki.PageProxy = PageProxy;
-
-	function PageProxy(ref, page){
+	// Stage represents a staging area where modifications/loading are done.
+	Wiki.Stage = Stage;
+	function Stage(ref, page){
 		this.url = ref.url;
 		this.owner = ref.owner;
 		this.link = ref.link;
@@ -19,9 +20,14 @@
 		page.title = page.title || ref.title || "";
 
 		this.page = new Wiki.Page(page);
+		this.notifier = new Notifier();
+		this.notifier.mixto(this);
 	};
 
-	PageProxy.prototype = {
-
+	Stage.prototype = {
+		close: function(){
+			this.notifier.emit({type: "close"});
+		},
 	};
+
 })(Wiki);

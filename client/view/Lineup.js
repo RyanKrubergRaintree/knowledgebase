@@ -1,13 +1,13 @@
-//import "/view/Page.js"
+//import "/view/Stage.js"
 //import "/view/View.js"
 
-View.Pages = (function(){
-	var Pages = React.createClass({
-		displayName: "Pages",
+View.Lineup = (function(){
+	var Lineup = React.createClass({
+		displayName: "Lineup",
 
 		getInitialState: function(){
 			return {
-				proxies: Global.Lineup.proxies,
+				stages: Global.Lineup.stages,
 			}
 		},
 
@@ -19,13 +19,13 @@ View.Pages = (function(){
 		},
 
 		changed: function() {
-			this.setState({proxies: Global.Lineup.proxies});
+			this.setState({stages: Global.Lineup.stages});
 		},
 		render: function(){
 			return React.DOM.div(
-				{ className: "pages" },
-				this.state.proxies.map(function(proxy){
-					return React.createElement(View.Page, {
+				{ className: "lineup" },
+				this.state.stages.map(function(proxy){
+					return React.createElement(View.Stage, {
 						key: proxy.key,
 						proxy: proxy
 					});
@@ -34,5 +34,5 @@ View.Pages = (function(){
 		}
 	});
 
-	return Pages;
+	return Lineup;
 })();

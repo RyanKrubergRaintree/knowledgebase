@@ -1,23 +1,23 @@
 // import "/util/Notifier.js"
 // import "/wiki/Wiki.js"
 // import "/wiki/Convert.js"
-// import "/wiki/PageProxy.js"
+// import "/wiki/Stage.js"
+
+
+//TODO: get rid of close --> use notification from Stage
 
 (function(Wiki){
 	"use strict";
 
 	Wiki.Lineup = Lineup;
 	function Lineup(){
-		this.proxies = [];
+		this.stages = [];
 		this.lastKey = 0;
 		this.notifier = new Notifier();
+		this.notifier.mixto(this);
 	}
 
 	Lineup.prototype = {
-		on: function(event, handler, recv){ this.notifier.on(event, handler, recv); },
-		off: function(event, handler, recv){ this.notifier.off(event, handler, recv); },
-		remove: function(recv){ this.notifier.remove(recv); },
-
 		changed: function(){
 			this.notifier.emit({
 				type:"changed",
@@ -29,8 +29,8 @@
 			if(typeof key === 'undefined'){
 				return -1;
 			}
-			for(var i = 0; i < this.proxies.length; i += 1){
-				if(this.proxies[i].key == key){
+			for(var i = 0; i < this.stages.length; i += 1){
+				if(this.stages[i].key == key){
 					return i;
 				}
 			}
@@ -43,35 +43,35 @@
 			}
 			var i = this.indexOf_(key);
 			if(i >= 0){
-				this.proxies = this.proxies.slice(0, i + 1);
+				this.stages = this.stages.slice(0, i + 1);
 			}
 		},
 
 		clear: function(){
-			this.proxies = [];
+			this.stages = [];
 			this.changed();
 		},
 
 		close: function(key){
-			this.proxies = this.proxies.filter(function(proxy){
-				return proxy.key !== key;
+			this.stages = this.stages.filter(function(stage){
+				return stage.key !== key;
 			});
 			this.changed();
 		},
 
 		closeLast: function(){
-			var proxies = this.proxies;
-			proxies = proxies.slice(0, Math.max(proxies.length-1, 1));
+			var stages = this.stages;
+			stages = stages.slice(0, Math.max(stages.length-1, 1));
 			this.changed();
 		},
 
-		changeRef: function(key, proxy){
+		changeRef: function(key, stage){
 			var i = this.indexOf_(key);
 			if(i >= 0){
-				var ref = this.proxies[i];
-				ref.url = Convert.URLToReadable(proxy.url);
-				ref.link = Convert.URLToLink(proxy.link);
-				ref.title = proxy.title;
+				var ref = this.stages[i];
+				ref.url = Convert.URLToReadable(stage.url);
+				ref.link = Convert.URLToLink(stage.link);
+				ref.title = stage.title;
 				this.changed();
 			}
 		},
@@ -86,7 +86,7 @@
 			this.trim_(props.after);
 			var url = Convert.URLToReadable(props.url);
 
-			var proxy = new Wiki.PageProxy({
+			var stage = new Wiki.Stage({
 				url: url,
 				title: props.title || Convert.URLToTitle(url),
 				link: props.link || Convert.URLToLink(url),
@@ -94,41 +94,41 @@
 			});
 
 			if(props.link === ""){
-				proxy.link = "";
+				stage.link = "";
 			}
 
 			var i = this.indexOf_(props.insteadOf);
 			if(i >= 0){
-				this.proxies[i] = proxy;
+				this.stages[i] = stage;
 			} else {
-				this.proxies.push(proxy);
+				this.stages.push(stage);
 			}
 
 			this.changed();
-			return proxy.key;
+			return stage.key;
 		},
 
 
 		updateRefs: function(nextproxies){
-			var preproxies = this.proxies.slice();
+			var preproxies = this.stages.slice();
 			var changed = false;
 
 			var self = this;
-			var newproxies = nextproxies.map(function(proxy){
+			var newproxies = nextproxies.map(function(stage){
 				var prev = preproxies.shift();
-				if(prev && (prev.url == proxy.url)){
+				if(prev && (prev.url == stage.url)){
 					return prev;
 				}
 				changed = true;
-				proxy.key = self.lastKey++;
-				return proxy;
+				stage.key = self.lastKey++;
+				return stage;
 			});
 
 			if(preproxies.length > 0){
 				changed = true;
 			}
 			if(changed){
-				this.proxies = newproxies;
+				this.stages = newproxies;
 				this.changed();
 			}
 		}
