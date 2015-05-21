@@ -3,7 +3,7 @@
 
 	padding: 0 10px;
 	margin: 0.01px;
-	min-height: 20px;
+	min-height: 16px;
 
 	transition: outline 0.3s ease-in-out;
 	outline: 5px solid rgba(0,0,0,0.0);
@@ -35,8 +35,15 @@
 	text-decoration: none;
 	color: inherit;
 	
-	background: #EEE;
 	border: 1px solid #E5E5E5;
 	margin-right: 8px;
 	padding: 0 8px;
+
+	font-size: 12px;
+
+	transition: border 0.3s ease-in-out;
+}
+
+.item-tags .tag:hover {
+	border: 1px solid #7DC6FF;
 }

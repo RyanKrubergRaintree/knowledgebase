@@ -13,8 +13,7 @@ KB.Page = (function(){
 		this.story = data.story || [];
 		this.journal = data.journal || [];
 		this.version = data.version || 0;
-		//TODO: use correct date format
-		this.modified = data.modified || (new Date()).valueOf();
+		this.modified = data.modified || (new Date()).toISOString();
 	};
 
 	Page.prototype = {
