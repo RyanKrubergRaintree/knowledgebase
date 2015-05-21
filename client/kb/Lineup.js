@@ -6,10 +6,9 @@
 
 //TODO: get rid of close --> use notification from Stage
 
-(function(KB){
+KB.Lineup = (function(){
 	"use strict";
 
-	KB.Lineup = Lineup;
 	function Lineup(){
 		this.stages = [];
 		this.lastKey = 0;
@@ -133,4 +132,6 @@
 			}
 		}
 	};
-})(KB);
+
+	return Lineup;
+})();

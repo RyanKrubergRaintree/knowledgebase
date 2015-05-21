@@ -1,7 +1,8 @@
-//import "/view/View.js"
 //import "/util/SmoothScroll.js"
+//import "/kb/Stage.js"
+//import "/kb/Page.js"
 
-View.Stage = (function(){
+KB.Stage.View = (function(){
 	var PageButtons = React.createClass({
 		displayName: "PageButtons",
 		render: function(){
@@ -23,7 +24,7 @@ View.Stage = (function(){
 			 	td = React.DOM.td;
 
 			return table({className:"page-meta"},
-				tr(null, td(null, "Link"), td(null, this.props.proxy.link)),
+				tr(null, td(null, "Link"), td(null, this.props.stage.link)),
 				tr(null, td(null, "Create by"), td(null, "Raintree Systems Help")),
 				tr(null, td(null, "Shared with"), td(null, "Everyone"))
 			);
@@ -71,7 +72,7 @@ View.Stage = (function(){
 				React.createElement(PageButtons, {}),
 				React.DOM.div(
 					{className:"stage-scroll round-scrollbar"},
-					React.createElement(PageMeta, {proxy: this.props.proxy}),
+					React.createElement(PageMeta, {stage: this.props.stage}),
 					React.createElement(Page, {})
 				)
 			);

@@ -1,7 +1,7 @@
-//import "/view/View.js"
-//import "/view/Lineup.js"
+//import "/kb/KB.js"
+//import "/kb/Lineup.View.js"
 
-View.App = (function(){
+KB.Site = (function(){
 	"use strict"
 
 	var HeaderMenu = React.createClass({
@@ -51,20 +51,20 @@ View.App = (function(){
 			return React.DOM.div({
 				id: "content"
 			},
-				React.createElement(View.Lineup, {})
+				React.createElement(KB.Lineup.View, this.props)
 			);
 		}
 	});
 
-	var App = React.createClass({
-		displayName: "App",
+	var Site = React.createClass({
+		displayName: "Site",
 		render: function(){
 			return React.DOM.div({},
-				React.createElement(Header, {}),
-				React.createElement(Content, {})
+				React.createElement(Header,  this.props),
+				React.createElement(Content, this.props)
 			);
 		}
 	});
 
-	return App;
+	return Site;
 })();

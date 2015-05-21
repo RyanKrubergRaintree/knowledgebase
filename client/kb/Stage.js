@@ -2,11 +2,10 @@
 //import "/kb/KB.js"
 //import "/kb/Page.js"
 
- (function(KB){
+KB.Stage = (function(){
 	"use strict";
 
 	// Stage represents a staging area where modifications/loading are done.
-	KB.Stage = Stage;
 	function Stage(ref, page){
 		this.url = ref.url;
 		this.owner = ref.owner;
@@ -30,4 +29,5 @@
 		},
 	};
 
-})(KB);
+	return Stage;
+})();

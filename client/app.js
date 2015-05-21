@@ -14,10 +14,12 @@ Global = {
 Global.Lineup = new KB.Lineup();
 Global.Crumbs = new KB.Crumbs(Global.Lineup);
 
-// import "/view/App.js"
+// import "/kb/Site.js"
 function initialize(mountNode){
 	React.initializeTouchEvents(true);
-	React.render(React.createElement(View.App, null), mountNode);
+	React.render(React.createElement(KB.Site, {
+		Lineup: Global.Lineup
+	}), mountNode);
 
 	Global.Crumbs.initLineup();
 }

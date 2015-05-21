@@ -1,10 +1,9 @@
 //import "/kb/KB.js"
 
-(function(KB){
+KB.Page = (function(){
 	"use strict";
 
 	// Page corresponds to the knowledgebase page structure
-	KB.Page = Page;
 	function Page(data){
 		data = data || {};
 		this.owner = data.owner || "";
@@ -76,4 +75,6 @@
 			story.unshift(item);
 		}
 	};
-})(KB);
+
+	return Page;
+})();

@@ -3,7 +3,7 @@
 // import "/kb/Convert.js"
 // import "/kb/Stage.js"
 
-(function(KB){
+KB.Crumbs = (function(){
 	"use strict";
 
 	var separator = '| ';
@@ -48,7 +48,6 @@
 		return stages;
 	}
 
-	KB.Crumbs = Crumbs;
 	function Crumbs(lineup){
 		this.lineup_ = lineup;
 		this.navigatingTo_ = "";
@@ -76,4 +75,6 @@
 			}
 		}
 	};
+
+	return Crumbs;
 })(KB);
