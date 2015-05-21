@@ -23,6 +23,14 @@ KB.Lineup = (function(){
 			});
 		},
 
+		stageById: function(id){
+			for(var i = 0; i < this.stages.length; i += 1){
+				if(this.stages[i].id == id){
+					return this.stages[i];
+				}
+			}
+			return undefined;
+		},
 		indexOf_: function(id){
 			if(typeof id === 'undefined'){
 				return -1;
@@ -145,8 +153,71 @@ KB.Lineup = (function(){
 			}
 
 			this.addListeners();
+		},
+
+		findStageFromElement: function(el){
+			for(var i = 0; i < 32; i += 1){
+				if(el == null){ return null; }
+				if(el.classList.contains("stage")){
+					return this.stageById(el.dataset.id);
+				}
+				el = el.parentElement;
+			}
+			return undefined;
+		},
+
+		handleOpenLink: function(ev){
+			var target = ev.target;
+			var stage = this.findStageFromElement(target);
+
+			var url = target.href;
+			if(stage){
+				var locFrom = Convert.URLToLocation(stage.url);
+				var locTo = Convert.URLToLocation(url);
+				url = "//" + locFrom.host + locTo.pathname;
+			}
+
+			var link = target.dataset.link;
+			var title = target.innerText;
+
+			if(ev.button == 1){
+				this.open({
+					url: url,
+					link: link,
+					title: title
+				});
+			} else {
+				this.open({
+					url: url,
+					link: link,
+					title: title,
+					after: stage && stage.id
+				});
+			}
+
+			ev.preventDefault();
+		},
+
+		handleClickLink: function(ev){
+			if(ev.target.localName != "a") return;
+			if(ev.target.classList.contains("external-link")) return;
+			if(ev.target.onclick != null) return;
+			if(ev.target.onmousedown != null) return;
+			if(ev.target.onmouseup != null) return;
+			if(ev.target.href == "") return;
+
+			this.handleOpenLink(ev);
 		}
 	};
+
+
+	function elementIsEditable(elem){
+		return elem && (
+			((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
+			(elem.nodeName === 'TEXTAREA') ||
+			(elem.contentEditable === 'true')
+		);
+	}
 
 	return Lineup;
 })();

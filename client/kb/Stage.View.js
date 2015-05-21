@@ -80,8 +80,13 @@ KB.Stage.View = (function(){
 
 		render: function(){
 			var wide = this.state.wide ? " stage-wide" : "";
+			var stage = this.props.stage;
 			return React.DOM.div(
-				{className: "stage" + wide, onClick: this.activate},
+				{
+					className: "stage" + wide,
+					onClick: this.activate,
+					'data-id': stage.id
+				},
 				React.createElement(StageButtons, {
 					stage: this.props.stage,
 					isWide: this.state.wide,

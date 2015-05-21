@@ -5,7 +5,7 @@ Global = {
 	HomePage: {},
 
 	Lineup: null,
-	Crumbs: null
+	Crumbs: null,
 };
 
 // import "/kb/Crumbs.js"
@@ -22,4 +22,6 @@ function initialize(mountNode){
 	}), mountNode);
 
 	Global.Crumbs.initLineup();
+	window.addEventListener("click",
+		Global.Lineup.handleClickLink.bind(Global.Lineup));
 }
