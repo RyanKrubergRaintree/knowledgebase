@@ -24,8 +24,8 @@ KB.Stage.View = (function(){
 			 	td = React.DOM.td;
 
 			return table({className:"stage-info"},
-				tr(null, td(null, "Link"), td(null, this.props.stage.link)),
-				tr(null, td(null, "Create by"), td(null, "Raintree Systems Help")),
+				tr(null, td(null, "Link"),        td(null, this.props.stage.link)),
+				tr(null, td(null, "Create by"),   td(null, "Raintree Systems Help")),
 				tr(null, td(null, "Shared with"), td(null, "Everyone"))
 			);
 		}
@@ -48,8 +48,13 @@ KB.Stage.View = (function(){
 				React.createElement(StageButtons, {}),
 				React.DOM.div(
 					{className:"stage-scroll round-scrollbar"},
-					React.createElement(StageInfo, {stage: this.props.stage}),
-					React.createElement(KB.Page.View, {stage: this.props.stage, page: this.props.stage.page})
+					React.createElement(StageInfo, {
+						stage: this.props.stage
+					}),
+					React.createElement(KB.Page.View, {
+						stage: this.props.stage,
+						page: this.props.stage.page
+					})
 				)
 			);
 		}

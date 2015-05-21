@@ -11,7 +11,6 @@ KB.Lineup = (function(){
 
 	function Lineup(){
 		this.stages = [];
-		this.lastKey = 0;
 		this.notifier = new Notifier();
 		this.notifier.mixto(this);
 	}
@@ -24,23 +23,23 @@ KB.Lineup = (function(){
 			});
 		},
 
-		indexOf_: function(key){
-			if(typeof key === 'undefined'){
+		indexOf_: function(id){
+			if(typeof id === 'undefined'){
 				return -1;
 			}
 			for(var i = 0; i < this.stages.length; i += 1){
-				if(this.stages[i].key == key){
+				if(this.stages[i].id == id){
 					return i;
 				}
 			}
 			return -1;
 		},
 
-		trim_: function(key){
-			if(typeof key === 'undefined'){
+		trim_: function(id){
+			if(typeof id === 'undefined'){
 				return;
 			}
-			var i = this.indexOf_(key);
+			var i = this.indexOf_(id);
 			if(i >= 0){
 				this.stages = this.stages.slice(0, i + 1);
 			}
@@ -51,9 +50,9 @@ KB.Lineup = (function(){
 			this.changed();
 		},
 
-		close: function(key){
+		close: function(id){
 			this.stages = this.stages.filter(function(stage){
-				return stage.key !== key;
+				return stage.id !== id;
 			});
 			this.changed();
 		},
@@ -64,8 +63,8 @@ KB.Lineup = (function(){
 			this.changed();
 		},
 
-		changeRef: function(key, stage){
-			var i = this.indexOf_(key);
+		changeRef: function(id, stage){
+			var i = this.indexOf_(id);
 			if(i >= 0){
 				var ref = this.stages[i];
 				ref.url = Convert.URLToReadable(stage.url);
@@ -88,8 +87,7 @@ KB.Lineup = (function(){
 			var stage = new KB.Stage({
 				url: url,
 				title: props.title || Convert.URLToTitle(url),
-				link: props.link || Convert.URLToLink(url),
-				key: this.lastKey++
+				link: props.link || Convert.URLToLink(url)
 			});
 
 			if(props.link === ""){
@@ -104,7 +102,7 @@ KB.Lineup = (function(){
 			}
 
 			this.changed();
-			return stage.key;
+			return stage.id;
 		},
 
 
@@ -119,7 +117,6 @@ KB.Lineup = (function(){
 					return prev;
 				}
 				changed = true;
-				stage.key = self.lastKey++;
 				return stage;
 			});
 

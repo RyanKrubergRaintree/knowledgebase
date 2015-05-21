@@ -10,7 +10,13 @@ KB.Page = (function(){
 		this.slug = data.slug || "";
 		this.title = data.title || "";
 		this.synopsis = data.synopsis || "";
-		this.story = data.story || [];
+		this.story = data.story || [
+			{id:"1", type:"paragraph", text: "Quibusdam distinctio, sapiente beatae laudantium ipsa quisquam. Minima nostrum non tenetur cumque, ipsum perspiciatis animi illum! Aperiam nihil, culpa laboriosam voluptatibus ratione."},
+			{id:"2", type:"paragraph", text: "Consequuntur reprehenderit sint id, assumenda quisquam! Quo, libero. Assumenda, sint aspernatur! Tenetur quos cupiditate adipisci omnis laboriosam sequi labore praesentium molestias iste!"},
+			{id:"3", type:"paragraph", text: "Placeat nemo sed dolore, neque, voluptatum quam, eveniet delectus, in non itaque corporis praesentium similique perspiciatis illum odit culpa assumenda adipisci. Voluptatibus."},
+			{id:"4", type:"paragraph", text: "Ipsam doloribus culpa, autem quas illum velit ut aut adipisci error. Omnis sint laborum quisquam hic debitis numquam atque eaque fugit ipsam?"},
+			{id:"5", type:"paragraph", text: "Nihil totam, alias accusantium quisquam ad nisi fuga deserunt labore placeat nesciunt deleniti earum eos magnam, debitis, minus non sapiente exercitationem eveniet."}
+		];
 		this.journal = data.journal || [];
 		this.version = data.version || 0;
 		//TODO: use correct date format

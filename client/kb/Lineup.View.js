@@ -23,7 +23,7 @@ KB.Lineup.View = (function(){
 				{ className: "lineup" },
 				this.props.Lineup.stages.map(function(stage){
 					return React.createElement(KB.Stage.View, {
-						key: stage.key,
+						key: stage.id,
 						stage: stage
 					});
 				}

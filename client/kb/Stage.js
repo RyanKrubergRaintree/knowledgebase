@@ -1,3 +1,4 @@
+//import "/util/ObjectId.js"
 //import "/util/Notifier.js"
 //import "/kb/KB.js"
 //import "/kb/Page.js"
@@ -7,11 +8,12 @@ KB.Stage = (function(){
 
 	// Stage represents a staging area where modifications/loading are done.
 	function Stage(ref, page){
+		this.id = GenerateID();
+
 		this.url = ref.url;
 		this.owner = ref.owner;
 		this.link = ref.link;
 		this.title = ref.title;
-		this.key = ref.key;
 
 		page = page || {};
 		page.owner = page.owner || ref.owner || "";
@@ -27,6 +29,10 @@ KB.Stage = (function(){
 		close: function(){
 			this.notifier.emit({type: "close"});
 		},
+
+		resolveLinks: function(text){
+			return text;
+		}
 	};
 
 	return Stage;
