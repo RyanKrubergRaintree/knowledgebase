@@ -46,21 +46,15 @@ KB.Lineup = (function(){
 		},
 
 		clear: function(){
+			this.removeListeners();
 			this.stages = [];
 			this.changed();
 		},
 
-		close: function(id){
-			this.stages = this.stages.filter(function(stage){
-				return stage.id !== id;
-			});
-			this.changed();
-		},
-
 		closeLast: function(){
-			var stages = this.stages;
-			stages = stages.slice(0, Math.max(stages.length-1, 1));
-			this.changed();
+			if(this.stages.length > 0){
+				this.stages[this.stages.length-1].close();
+			}
 		},
 
 		changeRef: function(id, stage){
@@ -90,6 +84,8 @@ KB.Lineup = (function(){
 				link: props.link || Convert.URLToLink(url)
 			});
 
+			stage.on("closed", this.handleClose, this);
+
 			if(props.link === ""){
 				stage.link = "";
 			}
@@ -105,14 +101,34 @@ KB.Lineup = (function(){
 			return stage.id;
 		},
 
+		handleClose: function(ev){
+			this.stages = this.stages.filter(function(stage){
+				return stage != ev.stage;
+			});
+			this.changed();
+		},
 
-		updateRefs: function(nextproxies){
-			var preproxies = this.stages.slice();
+		removeListeners: function(){
+			this.stages.map(function(stage){
+				stage.remove(this);
+			});
+		},
+		addListeners: function(){
+			var self = this;
+			this.stages.map(function(stage){
+				stage.on("closed", self.handleClose, self);
+			});
+		},
+
+		updateRefs: function(nextstages){
+			this.removeListeners();
+
+			var stages = this.stages.slice();
 			var changed = false;
 
 			var self = this;
-			var newproxies = nextproxies.map(function(stage){
-				var prev = preproxies.shift();
+			var newproxies = nextstages.map(function(stage){
+				var prev = stages.shift();
 				if(prev && (prev.url == stage.url)){
 					return prev;
 				}
@@ -120,13 +136,15 @@ KB.Lineup = (function(){
 				return stage;
 			});
 
-			if(preproxies.length > 0){
+			if(stages.length > 0){
 				changed = true;
 			}
 			if(changed){
 				this.stages = newproxies;
 				this.changed();
 			}
+
+			this.addListeners();
 		}
 	};
 

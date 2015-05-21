@@ -2,7 +2,6 @@
 
 function Notifier(){
 	this.listeners = [];
-	this.lastKey = 0;
 }
 
 Notifier.prototype = {
@@ -22,8 +21,7 @@ Notifier.prototype = {
 		this.listeners.push({
 			event: event,
 			handler: handler,
-			recv: recv,
-			key: this.lastKey++
+			recv: recv
 		});
 	},
 	off: function(event, handler, recv){
@@ -47,10 +45,10 @@ Notifier.prototype = {
 	emit: function(event){
 		var self = this;
 		window.setTimeout(function(){
-			self.update(event);
+			self.handle(event);
 		}, 0);
 	},
-	update: function(event){
+	handle: function(event){
 		this.listeners.map(function(listener){
 			if(listener.event == event.type){
 				listener.handler.call(listener.recv, event);

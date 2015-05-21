@@ -15,6 +15,8 @@ KB.Stage = (function(){
 		this.link = ref.link;
 		this.title = ref.title;
 
+		this.wide = false;
+
 		page = page || {};
 		page.owner = page.owner || ref.owner || "";
 		page.slug = page.slug || ref.slug || "";
@@ -23,11 +25,14 @@ KB.Stage = (function(){
 		this.page = new KB.Page(page);
 		this.notifier = new Notifier();
 		this.notifier.mixto(this);
+
+		this.state = "loading";
 	};
 
 	Stage.prototype = {
 		close: function(){
-			this.notifier.emit({type: "close"});
+			this.state = "closed";
+			this.notifier.handle({type: "closed", stage: this});
 		},
 
 		resolveLinks: function(text){

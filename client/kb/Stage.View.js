@@ -5,13 +5,34 @@
 KB.Stage.View = (function(){
 	var StageButtons = React.createClass({
 		displayName: "StageButtons",
+
+		toggleWidth: function(){
+			this.props.onToggleWidth();
+		},
+		close: function(){
+			this.props.stage.close();
+		},
+
 		render: function(){
+			var stage = this.props.stage;
 			var a = React.DOM.a;
 			return React.DOM.div(
 				{className: "stage-buttons"},
-				a({className:"mdi mdi-playlist-plus", href:"#", title:"Add an item."}),
-				a({className:"mdi mdi-arrow-expand", href:"#", title:"Toggle page width."}),
-				a({className:"mdi mdi-close", href:"#", title:"Close page."})
+				a({
+					className:"mdi mdi-playlist-plus",
+					href:"#",
+					title:"Add an item."
+				}),
+				a({
+					className:"mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),
+					title:"Toggle page width.",
+					onClick: this.toggleWidth
+				}),
+				a({
+					className:"mdi mdi-close",
+					title:"Close page.",
+					onClick: this.close
+				})
 			);
 		}
 	});
@@ -34,6 +55,18 @@ KB.Stage.View = (function(){
 	var Stage = React.createClass({
 		displayName: "Stage",
 
+		getInitialState: function(){
+			return {
+				wide: false
+			};
+		},
+
+		toggleWidth: function(){
+			this.setState({
+				wide: !this.state.wide
+			});
+		},
+
 		activate: function(ev){
 			if(typeof ev == 'undefined'){
 				SmoothScroll.to(this.getDOMNode());
@@ -43,14 +76,17 @@ KB.Stage.View = (function(){
 		},
 
 		render: function(){
+			var wide = this.state.wide ? " stage-wide" : "";
 			return React.DOM.div(
-				{className: "stage", onClick: this.activate},
-				React.createElement(StageButtons, {}),
+				{className: "stage" + wide, onClick: this.activate},
+				React.createElement(StageButtons, {
+					stage: this.props.stage,
+					isWide: this.state.wide,
+					onToggleWidth: this.toggleWidth
+				}),
 				React.DOM.div(
 					{className:"stage-scroll round-scrollbar"},
-					React.createElement(StageInfo, {
-						stage: this.props.stage
-					}),
+					React.createElement(StageInfo, this.props),
 					React.createElement(KB.Page.View, {
 						stage: this.props.stage,
 						page: this.props.stage.page

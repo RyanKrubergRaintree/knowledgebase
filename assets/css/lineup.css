@@ -17,14 +17,32 @@
 	flex: none;
 	width: 99%;
 	max-width: 465px;
+
+	transition:
+		width 0.3s ease-in-out,
+		max-width 0.3s ease-in-out
+	;
+}
+
+.stage-wide {
+	max-width: 600px;
 }
 
 /* 465 * 1.5 ~= 700 */
-@media(min-width:  700px) { .stage { width: 49%; } }
+@media(min-width:  700px) {
+	.stage { width: 49%; }
+	.stage-wide { width: 99%; }
+}
 /* 465 * 2.5 ~= 1163 */
-@media(min-width: 1163px) { .stage { width: 33%; } }
+@media(min-width: 1163px) {
+	.stage { width: 33%; }
+	.stage-wide { width: 66%; }
+}
 /* 465 * 3.5 ~= 1628 */
-@media(min-width: 1628px) { .stage { width: 24.5%; } }
+@media(min-width: 1628px) {
+	.stage { width: 24.5%; }
+	.stage-wide { width: 49%; }
+}
 
 .stage-buttons {
 	position: absolute;
