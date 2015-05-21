@@ -100,9 +100,6 @@ func (s *Source) sorted(sources []string) ([]string, error) {
 		deps[file] = s.extractDeps(file)
 	}
 
-	for file, deps := range deps {
-		log.Println("\t", file, "->", deps)
-	}
 	sorted := make(map[string]bool)
 
 	// brute force topological sort
@@ -127,6 +124,9 @@ func (s *Source) sorted(sources []string) ([]string, error) {
 		}
 
 		if len(sorted) == len(sources) {
+			for _, file := range result {
+				log.Println("\t", file, "->", deps[file])
+			}
 			return result, nil
 		}
 
