@@ -107,3 +107,24 @@ ItemView['entry'] = React.createClass({
 		);
 	}
 });
+
+ItemView['tags'] = React.createClass({
+	displayName: 'Tags',
+	render: function(){
+		var item = this.props.item,
+			stage = this.props.stage;
+		var tags = item.text.split(",");
+
+		return React.DOM.div({className: 'item-tags content-entry'},
+			tags.map(function(tag, i){
+				tag = tag.trim();
+				return React.DOM.a({
+					className: "tag",
+					key: i,
+					href: stage.getTagLink(tag)
+				}, tag);
+			}),
+			React.DOM.div({className:"clear-fix"})
+		);
+	}
+});

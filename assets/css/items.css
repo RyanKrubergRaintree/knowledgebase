@@ -1,0 +1,34 @@
+.item {
+	position: relative;
+	outline: 1px solid rgba(0,0,0,0.0);
+
+	padding: 0 10px;
+	min-height: 20px;
+}
+
+.item-drag {
+	position: absolute;
+	top: 0; right: -8px; bottom: 0;
+	width: 16px;
+
+	cursor: move;
+
+	background-image: url("drag.png");
+	background-repeat: no-repeat repeat;
+	background-position: center center;
+}
+
+.item-tags {
+}
+
+.item-tags .tag {
+	float: left;
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	
+	background: #EEE;
+	border: 1px solid #E5E5E5;
+	margin-right: 8px;
+	padding: 0 8px;
+}

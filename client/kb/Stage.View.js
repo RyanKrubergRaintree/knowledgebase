@@ -20,8 +20,10 @@ KB.Stage.View = (function(){
 				{className: "stage-buttons"},
 				a({
 					className:"mdi mdi-playlist-plus",
-					href:"#",
-					title:"Add an item."
+					draggable: true,
+					style: { cursor: "move" },
+					title:"Drag to page to add an item."
+					//TODO: add drag start handling
 				}),
 				a({
 					className:"mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),
@@ -47,7 +49,8 @@ KB.Stage.View = (function(){
 			return table({className:"stage-info"},
 				tr(null, td(null, "Link"),        td(null, this.props.stage.link)),
 				tr(null, td(null, "Create by"),   td(null, "Raintree Systems Help")),
-				tr(null, td(null, "Shared with"), td(null, "Everyone"))
+				tr(null, td(null, "Shared with"), td(null, "Everybody")),
+				tr(null, td(null, "State:"),      td(null, this.props.stage.state))
 			);
 		}
 	});
@@ -93,6 +96,23 @@ KB.Stage.View = (function(){
 					})
 				)
 			);
+		},
+
+		// bindings to Stage
+		changed: function(){
+			this.forceUpdate();
+		},
+		componentDidMount: function(){
+			this.props.stage.on("changed", this.changed, this);
+		},
+		componentWillReceiveProps: function(nextprops){
+			if(this.props.stage !== nextprops.stage){
+				this.props.stage.remove(this);
+				nextprops.stage.on("changed", this.changed, this);
+			}
+		},
+		componentWillUnmount: function() {
+			this.props.stage.remove(this);
 		}
 	});
 

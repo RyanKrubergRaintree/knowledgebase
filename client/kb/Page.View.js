@@ -47,10 +47,18 @@ KB.Page.View = (function(){
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			return React.createElement(ItemView[item.type], {
-				stage: stage,
-				item: item
-			});
+			var view = ItemView[item.type] || ItemView.Unknown;
+			return React.DOM.div(
+				{ className: "item" },
+				React.DOM.div({
+					className:"item-drag",
+					title: "Move/Copy the item."
+				}),
+				React.createElement(view, {
+					stage: stage,
+					item: item
+				})
+			);
 		}
 	});
 

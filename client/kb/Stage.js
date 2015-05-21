@@ -15,8 +15,6 @@ KB.Stage = (function(){
 		this.link = ref.link;
 		this.title = ref.title;
 
-		this.wide = false;
-
 		page = page || {};
 		page.owner = page.owner || ref.owner || "";
 		page.slug = page.slug || ref.slug || "";
@@ -26,13 +24,61 @@ KB.Stage = (function(){
 		this.notifier = new Notifier();
 		this.notifier.mixto(this);
 
-		this.state = "loading";
+		this.state_ = "";
+
+		var self = this;
+		window.setTimeout(function(){
+			self.requestPage();
+		});
+
+		this.lastStatus = 200;
+		this.lastError = "";
 	};
 
 	Stage.prototype = {
+		set state(value){
+			this.state_ = value;
+			this.changed();
+		},
+
+		get state(){
+			return this.state_;
+		},
+
 		close: function(){
 			this.state = "closed";
 			this.notifier.handle({type: "closed", stage: this});
+		},
+		changed: function(){
+			this.notifier.emit({type: "changed", stage: this});
+		},
+
+
+		requestPage: function(){
+			this.state = "requesting";
+
+			var xhr = new XMLHttpRequest();
+			xhr.withCredentials = true;
+			var self = this;
+
+			xhr.addEventListener('load', function(ev){
+				var data = JSON.parse(xhr.response),
+					page = new KB.Page(data);
+				self.page = page;
+				self.state = "loaded";
+			}, false);
+
+			xhr.addEventListener('error', function(ev){
+				console.error(ev);
+			}, false);
+
+			xhr.open('GET', this.url, true);
+			xhr.setRequestHeader('Accept', 'application/json');
+			xhr.send();
+		},
+
+		getTagLink: function(tag){
+			return "/" + this.owner + ":/tags/" + tag;
 		},
 
 		resolveLinks: function(text){

@@ -111,13 +111,14 @@
 
 .page {
 	background: #FFF;
-	padding: 15px 15px 10px 15px;
+	padding: 15px 0 10px 0;
 
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
 
 .page h1 {
 	font-size: 24px;
+	margin-left: 10px;
 }
 
 .round-scrollbar::-webkit-scrollbar {
