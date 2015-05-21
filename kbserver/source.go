@@ -2,6 +2,7 @@ package kbserver
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -130,10 +131,24 @@ func (s *Source) sorted(sources []string) ([]string, error) {
 		}
 
 		if !changes {
-			return nil, errors.New("sources contain a circular dependency")
+			break
 		}
 	}
 
+	fmt.Println("Unresolved dependencies:")
+	for _, file := range sources {
+		if sorted[file] {
+			continue
+		}
+
+		fmt.Print("  ", file, " > ")
+		for _, dep := range deps[file] {
+			if !sorted[dep] {
+				fmt.Print(dep, " ")
+			}
+		}
+		fmt.Println()
+	}
 	return nil, errors.New("sources contain a circular dependency")
 }
 

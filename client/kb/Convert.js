@@ -1,4 +1,3 @@
-
 Convert = {};
 (function(Convert){
 	"use strict";

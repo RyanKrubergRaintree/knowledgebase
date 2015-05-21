@@ -1,15 +1,15 @@
 // import "/util/Notifier.js"
-// import "/wiki/Wiki.js"
-// import "/wiki/Convert.js"
-// import "/wiki/Stage.js"
+// import "/kb/KB.js"
+// import "/kb/Convert.js"
+// import "/kb/Stage.js"
 
 
 //TODO: get rid of close --> use notification from Stage
 
-(function(Wiki){
+(function(KB){
 	"use strict";
 
-	Wiki.Lineup = Lineup;
+	KB.Lineup = Lineup;
 	function Lineup(){
 		this.stages = [];
 		this.lastKey = 0;
@@ -86,7 +86,7 @@
 			this.trim_(props.after);
 			var url = Convert.URLToReadable(props.url);
 
-			var stage = new Wiki.Stage({
+			var stage = new KB.Stage({
 				url: url,
 				title: props.title || Convert.URLToTitle(url),
 				link: props.link || Convert.URLToLink(url),
@@ -133,4 +133,4 @@
 			}
 		}
 	};
-})(Wiki);
+})(KB);

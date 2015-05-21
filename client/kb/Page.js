@@ -1,10 +1,10 @@
-//import "/wiki/Wiki.js"
+//import "/kb/KB.js"
 
-(function(Wiki){
+(function(KB){
 	"use strict";
 
 	// Page corresponds to the knowledgebase page structure
-	Wiki.Page = Page;
+	KB.Page = Page;
 	function Page(data){
 		data = data || {};
 		this.owner = data.owner || "";
@@ -76,4 +76,4 @@
 			story.unshift(item);
 		}
 	};
-})(Wiki);
+})(KB);

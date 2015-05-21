@@ -1,12 +1,12 @@
 //import "/util/Notifier.js"
-//import "/wiki/Wiki.js"
-//import "/wiki/Page.js"
+//import "/kb/KB.js"
+//import "/kb/Page.js"
 
- (function(Wiki){
+ (function(KB){
 	"use strict";
 
 	// Stage represents a staging area where modifications/loading are done.
-	Wiki.Stage = Stage;
+	KB.Stage = Stage;
 	function Stage(ref, page){
 		this.url = ref.url;
 		this.owner = ref.owner;
@@ -19,7 +19,7 @@
 		page.slug = page.slug || ref.slug || "";
 		page.title = page.title || ref.title || "";
 
-		this.page = new Wiki.Page(page);
+		this.page = new KB.Page(page);
 		this.notifier = new Notifier();
 		this.notifier.mixto(this);
 	};
@@ -30,4 +30,4 @@
 		},
 	};
 
-})(Wiki);
+})(KB);

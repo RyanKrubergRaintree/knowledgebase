@@ -8,11 +8,11 @@ Global = {
 	Crumbs: null
 };
 
-// import "/wiki/Crumbs.js"
-// import "/wiki/Lineup.js"
+// import "/kb/Crumbs.js"
+// import "/kb/Lineup.js"
 
-Global.Lineup = new Wiki.Lineup();
-Global.Crumbs = new Wiki.Crumbs(Global.Lineup);
+Global.Lineup = new KB.Lineup();
+Global.Crumbs = new KB.Crumbs(Global.Lineup);
 
 // import "/view/App.js"
 function initialize(mountNode){

@@ -1,9 +1,9 @@
-// import "/wiki/Lineup.js"
-// import "/wiki/Wiki.js"
-// import "/wiki/Convert.js"
-// import "/wiki/Stage.js"
+// import "/kb/Lineup.js"
+// import "/kb/KB.js"
+// import "/kb/Convert.js"
+// import "/kb/Stage.js"
 
-(function(Wiki){
+(function(KB){
 	"use strict";
 
 	var separator = '| ';
@@ -38,7 +38,7 @@
 			}
 
 			var url = token;
-			stages.push(new Wiki.Stage({
+			stages.push(new KB.Stage({
 				url: url,
 				link: Convert.URLToLink(url),
 				title: Convert.URLToTitle(url),
@@ -48,7 +48,7 @@
 		return stages;
 	}
 
-	Wiki.Crumbs = Crumbs;
+	KB.Crumbs = Crumbs;
 	function Crumbs(lineup){
 		this.lineup_ = lineup;
 		this.navigatingTo_ = "";
@@ -76,4 +76,4 @@
 			}
 		}
 	};
-})(Wiki);
+})(KB);
