@@ -68,6 +68,7 @@ func (db *Database) Initialize() error {
 			Version   INT   NOT NULL DEFAULT 0,
 			
 			Tags      TEXT[] NOT NULL DEFAULT '{}',
+			NormTags  TEXT[] NOT NULL DEFAULT '{}',
 
 			Created  TIMESTAMP NOT NULL DEFAULT current_timestamp,
 			Modified TIMESTAMP NOT NULL DEFAULT current_timestamp,

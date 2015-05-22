@@ -41,12 +41,18 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimSuffix(r.URL.Path, ".json")
 	group, slug := kb.SplitLink(path)
 	if group == "" {
+		if strings.HasPrefix(path, "/index/") {
+			r.URL.Path = strings.TrimPrefix(path, "/index")
+			server.HandleIndex(w, r)
+			return
+		}
 		http.NotFound(w, r)
+		return
 	}
 
 	user, err := server.CurrentUser(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -58,4 +64,20 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(data)
+}
+
+func (server *Server) HandleIndex(w http.ResponseWriter, r *http.Request) {
+	user, err := server.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	index := server.IndexByUser(user.ID)
+	switch r.URL.Path {
+	case "/tags":
+		entries, err := index.List()
+		log.Println(entries, err)
+	default:
+		http.NotFound(w, r)
+	}
 }

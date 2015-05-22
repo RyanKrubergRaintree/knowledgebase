@@ -30,6 +30,7 @@ func PageEntryFrom(page *Page) PageEntry {
 		Slug:     page.Slug,
 		Title:    page.Title,
 		Synopsis: page.Synopsis,
+		Tags:     ExtractTags(page),
 		Modified: page.LastModified(),
 	}
 }

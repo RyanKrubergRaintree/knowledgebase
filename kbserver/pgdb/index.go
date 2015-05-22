@@ -106,12 +106,13 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 }
 
 func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
+	ntag := string(kb.Slugify(tag))
 	return db.selectPages(`
-		WHERE (Tags @> $1) 
+		WHERE (NTags @> $1) 
 		  AND (    Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
 				OR Owner IN (SELECT GroupID FROM Memberships WHERE User = $2))
 		ORDER BY Owner, Slug
-	`, tag, db.User)
+	`, ntag, db.User)
 }
 
 func (db *Index) RecentChanges(n int) ([]kb.PageEntry, error) {

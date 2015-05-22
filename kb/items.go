@@ -59,20 +59,28 @@ func Tags(tags ...string) Item {
 }
 
 func ExtractTags(page *Page) []string {
-	tags := make(map[string]struct{})
+	tags := make(map[string]string)
 	for _, item := range page.Story {
 		if item.Type() == "tags" {
 			for _, tag := range strings.Split(item.Val("text"), ",") {
-				tag = strings.TrimSpace(tag)
-				tag = strings.ToLower(tag)
-				tags[tag] = struct{}{}
+				ntag := string(Slugify(tag))
+				tags[ntag] = strings.TrimSpace(tag)
 			}
 		}
 	}
 
 	result := make([]string, 0, len(tags))
-	for tag := range tags {
+	for _, tag := range tags {
 		result = append(result, tag)
 	}
 	return result
+}
+
+func NormalizeTags(tags []string) []string {
+	normalized := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		normalized = append(normalized, string(Slugify(tag)))
+	}
+
+	return normalized
 }

@@ -68,15 +68,16 @@ func (db *Pages) Create(page *kb.Page) error {
 	}
 
 	tags := kb.ExtractTags(page)
+	ntags := kb.NormalizeTags(tags)
 	data, err := json.Marshal(page)
 	if err != nil {
 		return err
 	}
 	_, err = db.Exec(`
 		INSERT INTO Pages
-		(Owner, Slug, Data, Tags)
-		VALUES ($1, $2, $3, $4)
-	`, page.Owner, page.Slug, data, stringSlice(tags))
+		(Owner, Slug, Data, Tags, NormTags)
+		VALUES ($1, $2, $3, $4, $5)
+	`, page.Owner, page.Slug, data, stringSlice(tags), stringSlice(ntags))
 
 	return err
 }
@@ -123,6 +124,8 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 	}
 
 	tags := kb.ExtractTags(page)
+	ntags := kb.NormalizeTags(tags)
+
 	data, err := json.Marshal(page)
 	if err != nil {
 		return err
@@ -131,10 +134,11 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 	_, err = db.Exec(`
 		UPDATE Pages
 		SET	Tags = $1,
-			Data = $2,
+		    NTags = $2
+			Data = $3,
 			Version = (Version + 1)
-		WHERE Owner = $3 AND Slug = $4
-	`, stringSlice(tags), data, db.Group, slug)
+		WHERE Owner = $4 AND Slug = $5
+	`, stringSlice(tags), stringSlice(ntags), data, db.Group, slug)
 
 	return err
 }

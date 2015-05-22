@@ -14,9 +14,11 @@ func NewPage(owner string, title string) *kb.Page {
 		Title:    title,
 		Synopsis: lorem.Paragraph(1, 1),
 		Story: kb.Story{
-			kb.Paragraph("Simple link: [[Community:Simple]]."),
+			kb.Tags("Welcome", "Home", "Some Example"),
+			kb.Paragraph("Simple link: [[Simple]]."),
 			kb.Paragraph("Link to self: [[Community:Welcome]]."),
-			kb.Paragraph("External link: [[http://neti.ee neti.ee]]"),
+			kb.Paragraph("External link: [[http://google.com google.com]]"),
+			kb.Paragraph("Index [[index/all]] [[index/tags]] [[index/groups]] [[index/group/" + string(kb.Slugify(owner)) + "]]"),
 			kb.Paragraph(lorem.Paragraph(1, 1)),
 			kb.Paragraph(lorem.Paragraph(1, 1)),
 			kb.Paragraph(lorem.Paragraph(1, 1)),

@@ -71,11 +71,6 @@ KB.Stage = (function(){
 			xhr.open('GET', this.url, true);
 			xhr.setRequestHeader('Accept', 'application/json');
 			xhr.send();
-		},
-
-		getTagLink: function(tag){
-			var i = this.url.lastIndexOf(":");
-			return this.url.substr(0, i) + ':index/tags';
 		}
 	};
 
