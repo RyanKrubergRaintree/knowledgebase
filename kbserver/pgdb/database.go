@@ -27,7 +27,6 @@ func (db *Database) exec(query string, args ...interface{}) error {
 
 func (db *Database) reset() error {
 	return db.exec(`
-		-- Reset DB state;
 		DROP SCHEMA public CASCADE;
 		CREATE SCHEMA public;
 		GRANT ALL ON SCHEMA public TO postgres;
@@ -40,28 +39,30 @@ func (db *Database) Initialize() error {
 	_ = db.reset()
 	return db.exec(`
 		CREATE TABLE Groups (
-			Name    TEXT   PRIMARY KEY UNIQUE,
-			Public  BOOL   NOT NULL, -- can be read by everyone
+			ID      TEXT   PRIMARY KEY,
+			Name    TEXT   NOT NULL,
+			Public  BOOL   NOT NULL,
 
 			Description TEXT NOT NULL DEFAULT ''
 		);
 
 		CREATE TABLE Users (
-			Name  TEXT   PRIMARY KEY UNIQUE,
+			ID    TEXT   PRIMARY KEY,
+			Name  TEXT   NOT NULL,
 			Email TEXT   NOT NULL,
 			
 			Description TEXT NOT NULL DEFAULT ''
 		);
 
 		CREATE TABLE Memberships (
-			UserName  TEXT NOT NULL REFERENCES Users(Name),
-			GroupName TEXT NOT NULL REFERENCES Groups(Name),
+			UserID  TEXT NOT NULL REFERENCES Users(ID),
+			GroupID TEXT NOT NULL REFERENCES Groups(ID),
 
-			CONSTRAINT Memberships_PKEY PRIMARY KEY (UserName, GroupName)			
+			CONSTRAINT Memberships_PKEY PRIMARY KEY (UserID, GroupID)			
 		);
 
 		CREATE TABLE Pages (
-			Owner     TEXT  NOT NULL REFERENCES Groups(Name),
+			Owner     TEXT  NOT NULL REFERENCES Groups(ID),
 			Slug      TEXT  NOT NULL,
 			Data      JSONB NOT NULL,
 			Version   INT   NOT NULL DEFAULT 0,
@@ -73,8 +74,6 @@ func (db *Database) Initialize() error {
 
 			CONSTRAINT Pages_PKEY PRIMARY KEY (Owner, Slug)
 		);
-		CREATE INDEX PagesTagIndex ON Pages USING gin ((Data->'tags'));
-		CREATE INDEX PagesSynopsisIndex ON Pages USING gin ((Data->'synopsis'));
 
 		-- Triggers to automatically update modified date
 		CREATE FUNCTION UpdateModifiedDate() RETURNS TRIGGER AS $$

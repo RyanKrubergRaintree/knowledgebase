@@ -11,13 +11,10 @@ KB.Stage = (function(){
 		this.id = GenerateID();
 
 		this.url = ref.url;
-		this.owner = ref.owner;
 		this.link = ref.link;
 		this.title = ref.title;
 
 		page = page || {};
-		page.owner = page.owner || ref.owner || "";
-		page.slug = page.slug || ref.slug || "";
 		page.title = page.title || ref.title || "";
 
 		this.page = new KB.Page(page);
@@ -53,7 +50,6 @@ KB.Stage = (function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
 
-
 		requestPage: function(){
 			this.state = "requesting";
 
@@ -78,11 +74,8 @@ KB.Stage = (function(){
 		},
 
 		getTagLink: function(tag){
-			return "/" + this.owner + ":/tags/" + tag;
-		},
-
-		resolveLinks: function(text){
-			return text;
+			var i = this.url.lastIndexOf(":");
+			return this.url.substr(0, i) + ':index/tags';
 		}
 	};
 

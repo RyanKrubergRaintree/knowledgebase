@@ -3,6 +3,7 @@ package pgdb
 import (
 	"database/sql"
 
+	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
@@ -15,26 +16,26 @@ type Users struct{ *Database }
 func (db *Users) Create(user kbserver.User) error {
 	return db.exec(`
 		INSERT INTO Users 
-		(Name, Email, Description)
-		VALUES ($1, $2, $3)`,
-		user.Name, user.Email, user.Description)
+		(ID, Name, Email, Description)
+		VALUES ($1, $2, $3, $4)`,
+		kb.Slugify(user.Name), user.Name, user.Email, user.Description)
 }
 
-func (db *Users) Delete(name string) error {
+func (db *Users) Delete(name kb.Slug) error {
 	return db.exec(`DELETE FROM Users WHERE Name = ?`, name)
 }
 
-func (db *Users) ByName(name string) (kbserver.User, error) {
+func (db *Users) ByName(name kb.Slug) (kbserver.User, error) {
 	var user kbserver.User
 	err := db.QueryRow(`
 		SELECT
-			Name, Email, Description,
+			ID, Name, Email, Description,
 			array_agg(Memberships.GroupName) as Groups
 		FROM Users
-		JOIN Memberships ON (Users.Name = Memberships.UserName)
-		GROUP BY Users.Name
-		WHERE Users.Name = $1
-	`, name).Scan(&user.Name, &user.Email, &user.Description, &user.Groups)
+		JOIN Memberships ON (Users.ID = Memberships.UserID)
+		GROUP BY Users.ID
+		WHERE Users.ID = $1
+	`, name).Scan(&user.Name, &user.Name, &user.Email, &user.Description, &user.Groups)
 	if err == sql.ErrNoRows {
 		return user, kbserver.ErrUserNotExist
 	}
@@ -44,11 +45,11 @@ func (db *Users) ByName(name string) (kbserver.User, error) {
 func (db *Users) List() ([]kbserver.User, error) {
 	rows, err := db.Query(`
 		SELECT
-			Name, Email, Description,
+			ID, Name, Email, Description,
 			array_agg(Memberships.GroupName) as Groups
 		FROM Users
-		JOIN Memberships ON (Users.Name = Memberships.UserName)
-		GROUP BY Users.Name
+		JOIN Memberships ON (Users.ID = Memberships.UserID)
+		GROUP BY Users.ID
 	`)
 	if err != nil {
 		return nil, err
@@ -58,7 +59,7 @@ func (db *Users) List() ([]kbserver.User, error) {
 	var users []kbserver.User
 	for rows.Next() {
 		var user kbserver.User
-		rows.Scan(&user.Name, &user.Email, &user.Description, &user.Groups)
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Groups)
 		users = append(users, user)
 	}
 	return users, rows.Err()

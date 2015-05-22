@@ -17,24 +17,24 @@ var (
 type Database interface {
 	Users() Users
 	Groups() Groups
-	PagesByGroup(user, group string) Pages
-	IndexByUser(user string) Index
+	PagesByGroup(user, group kb.Slug) Pages
+	IndexByUser(user kb.Slug) Index
 }
 
 type Users interface {
 	Create(user User) error
-	Delete(name string) error
-	ByName(name string) (User, error)
+	Delete(id kb.Slug) error
+	ByName(id kb.Slug) (User, error)
 	List() ([]User, error)
 }
 
 type Groups interface {
 	Create(group Group) error
-	Delete(name string) error
+	Delete(group kb.Slug) error
 	List() ([]Group, error)
 
-	AddMember(group string, user string) error
-	RemoveMember(group string, user string) error
+	AddMember(group, user kb.Slug) error
+	RemoveMember(group, user kb.Slug) error
 }
 
 type Pages interface {
@@ -57,6 +57,7 @@ type Index interface {
 }
 
 type User struct {
+	ID          kb.Slug
 	Name        string
 	Email       string
 	Description string
@@ -73,6 +74,7 @@ func (user *User) BelongsTo(groupname string) bool {
 }
 
 type Group struct {
+	ID          kb.Slug
 	Name        string
 	Public      bool
 	Description string

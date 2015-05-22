@@ -9,14 +9,14 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-func (db *Database) PagesByGroup(user, group string) kbserver.Pages {
+func (db *Database) PagesByGroup(user, group kb.Slug) kbserver.Pages {
 	return &Pages{db, user, group}
 }
 
 type Pages struct {
 	*Database
-	User  string
-	Group string
+	User  kb.Slug
+	Group kb.Slug
 }
 
 func (db *Pages) tx() (*sql.Tx, error) {
@@ -28,7 +28,7 @@ func (db *Pages) tx() (*sql.Tx, error) {
 	err = tx.QueryRow(`
 		SELECT
 		FROM Memberships
-		WHERE UserName = $1 AND GroupName = $2
+		WHERE UserID = $1 AND GroupID = $2
 	`, db.User, db.Group).Scan()
 
 	if err == sql.ErrNoRows {
@@ -45,15 +45,15 @@ func (db *Pages) tx() (*sql.Tx, error) {
 
 func (db *Pages) CanWrite() (result bool) {
 	err := db.QueryRow(`SELECT
-		EXISTS(SELECT FROM Memberships WHERE UserName = $1 AND GroupName = $2)
+		EXISTS(SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2)
 	`, db.User, db.Group).Scan(&result)
 	return (err == nil) && result
 }
 
 func (db *Pages) CanRead() (result bool) {
 	err := db.QueryRow(`SELECT
-		(SELECT Public FROM Groups WHERE Name = $2)
-     	OR EXISTS( SELECT FROM Memberships WHERE UserName = $1 AND GroupName = $2 )
+		(SELECT Public FROM Groups WHERE ID = $2)
+     	OR EXISTS( SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2 )
 	`, db.User, db.Group).Scan(&result)
 	return (err == nil) && result
 }

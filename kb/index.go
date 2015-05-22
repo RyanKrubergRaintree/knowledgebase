@@ -7,7 +7,7 @@ import (
 )
 
 type PageEntry struct {
-	Owner    string    `json:"owner"`
+	Owner    Slug      `json:"owner"`
 	Slug     Slug      `json:"slug"`
 	Title    string    `json:"title"`
 	Synopsis string    `json:"synopsis"`

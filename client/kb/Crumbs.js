@@ -6,18 +6,10 @@
 KB.Crumbs = (function(){
 	"use strict";
 
-	var separator = '| ';
-
 	// converts to
 	// #┃ref1┃ref2┃ref3
 	function toHash(stages){
-		return separator + stages.map(function(ref){
-			var loc = Convert.URLToLocation(ref.url);
-			if((loc.origin == "") || (loc.origin == window.location.origin)) {
-				return loc.pathname + loc.search;
-			}
-			return "//" + loc.host + loc.pathname + loc.search;
-		}).join(separator);
+		return " " + stages.map(Convert.ReferenceToLink).join('| ');
 	}
 
 	// converts from
@@ -25,25 +17,15 @@ KB.Crumbs = (function(){
 	function fromHash(hash){
 		// IE doesn't have the first #
 		if(hash[0] == '#'){
-			hash = hash.substr(2);
-		} else {
 			hash = hash.substr(1);
+		} else {
+			hash = hash.substr(0);
 		}
 
 		var stages = [];
-		hash.split(separator).map(function(token){
-			token = token.trim();
-			if(token.trim() === ''){
-				return;
-			}
-
-			var url = token;
-			stages.push(new KB.Stage({
-				url: url,
-				link: Convert.URLToLink(url),
-				title: Convert.URLToTitle(url),
-				key: -1
-			}));
+		hash.split('|').map(function(link){
+			if(link.trim() === ''){ return; }
+			stages.push(new KB.Stage(Convert.LinkToReference(link)));
 		});
 		return stages;
 	}
@@ -66,10 +48,10 @@ KB.Crumbs = (function(){
 			this.navigatingTo_ = toHash(this.lineup_.stages);
 			window.location.hash = this.navigatingTo_;
 		},
-		initLineup: function(){
+		initLineup: function(defaultPage){
 			var hash = window.location.hash;
 			if((hash === '') || (hash === '#')){
-				this.lineup_.open(Global.HomePage);
+				this.lineup_.openLink(defaultPage);
 			} else {
 				this.lineup_.updateRefs(fromHash(window.location.hash));
 			}

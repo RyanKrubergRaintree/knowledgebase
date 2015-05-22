@@ -2,7 +2,7 @@
 
 Global = {
 	User: "",
-	HomePage: {},
+	HomePage: "",
 
 	Lineup: null,
 	Crumbs: null,
@@ -21,7 +21,7 @@ function initialize(mountNode){
 		Lineup: Global.Lineup
 	}), mountNode);
 
-	Global.Crumbs.initLineup();
+	Global.Crumbs.initLineup(Global.HomePage);
 	window.addEventListener("click",
 		Global.Lineup.handleClickLink.bind(Global.Lineup));
 }

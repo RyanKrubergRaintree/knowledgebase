@@ -1,4 +1,5 @@
 // import /kb/Convert.js
+// import /kb/Resolve.js
 
 ItemView = {};
 
@@ -32,7 +33,7 @@ ItemView['paragraph'] = React.createClass({
 		return React.DOM.p({
 			className: 'item-content content-paragraph',
 			dangerouslySetInnerHTML: {
-				__html: stage.resolveLinks(this.props.item.text)
+				__html: Resolve(stage, this.props.item.text)
 			}
 		});
 	}
@@ -45,7 +46,7 @@ ItemView['html'] = React.createClass({
 		return React.DOM.div({
 			className: 'item-content content-html',
 			dangerouslySetInnerHTML: {
-				__html: stage.resolveLinks(this.props.item.text)
+				__html: ResolveHTML(stage, this.props.item.text)
 			}
 		});
 	}

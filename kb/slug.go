@@ -62,7 +62,7 @@ func Slugify(s string) Slug {
 			continue
 		}
 		switch r {
-		case '/':
+		case '/', ':':
 			slug = append(slug, r)
 			emitdash = false
 			cutdash = true
@@ -87,15 +87,15 @@ func Slugify(s string) Slug {
 	return Slug(slug)
 }
 
-func SplitOwner(url string) (owner string, page Slug) {
-	start := 0
-	if strings.HasPrefix(url, "/") {
-		start = 1
+func SplitLink(link string) (owner Slug, page Slug) {
+	if strings.HasPrefix(link, "/") {
+		link = link[1:]
 	}
+	slug := Slugify(link)
 
-	i := strings.Index(url, ":")
+	i := strings.LastIndex(string(slug), ":")
 	if i < 0 {
-		return "", Slugify(url[start:])
+		return "", slug
 	}
-	return url[start:i], Slugify(url[i+1:])
+	return slug[:i], slug[i+1:]
 }

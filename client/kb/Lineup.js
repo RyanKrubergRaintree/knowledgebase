@@ -78,35 +78,29 @@ KB.Lineup = (function(){
 
 
 		// url
-		// title, optional
-		// link, optional
+		// title
+		// link
 		// after, optional
 		// insteadOf, optional
 		open: function(props){
 			this.trim_(props.after);
-			var url = Convert.URLToReadable(props.url);
-
-			var stage = new KB.Stage({
-				url: url,
-				title: props.title || Convert.URLToTitle(url),
-				link: props.link || Convert.URLToLink(url)
-			});
-
-			stage.on("closed", this.handleClose, this);
-
-			if(props.link === ""){
-				stage.link = "";
-			}
+			var stage = new KB.Stage(props);
 
 			var i = this.indexOf_(props.insteadOf);
 			if(i >= 0){
+				this.stages[i].remove(this);
 				this.stages[i] = stage;
 			} else {
 				this.stages.push(stage);
 			}
 
+			stage.on("closed", this.handleClose, this);
 			this.changed();
 			return stage.id;
+		},
+
+		openLink: function(link){
+			this.open(Convert.LinkToReference(link));
 		},
 
 		handleClose: function(ev){
@@ -135,10 +129,15 @@ KB.Lineup = (function(){
 			var changed = false;
 
 			var self = this;
-			var newproxies = nextstages.map(function(stage){
+			var newstages = nextstages.map(function(stage){
 				var prev = stages.shift();
-				if(prev && (prev.url == stage.url)){
-					return prev;
+
+				if(prev){
+					var plink = Convert.ReferenceToLink(prev);
+					var slink = Convert.ReferenceToLink(stage);
+					if(plink == slink) {
+						return prev;
+					}
 				}
 				changed = true;
 				return stage;
@@ -148,7 +147,7 @@ KB.Lineup = (function(){
 				changed = true;
 			}
 			if(changed){
-				this.stages = newproxies;
+				this.stages = newstages;
 				this.changed();
 			}
 

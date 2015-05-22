@@ -122,7 +122,8 @@ func (front *Front) callback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = front.Context.Login(w, r, kb.User{
-		ID:       user.UserID,
+		AuthID:   user.UserID,
+		ID:       kb.Slugify(user.Name),
 		Email:    user.Email,
 		Name:     user.Name,
 		Provider: provider,

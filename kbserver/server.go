@@ -39,11 +39,8 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := strings.TrimSuffix(r.URL.Path, ".json")
-	owner, slug := kb.SplitOwner(path)
-	if owner == "" && strings.HasSuffix(r.Host, "."+server.Domain) {
-		owner = strings.TrimSuffix(r.Host, "."+server.Domain)
-	}
-	if owner == "" {
+	group, slug := kb.SplitLink(path)
+	if group == "" {
 		http.NotFound(w, r)
 	}
 
@@ -53,7 +50,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pages := server.PagesByGroup(user.Name, owner)
+	pages := server.PagesByGroup(user.ID, group)
 	data, err := pages.LoadRaw(slug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

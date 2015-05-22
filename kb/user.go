@@ -3,7 +3,8 @@ package kb
 import "encoding/gob"
 
 type User struct {
-	ID       string
+	AuthID   string
+	ID       Slug
 	Email    string
 	Name     string
 	Provider string

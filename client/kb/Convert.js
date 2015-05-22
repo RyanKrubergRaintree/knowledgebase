@@ -1,24 +1,63 @@
+// import "/kb/Slug.js"
+
 Convert = {};
 (function(Convert){
 	"use strict";
+
+	// There are several possible links
+	// "//kb.example.com/example" - full URL
+	// "/kb:example" - rooted local URL
+	// "kb:Example" - local URL
+	Convert.LinkToReference = function(link){
+		link = link.trim();
+		// External site:
+		// "//kb.example.com/example"
+		if((link[0] == "/") && (link[1] == "/") ) {
+			return {
+				link: link,
+				url:  link,
+				title: Convert.LinkToTitle(link)
+			};
+		}
+
+		// remove prefix "/"
+		if(link[0] == "/") {
+			link = link.substr(1);
+		}
+
+		return {
+			link: link,
+			url: "/" + Slugify(link),
+			title: Convert.LinkToTitle(link),
+		};
+	}
+
+	Convert.ReferenceToLink = function(ref){
+		return ref.url;
+	};
+
+	Convert.LinkToTitle = function(link){
+		var i = Math.max(link.lastIndexOf("/"), link.lastIndexOf(":"));
+		return link.substr(i + 1);
+	};
 
 	//TODO
 
 	Convert.URLToReadable = function(url){
 		return url;
-	}
+	};
 
 	Convert.URLToLink = function(url){
 		return url;
-	}
+	};
 
 	Convert.URLToTitle = function(url){
 		return url;
-	}
+	};
 
 	Convert.URLToLink = function(url){
 		return url;
-	}
+	};
 
 	Convert.URLToLocation = function(url){
 		var a = document.createElement("a");
@@ -47,6 +86,5 @@ Convert = {};
 			get url(){ return a.href; },
 			set url(v){ a.href = v; }
 		};
-	}
-
+	};
 })(Convert);

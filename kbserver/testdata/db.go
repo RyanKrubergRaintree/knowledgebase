@@ -25,38 +25,43 @@ func check(errors ...error) {
 func SetupDatabase(db kbserver.Database) {
 	check(
 		db.Groups().Create(kbserver.Group{
+			ID:          "community",
 			Name:        "Community",
 			Public:      true,
 			Description: "All editing users",
 		}),
 		db.Groups().Create(kbserver.Group{
+			ID:          "engineering",
 			Name:        "Engineering",
 			Public:      true,
 			Description: "Raintree Engineering",
 		}),
 		db.Groups().Create(kbserver.Group{
+			ID:          "help",
 			Name:        "Help",
 			Public:      true,
 			Description: "Raintree Help",
 		}),
 
 		db.Users().Create(kbserver.User{
+			ID:          "admin",
 			Name:        "Admin",
 			Email:       "",
 			Description: "",
 		}),
 
-		db.Groups().AddMember("Engineering", "Admin"),
-		db.Groups().AddMember("Community", "Admin"),
+		db.Groups().AddMember("engineering", "admin"),
+		db.Groups().AddMember("community", "admin"),
 
-		db.PagesByGroup("Admin", "Community").Create(NewPage("Community", "Welcome")),
+		db.PagesByGroup("admin", "community").Create(NewPage("Community", "Welcome")),
 
 		db.Users().Create(kbserver.User{
+			ID:          "egon-elbre",
 			Name:        "Egon Elbre",
 			Email:       "egonelbre@gmail.com",
 			Description: "Raintree Engineering",
 		}),
-		db.Groups().AddMember("Engineering", "Egon Elbre"),
-		db.Groups().AddMember("Community", "Egon Elbre"),
+		db.Groups().AddMember("engineering", "egon-elbre"),
+		db.Groups().AddMember("community", "egon-elbre"),
 	)
 }
