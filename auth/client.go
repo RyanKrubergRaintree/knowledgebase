@@ -37,6 +37,14 @@ var displayName = map[string]string{
 	"linkedin": "LinkedIn",
 }
 
+var iconName = map[string]string{
+	"twitter":  "mdi mdi-twitter",
+	"facebook": "mdi mdi-facebook",
+	"gplus":    "mdi mdi-google",
+	"github":   "mdi mdi-github-circle",
+	"linkedin": "mdi mdi-linkedIn",
+}
+
 type Client struct{ Key, Secret string }
 
 func ClientsFromEnv() map[string]Client {
@@ -81,6 +89,7 @@ func Register(appkey string, url string, clients map[string]Client) {
 type loginInfo struct {
 	URL  string
 	Name string
+	Icon string
 }
 
 func getLogins() []loginInfo {
@@ -90,6 +99,7 @@ func getLogins() []loginInfo {
 		logins = append(logins, loginInfo{
 			URL:  path.Join(authPath, "provider", name),
 			Name: displayName[name],
+			Icon: iconName[name],
 		})
 	}
 	return logins

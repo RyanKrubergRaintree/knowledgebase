@@ -19,7 +19,7 @@
 		<div id="logins">
 			<h2 class="title">Login with:</h2>
 			{{ range .Logins }}
-			<a href="{{.URL}}" class='button'>{{.Name}}</a>
+			<a href="{{.URL}}" class='button'><span class="login-icon {{.Icon}}"></span>{{.Name}}</a>
 			{{ end }}
 		</div>
 	</div>
