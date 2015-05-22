@@ -53,12 +53,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pages, err := server.PagesByOwner(user.Name, owner)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
+	pages := server.PagesByGroup(user.Name, owner)
 	data, err := pages.LoadRaw(slug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

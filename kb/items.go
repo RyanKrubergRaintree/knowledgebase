@@ -57,3 +57,22 @@ func Tags(tags ...string) Item {
 		"text": strings.Join(tags, ", "),
 	}
 }
+
+func ExtractTags(page *Page) []string {
+	tags := make(map[string]struct{})
+	for _, item := range page.Story {
+		if item.Type() == "tags" {
+			for _, tag := range strings.Split(item.Val("text"), ",") {
+				tag = strings.TrimSpace(tag)
+				tag = strings.ToLower(tag)
+				tags[tag] = struct{}{}
+			}
+		}
+	}
+
+	result := make([]string, 0, len(tags))
+	for tag := range tags {
+		result = append(result, tag)
+	}
+	return result
+}

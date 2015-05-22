@@ -131,5 +131,8 @@ func (item Item) Val(key string) string {
 	return ""
 }
 
+// Type returns the item `type`
+func (item Item) Type() string { return item.Val("type") }
+
 // ID returns the `item` identificator
 func (item Item) ID() string { return item.Val("id") }

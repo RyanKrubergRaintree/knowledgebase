@@ -8,9 +8,11 @@ import (
 
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kbserver"
-	"github.com/raintreeinc/knowledgebase/kbserver/memdb"
+	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 
 	"github.com/gorilla/sessions"
+
+	_ "github.com/lib/pq"
 )
 
 // TODO: add
@@ -19,14 +21,13 @@ import (
 
 var (
 	addr     = flag.String("listen", ":80", "http server `address`")
-	database = flag.String("database", "", "database `params`")
+	database = flag.String("database", "user=root dbname=knowledgebase sslmode=disable", "database `params`")
 	domain   = flag.String("domain", "", "`domain`")
 	conffile = flag.String("config", "knowledgebase.toml", "farm configuration")
 
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
-	//todo replace clientx with client
-	clientdir = flag.String("client", "client", "client `directory`")
+	clientdir    = flag.String("client", "client", "client `directory`")
 )
 
 func main() {
@@ -64,8 +65,10 @@ func main() {
 	http.Handle("/lib/", http.StripPrefix("/lib/", source))
 
 	// Load database
-	//TODO: replace with real database
-	db := memdb.New(*database)
+	db, err := pgdb.New(*database)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
