@@ -11,7 +11,7 @@ KB.Page.View = (function(){
 
 			return React.DOM.div(
 				{className: "page"},
-				React.DOM.h1(null, "Hello World"),
+				React.DOM.h1(null, page.title),
 				React.createElement(Story, {
 					stage: stage,
 					page: page,

@@ -45,14 +45,18 @@ func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry
 	var entries []kb.PageEntry
 	for rows.Next() {
 		var entry kb.PageEntry
+
+		xtags := stringSlice{}
 		err := rows.Scan(
 			&entry.Owner,
 			&entry.Slug,
 			&entry.Title,
 			&entry.Synopsis,
-			&entry.Tags,
+			&xtags,
 			&entry.Modified,
 		)
+		entry.Tags = []string(xtags)
+
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +69,7 @@ func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry
 func (db *Index) List() ([]kb.PageEntry, error) {
 	return db.selectPages(`
 		WHERE  Owner IN (SELECT Name      FROM Groups      WHERE Public = TRUE)
-			OR Owner IN (SELECT GroupName FROM Memberships WHERE User = ?)
+			OR Owner IN (SELECT GroupName FROM Memberships WHERE User = $1)
 		ORDER BY Owner, Slug
 	`, db.User)
 }
@@ -80,7 +84,7 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 			unnest(Tags) as Tag,
 			count(*) as Count
 		FROM Pages
-		WHERE Owner IN (SELECT GroupName FROM Memberships WHERE User = ?)
+		WHERE Owner IN (SELECT GroupName FROM Memberships WHERE User = $1)
 		   OR Owner IN (SELECT Name FROM Groups WHERE Public = True)
 		GROUP BY Tag
 	`, db.User)
@@ -103,9 +107,9 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 
 func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	return db.selectPages(`
-		WHERE (Tags @> ?) 
+		WHERE (Tags @> $1) 
 		  AND (    Owner IN (SELECT Name      FROM Groups      WHERE Public = TRUE)
-				OR Owner IN (SELECT GroupName FROM Memberships WHERE User = ?))
+				OR Owner IN (SELECT GroupName FROM Memberships WHERE User = $2))
 		ORDER BY Owner, Slug
 	`, tag, db.User)
 }
@@ -113,8 +117,8 @@ func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 func (db *Index) RecentChanges(n int) ([]kb.PageEntry, error) {
 	return db.selectPages(`
 		WHERE  Owner IN (SELECT Name      FROM Groups      WHERE Public = TRUE)
-			OR Owner IN (SELECT GroupName FROM Memberships WHERE User = ?)
+			OR Owner IN (SELECT GroupName FROM Memberships WHERE User = $1)
 		ORDER BY Modified DESC, Owner, Slug
-		LIMIT ?
+		LIMIT $2
 	`, db.User, n)
 }

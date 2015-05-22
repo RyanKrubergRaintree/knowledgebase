@@ -32,6 +32,9 @@ type Groups interface {
 	Create(group Group) error
 	Delete(name string) error
 	List() ([]Group, error)
+
+	AddMember(group string, user string) error
+	RemoveMember(group string, user string) error
 }
 
 type Pages interface {

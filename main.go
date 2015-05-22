@@ -9,6 +9,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
+	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
 
 	"github.com/gorilla/sessions"
 
@@ -69,6 +70,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	testdata.SetupDatabase(db)
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))

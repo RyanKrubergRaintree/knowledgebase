@@ -28,7 +28,7 @@ func (db *Pages) tx() (*sql.Tx, error) {
 	err = tx.QueryRow(`
 		SELECT
 		FROM Memberships
-		WHERE UserName = ? AND GroupName = ?
+		WHERE UserName = $1 AND GroupName = $2
 	`, db.User, db.Group).Scan()
 
 	if err == sql.ErrNoRows {
@@ -45,16 +45,16 @@ func (db *Pages) tx() (*sql.Tx, error) {
 
 func (db *Pages) CanWrite() (result bool) {
 	err := db.QueryRow(`SELECT
-		EXISTS(SELECT FROM Memberships WHERE UserName  = ? AND GroupName = ?)
+		EXISTS(SELECT FROM Memberships WHERE UserName = $1 AND GroupName = $2)
 	`, db.User, db.Group).Scan(&result)
 	return (err == nil) && result
 }
 
 func (db *Pages) CanRead() (result bool) {
 	err := db.QueryRow(`SELECT
-		(SELECT Public FROM Groups WHERE Name = ?)
-     	OR EXISTS( SELECT FROM Memberships WHERE UserName = ? AND GroupName = ? )
-	`, db.Group, db.User, db.Group).Scan(&result)
+		(SELECT Public FROM Groups WHERE Name = $2)
+     	OR EXISTS( SELECT FROM Memberships WHERE UserName = $1 AND GroupName = $2 )
+	`, db.User, db.Group).Scan(&result)
 	return (err == nil) && result
 }
 
@@ -75,8 +75,8 @@ func (db *Pages) Create(page *kb.Page) error {
 	_, err = db.Exec(`
 		INSERT INTO Pages
 		(Owner, Slug, Data, Tags)
-		VALUES (?, ?, ?, ?)
-	`, page.Owner, page.Slug, data, tags)
+		VALUES ($1, $2, $3, $4)
+	`, page.Owner, page.Slug, data, stringSlice(tags))
 
 	return err
 }
@@ -101,7 +101,7 @@ func (db *Pages) LoadRaw(slug kb.Slug) ([]byte, error) {
 	err := db.QueryRow(`
 		SELECT Data
 		FROM Pages
-		WHERE Owner = ? AND Slug = ?
+		WHERE Owner = $1 AND Slug = $2
 	`, db.Group, slug).Scan(&data)
 
 	if err == sql.ErrNoRows {
@@ -130,11 +130,11 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 
 	_, err = db.Exec(`
 		UPDATE Pages
-		SET	Tags = ?,
-			Data = ?,
+		SET	Tags = $1,
+			Data = $2,
 			Version = (Version + 1)
-		WHERE Owner = ? AND Slug = ?
-	`, tags, data, db.Group, slug)
+		WHERE Owner = $3 AND Slug = $4
+	`, stringSlice(tags), data, db.Group, slug)
 
 	return err
 }
@@ -148,7 +148,7 @@ func (db *Pages) List() ([]kb.PageEntry, error) {
 
 	index := &Index{db.Database, db.User}
 	return index.selectPages(`
-		WHERE Owner = ?
+		WHERE Owner = $1
 		ORDER BY Slug
 	`, db.Group)
 }

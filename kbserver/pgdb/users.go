@@ -16,8 +16,7 @@ func (db *Users) Create(user kbserver.User) error {
 	return db.exec(`
 		INSERT INTO Users 
 		(Name, Email, Description)
-		VALUES
-		(?, ?, ?)`,
+		VALUES ($1, $2, $3)`,
 		user.Name, user.Email, user.Description)
 }
 
@@ -34,7 +33,7 @@ func (db *Users) ByName(name string) (kbserver.User, error) {
 		FROM Users
 		JOIN Memberships ON (Users.Name = Memberships.UserName)
 		GROUP BY Users.Name
-		WHERE Users.Name = ?
+		WHERE Users.Name = $1
 	`, name).Scan(&user.Name, &user.Email, &user.Description, &user.Groups)
 	if err == sql.ErrNoRows {
 		return user, kbserver.ErrUserNotExist

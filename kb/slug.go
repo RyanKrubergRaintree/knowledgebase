@@ -1,6 +1,7 @@
 package kb
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strings"
 	"unicode"
@@ -8,6 +9,15 @@ import (
 
 // Slug is a string where Slugify(string(slug)) == slug
 type Slug string
+
+func (slug *Slug) Scan(value interface{}) error {
+	*slug = Slug(value.(string))
+	return nil
+}
+
+func (slug Slug) Value() (driver.Value, error) {
+	return string(slug), nil
+}
 
 // ValidateSlug verifies whether a `slug` is valid
 func ValidateSlug(slug Slug) error {
@@ -85,7 +95,7 @@ func SplitOwner(url string) (owner string, page Slug) {
 
 	i := strings.Index(url, ":")
 	if i < 0 {
-		return "", Slugify("/" + url[start:])
+		return "", Slugify(url[start:])
 	}
-	return url[start:i], Slugify("/" + url[i+1:])
+	return url[start:i], Slugify(url[i+1:])
 }
