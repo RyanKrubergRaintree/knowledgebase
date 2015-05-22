@@ -47,7 +47,7 @@ func New(params string) *Database {
 func (db *Database) User(username string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrInvalidUser
+		return nil, kbserver.ErrUserNotExist
 	}
 	return user, nil
 }
@@ -55,7 +55,7 @@ func (db *Database) User(username string) (*User, error) {
 func (db *Database) Access(username, groupname string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrInvalidUser
+		return nil, kbserver.ErrUserNotExist
 	}
 
 	if !user.BelongsTo(groupname) {
@@ -105,7 +105,7 @@ func (pages *Pages) Create(slug kb.Slug, page *kb.Page) error {
 
 func (pages *Pages) Load(slug kb.Slug) (*kb.Page, error) {
 	if slug != "/home" {
-		return nil, kbserver.ErrPageMissing
+		return nil, kbserver.ErrPageNotExist
 	}
 
 	return &kb.Page{

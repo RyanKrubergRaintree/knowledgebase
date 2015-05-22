@@ -7,9 +7,11 @@ import (
 )
 
 var (
-	ErrInvalidUser    = errors.New("invalid user")
+	ErrUserNotExist   = errors.New("user does not exist")
+	ErrGroupNotExist  = errors.New("group does not exist")
 	ErrUserNotAllowed = errors.New("user does not have sufficient permissions")
-	ErrPageMissing    = errors.New("page does not exist")
+	ErrPageExists     = errors.New("page already exists")
+	ErrPageNotExist   = errors.New("page does not exist")
 )
 
 type Database interface {
