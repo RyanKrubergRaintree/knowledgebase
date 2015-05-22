@@ -8,6 +8,8 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
+var _ kbserver.Database = &Database{}
+
 type Database struct {
 	DB *sql.DB
 }

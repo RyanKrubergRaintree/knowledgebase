@@ -11,6 +11,8 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
+var _ kbserver.Database = &Database{}
+
 type User struct {
 	Name   string
 	Groups []string

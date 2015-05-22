@@ -8,7 +8,7 @@ import (
 
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kbserver"
-	"github.com/raintreeinc/knowledgebase/kbserver/stubdb"
+	"github.com/raintreeinc/knowledgebase/kbserver/memdb"
 
 	"github.com/gorilla/sessions"
 )
@@ -65,7 +65,7 @@ func main() {
 
 	// Load database
 	//TODO: replace with real database
-	db := stubdb.New("Egon Elbre:Egon Elbre,Community,Help,Engineering")
+	db := memdb.New(*database)
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))

@@ -8,6 +8,8 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
+var _ kbserver.Database = &Database{}
+
 type User struct {
 	Name   string
 	Info   kb.User
@@ -43,7 +45,7 @@ func New(params string) *Database {
 func (db *Database) User(username string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrInvalidUser
+		return nil, kbserver.ErrUserNotExist
 	}
 	return user, nil
 }
@@ -51,7 +53,7 @@ func (db *Database) User(username string) (*User, error) {
 func (db *Database) Access(username, groupname string) (*User, error) {
 	user, ok := db.Users[username]
 	if !ok {
-		return nil, kbserver.ErrInvalidUser
+		return nil, kbserver.ErrUserNotExist
 	}
 
 	if !user.BelongsTo(groupname) {
@@ -88,7 +90,7 @@ type Pages struct {
 
 func (group Pages) All() ([]kb.PageEntry, error) {
 	entries := make([]kb.PageEntry, 0, len(group.Pages))
-	for slug, page := range group.Pages {
+	for _, page := range group.Pages {
 		entries = append(entries, kb.PageEntryFrom(page))
 	}
 	return entries, nil
@@ -109,10 +111,6 @@ func (group Pages) Create(slug kb.Slug, page *kb.Page) error {
 }
 
 func (group Pages) Load(slug kb.Slug) (*kb.Page, error) {
-	if group.Exists(slug) {
-		return kbserver.ErrPageExists
-	}
-
 	page, exists := group.Pages[slug]
 	if !exists {
 		return nil, kbserver.ErrPageNotExist
@@ -183,7 +181,7 @@ func (index *Index) Tags() ([]kb.TagEntry, error) {
 	}
 
 	kb.SortTagEntriesByName(entries)
-	return entries
+	return entries, nil
 }
 
 func (index *Index) ByTag(tag string) ([]kb.PageEntry, error) {
