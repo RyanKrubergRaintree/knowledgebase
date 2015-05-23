@@ -47,10 +47,8 @@ KB.Stage.View = (function(){
 			 	td = React.DOM.td;
 
 			return table({className:"stage-info"},
-				tr(null, td(null, "Link"),        td(null, this.props.stage.link)),
-				tr(null, td(null, "Create by"),   td(null, "Raintree Systems Help")),
-				tr(null, td(null, "Shared with"), td(null, "Everybody")),
-				tr(null, td(null, "State:"),      td(null, this.props.stage.state))
+				tr(null, td(null, "Link"),  td(null, this.props.stage.link)),
+				tr(null, td(null, "State"), td(null, this.props.stage.state))
 			);
 		}
 	});

@@ -29,7 +29,7 @@ func (sys *System) Name() string { return "User" }
 
 func (sys *System) init() {
 	m := sys.Router
-	m.HandleFunc("/user:info", sys.userinfo).Methods("GET")
+	m.HandleFunc("/user:{userid}", sys.userinfo).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -37,9 +37,21 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
+	userval := mux.Vars(r)["userid"]
+	if userval == "" {
+		http.Error(w, "user id is missing", http.StatusBadRequest)
+		return
+	}
+	userid := kb.Slugify(userval)
+
 	user, err := sys.Server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if userid != user.ID {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 

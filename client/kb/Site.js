@@ -32,7 +32,7 @@ KB.Site = (function(){
 						type: "submit",
 						tabIndex: -1
 					})),
-				a({className:"button userinfo", id:"userinfo", href:"/user:info"}, Global.User),
+				a({className:"button userinfo", id:"userinfo", href:"/user:"+ Slugify(Global.User)}, Global.User),
 				React.createElement(HeaderMenu, {
 					items: [
 						{key:"0", href: "#", caption: "New Page"},
