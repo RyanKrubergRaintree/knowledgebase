@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -89,4 +90,9 @@ func Slugify(s string) Slug {
 	}
 
 	return Slug(slug)
+}
+
+func SlugToTitle(slug Slug) string {
+	title := strings.Replace(string(slug), "-", " ", -1)
+	return strings.Title(title)
 }

@@ -95,21 +95,22 @@ func (sys *System) indexTags(w http.ResponseWriter, r *http.Request, index kbser
 }
 
 func (sys *System) indexTag(w http.ResponseWriter, r *http.Request, index kbserver.Index) {
-	tag := mux.Vars(r)["tag"]
-	if tag == "" {
+	tagval := mux.Vars(r)["tag"]
+	if tagval == "" {
 		http.Error(w, "Tag param is missing", http.StatusBadRequest)
 		return
 	}
 
-	entries, err := index.ByTag(tag)
+	tag := kb.Slugify(tagval)
+	entries, err := index.ByTag(string(tag))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	kbserver.WriteJSON(w, r, &kb.Page{
 		Owner: "index",
-		Slug:  kb.Slugify("index:tag/" + tag),
-		Title: tag,
+		Slug:  "index:tag/" + tag,
+		Title: kb.SlugToTitle(tag),
 		Story: kb.StoryFromEntries(entries),
 	})
 }
