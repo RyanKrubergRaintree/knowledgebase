@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/kbindex"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
@@ -86,6 +87,9 @@ func main() {
 
 	// create KnowledgeBase server
 	server := kbserver.New(*domain, db, presenter, context)
+
+	// add systems
+	server.AddSystem(kbindex.New(server))
 
 	// protect server with authentication
 	url := "http://" + *domain
