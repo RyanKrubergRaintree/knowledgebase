@@ -42,16 +42,15 @@ KB.Site = (function(){
 				a({
 					className:"button userinfo",
 					id:"userinfo",
-					href:"/user:info/"+ Slugify(Global.User)
+					href:"/user:"+ Slugify(Global.User)
 				},
 					Global.User
 				),
 				React.createElement(HeaderMenu, {
 					items: [
 						{key:"0", href: "#", caption: "New Page"},
-						{key:"1", href: "#", caption: "Company"},
-						{key:"2", href: "/index:recent-changes", caption: "Recent Changes"},
-						{key:"3", href: "/system/auth/logout", caption: "Logout"}
+						{key:"1", href: "/page:recent-changes", caption: "Recent Changes"},
+						{key:"2", href: "/system/auth/logout", caption: "Logout"}
 					]
 				})
 			);

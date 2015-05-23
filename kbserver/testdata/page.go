@@ -14,10 +14,10 @@ func NewPage(owner string, title string) *kb.Page {
 			kb.Tags("Welcome", "Home", "Some Example"),
 			kb.Paragraph("Link to self: [[Community:Welcome]]."),
 			kb.Paragraph("External link: [[http://google.com google.com]]"),
-			kb.Paragraph("kbpage: [[page:Pages]], [[page:Recent Changes]]"),
-			kb.Paragraph("kbgroup: [[group:Groups]], [[group:Community]], [[group:Community Details]]"),
-			kb.Paragraph("kbtag: [[tag:Tags]], [[tag:Home]]"),
-			kb.Paragraph("kbuser: [[user:Egon Elbre]]"),
+			kb.Paragraph("Page: [[Page:Pages]], [[Page:Recent Changes]]"),
+			kb.Paragraph("Group: [[Group:Groups]], [[Group:Community]], [[Group:Community Details]]"),
+			kb.Paragraph("Tag: [[Tag:Tags]], [[Tag:Home]]"),
+			kb.Paragraph("User: [[User:Egon Elbre]]"),
 		},
 	}
 
