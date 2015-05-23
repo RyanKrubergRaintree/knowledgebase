@@ -89,8 +89,8 @@ func (sys *System) tags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "tags",
-		Slug:  "tags:tags",
+		Owner: "tag",
+		Slug:  "tag:tags",
 		Title: "Tags",
 		Story: story,
 	})

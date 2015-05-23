@@ -30,7 +30,6 @@ func (sys *System) Name() string { return "Group" }
 func (sys *System) init() {
 	m := sys.Router
 	m.HandleFunc("/group:groups", sys.groups).Methods("GET")
-	//TODO: fix this route
 	m.HandleFunc("/group:{groupid}-details", sys.info).Methods("GET")
 	m.HandleFunc("/group:{groupid}", sys.pages).Methods("GET")
 }
