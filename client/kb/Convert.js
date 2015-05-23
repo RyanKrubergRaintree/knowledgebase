@@ -50,7 +50,8 @@ Convert = {};
 
 	Convert.LinkToTitle = function(link){
 		var i = Math.max(link.lastIndexOf("/"), link.lastIndexOf(":"));
-		return link.substr(i + 1);
+		link = link.substr(i + 1);
+		return link;
 	};
 
 	Convert.URLToReadable = function(url){

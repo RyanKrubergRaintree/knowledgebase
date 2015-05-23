@@ -7,10 +7,12 @@ import (
 	"os"
 
 	"github.com/raintreeinc/knowledgebase/auth"
-	"github.com/raintreeinc/knowledgebase/kbindex"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
+
+	"github.com/raintreeinc/knowledgebase/kbindex"
 	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
+	"github.com/raintreeinc/knowledgebase/kbuser"
 
 	"github.com/gorilla/sessions"
 
@@ -90,6 +92,7 @@ func main() {
 
 	// add systems
 	server.AddSystem(kbindex.New(server))
+	server.AddSystem(kbuser.New(server))
 
 	// protect server with authentication
 	url := "http://" + *domain

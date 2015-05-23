@@ -27,15 +27,18 @@ func (db *Users) Delete(name kb.Slug) error {
 
 func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 	var user kbserver.User
+	var groups stringSlice
 	err := db.QueryRow(`
 		SELECT
-			ID, Name, Email, Description,
-			array_agg(Memberships.GroupName) as Groups
+			Users.ID, Users.Name, Users.Email, Users.Description,
+			array_agg(Groups.Name) as GroupNames
 		FROM Users
 		JOIN Memberships ON (Users.ID = Memberships.UserID)
-		GROUP BY Users.ID
+		JOIN Groups      ON (Memberships.GroupID = Groups.ID)
 		WHERE Users.ID = $1
-	`, name).Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Groups)
+		GROUP BY Users.ID
+	`, name).Scan(&user.ID, &user.Name, &user.Email, &user.Description, &groups)
+	user.Groups = []string(groups)
 	if err == sql.ErrNoRows {
 		return user, kbserver.ErrUserNotExist
 	}
@@ -48,10 +51,11 @@ func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 func (db *Users) List() ([]kbserver.User, error) {
 	rows, err := db.Query(`
 		SELECT
-			ID, Name, Email, Description,
-			array_agg(Memberships.GroupName) as Groups
+			Users.ID, Users.Name, Users.Email, Users.Description,
+			array_agg(Groups.Name) as GroupNames
 		FROM Users
 		JOIN Memberships ON (Users.ID = Memberships.UserID)
+		JOIN Groups      ON (Memberships.GroupID = Groups.ID)
 		GROUP BY Users.ID
 	`)
 	if err != nil {
@@ -62,7 +66,9 @@ func (db *Users) List() ([]kbserver.User, error) {
 	var users []kbserver.User
 	for rows.Next() {
 		var user kbserver.User
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Groups)
+		var groups stringSlice
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.Description, &groups)
+		user.Groups = []string(groups)
 		users = append(users, user)
 	}
 	return users, rows.Err()
