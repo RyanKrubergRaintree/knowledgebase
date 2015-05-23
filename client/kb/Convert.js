@@ -5,16 +5,24 @@ Convert = {};
 	"use strict";
 
 	// There are several possible links
-	// "//kb.example.com/example" - full URL
+	// "http://kb.example.com/example"
+	// "https://kb.example.com/example"
+	// "//kb.example.com/example"
 	// "/kb:example" - rooted local URL
 	// "kb:Example" - local URL
 	Convert.LinkToReference = function(link){
+		if(link.indexOf("https://", link) === 0){
+			link = link.substr(6);
+		} else if(link.indexOf("http://", link) === 0){
+			link = link.substr(5);
+		}
+
 		link = link.trim();
 		// External site:
 		// "//kb.example.com/example"
 		if((link[0] == "/") && (link[1] == "/") ) {
 			return {
-				link: link,
+				link: Convert.URLToReadable(link),
 				url:  link,
 				title: Convert.LinkToTitle(link)
 			};
@@ -29,7 +37,7 @@ Convert = {};
 		var owner = i >= 0 ? link.substr(0,i): "";
 
 		return {
-			link: link,
+			link: Convert.URLToReadable(link),
 			owner: owner,
 			url: "/" + Slugify(link),
 			title: Convert.LinkToTitle(link),
@@ -37,7 +45,7 @@ Convert = {};
 	}
 
 	Convert.ReferenceToLink = function(ref){
-		return ref.url;
+		return Convert.URLToReadable(ref.url);
 	};
 
 	Convert.LinkToTitle = function(link){
@@ -45,21 +53,14 @@ Convert = {};
 		return link.substr(i + 1);
 	};
 
-	//TODO
-
 	Convert.URLToReadable = function(url){
-		return url;
-	};
-
-	Convert.URLToLink = function(url){
-		return url;
-	};
-
-	Convert.URLToTitle = function(url){
-		return url;
-	};
-
-	Convert.URLToLink = function(url){
+		var loc = Convert.URLToLocation(url);
+		if((typeof loc.origin == "undefined") || (loc.origin == window.location.origin)){
+			if(loc.pathname[0] == "/") {
+				return loc.pathname + loc.search + loc.hash;
+			}
+			return "/" + loc.pathname + loc.search + loc.hash;
+		}
 		return url;
 	};
 

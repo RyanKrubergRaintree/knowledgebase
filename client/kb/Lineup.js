@@ -3,9 +3,6 @@
 // import "/kb/Convert.js"
 // import "/kb/Stage.js"
 
-
-//TODO: get rid of close --> use notification from Stage
-
 KB.Lineup = (function(){
 	"use strict";
 
@@ -169,14 +166,16 @@ KB.Lineup = (function(){
 			var target = ev.target;
 			var stage = this.findStageFromElement(target);
 
-			var url = target.href;
+			var ref = Convert.LinkToReference(target.href);
+			var url = ref.url;
+
 			if(stage){
 				var locFrom = Convert.URLToLocation(stage.url);
 				var locTo = Convert.URLToLocation(url);
 				url = "//" + locFrom.host + locTo.pathname;
 			}
 
-			var link = target.dataset.link;
+			var link = target.dataset.link || ref.link;
 			var title = target.innerText;
 
 			if(ev.button == 1){

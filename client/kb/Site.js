@@ -37,7 +37,7 @@ KB.Site = (function(){
 					items: [
 						{key:"0", href: "#", caption: "New Page"},
 						{key:"1", href: "#", caption: "Company"},
-						{key:"2", href: "#", caption: "Recent-Changes"},
+						{key:"2", href: "/index:recent-changes", caption: "Recent Changes"},
 						{key:"3", href: "/system/auth/logout", caption: "Logout"}
 					]
 				})
