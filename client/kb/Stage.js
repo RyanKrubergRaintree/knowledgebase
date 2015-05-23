@@ -23,11 +23,6 @@ KB.Stage = (function(){
 
 		this.state_ = "";
 
-		var self = this;
-		window.setTimeout(function(){
-			self.requestPage();
-		});
-
 		this.lastStatus = 200;
 		this.lastStatusText = "";
 		this.lastError = "";
