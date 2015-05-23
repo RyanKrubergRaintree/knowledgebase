@@ -1,6 +1,7 @@
 package kbserver
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -74,9 +75,27 @@ func (server *Server) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 	index := server.IndexByUser(user.ID)
 	switch r.URL.Path {
-	case "/tags":
+	case "/all":
 		entries, err := index.List()
-		log.Println(entries, err)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		page := &kb.Page{
+			Owner: "",
+			Slug:  "index/all",
+			Title: "All",
+			Story: kb.StoryFromEntries(entries),
+		}
+
+		data, err := json.Marshal(page)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Write(data)
 	default:
 		http.NotFound(w, r)
 	}

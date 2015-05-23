@@ -37,10 +37,10 @@
 	background-position: center center;
 }
 
-.item-tags {
+.content-tags {
 }
 
-.item-tags .tag {
+.content-tags .tag {
 	float: left;
 	display: block;
 	text-decoration: none;
@@ -55,6 +55,15 @@
 	transition: border 0.3s ease-in-out;
 }
 
-.item-tags .tag:hover {
+.content-tags .tag:hover {
 	border: 1px solid #7DC6FF;
+}
+
+.content-entry .entry-owner {
+	float: right;
+	font-size: 10px;
+}
+
+.content-entry .entry-synopsis {
+	font-size: 12px;
 }

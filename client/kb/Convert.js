@@ -25,8 +25,12 @@ Convert = {};
 			link = link.substr(1);
 		}
 
+		var i = link.lastIndexOf(":")
+		var owner = i >= 0 ? link.substr(0,i): "";
+
 		return {
 			link: link,
+			owner: owner,
 			url: "/" + Slugify(link),
 			title: Convert.LinkToTitle(link),
 		};

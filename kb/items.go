@@ -45,8 +45,7 @@ func Entry(title, synopsis string, slug Slug) Item {
 		"id":    slug,
 		"title": title,
 		"text":  synopsis,
-		"rank":  0,
-		"url":   slug,
+		"link":  slug,
 	}
 }
 

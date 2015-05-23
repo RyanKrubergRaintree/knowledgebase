@@ -2,6 +2,7 @@ package kb
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"strings"
 	"unicode"
@@ -11,12 +12,16 @@ import (
 type Slug string
 
 func (slug *Slug) Scan(value interface{}) error {
-	*slug = Slug(value.(string))
+	data, ok := value.([]byte)
+	if !ok {
+		return errors.New("slug is of type []byte/string")
+	}
+	*slug = Slug(data)
 	return nil
 }
 
 func (slug Slug) Value() (driver.Value, error) {
-	return string(slug), nil
+	return []byte(slug), nil
 }
 
 // ValidateSlug verifies whether a `slug` is valid

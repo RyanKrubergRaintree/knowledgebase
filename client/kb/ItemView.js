@@ -65,11 +65,10 @@ ItemView['reference'] = React.createClass({
 	displayName: 'Reference',
 	render: function(){
 		var item = this.props.item;
-		var url = Convert.URLToLocation(item.url);
-		var external = url.origin && (url.origin != window.location.origin);
+		var url = Convert.LinkToReference(item.link).url;
+		var loc = Convert.URLToLocation(url);
+		var external = loc.origin && (loc.origin != window.location.origin);
 
-		//TODO: handle external links
-		var url = item.url || Convert.LinkToURL(item.title);
 		return React.DOM.div({className: 'item-content content-reference'},
 			React.DOM.a({
 				className: external ? 'external-link': '',
@@ -85,26 +84,18 @@ ItemView['entry'] = React.createClass({
 	displayName: 'Entry',
 	render: function(){
 		var item = this.props.item;
-		var url = Convert.URLToLocation(item.url);
-		var external = url.origin && (url.origin != window.location.origin);
-
-		var origin = url.origin || window.location.origin;
-
-		var className = external ? 'external-link': '';
-		var target = external ? '_blank': '';
-
-		var url = item.url || Convert.LinkToURL(item.title);
-
-		return React.DOM.div({className: 'item-content content-entry'},
-			React.DOM.span({className: 'entry-rank'}, item.rank || 0),
-			React.DOM.span({className: 'entry-origin'}, origin),
+		var ref = Convert.LinkToReference(item.link);
+		var url = ref.url;
+		return React.DOM.div({
+			className: 'item-content content-entry',
+		},
 			React.DOM.a({
-				className: className + ' entry-title',
-				target: target,
+				className: 'entry-title',
 				title: url,
 				href: url
 			}, item.title),
-			React.DOM.p({className: 'synopsis'}, this.props.item.text)
+			React.DOM.div({className: 'entry-owner'}, ref.owner),
+			React.DOM.p({className: 'entry-synopsis'}, this.props.item.text)
 		);
 	}
 });
@@ -116,7 +107,7 @@ ItemView['tags'] = React.createClass({
 			stage = this.props.stage;
 		var tags = item.text.split(",");
 
-		return React.DOM.div({className: 'item-tags content-entry'},
+		return React.DOM.div({className: 'item-contet content-tags'},
 			tags.map(function(tag, i){
 				tag = tag.trim();
 				return React.DOM.a({

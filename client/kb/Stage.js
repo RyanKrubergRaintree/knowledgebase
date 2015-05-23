@@ -29,6 +29,7 @@ KB.Stage = (function(){
 		});
 
 		this.lastStatus = 200;
+		this.lastStatusText = "";
 		this.lastError = "";
 	};
 
@@ -58,6 +59,14 @@ KB.Stage = (function(){
 			var self = this;
 
 			xhr.addEventListener('load', function(ev){
+				if(xhr.status != 200){
+					self.lastStatus = xhr.status;
+					self.lastStatusText = xhr.statusText;
+					self.lastError = xhr.response;
+					self.state = "no-page";
+					return;
+				}
+
 				var data = JSON.parse(xhr.response),
 					page = new KB.Page(data);
 				self.page = page;
@@ -65,7 +74,10 @@ KB.Stage = (function(){
 			}, false);
 
 			xhr.addEventListener('error', function(ev){
-				console.error(ev);
+				self.lastStatus = xhr.status;
+				self.lastStatusText = xhr.statusText;
+				self.lastError = xhr.response;
+				self.state = "no-page";
 			}, false);
 
 			xhr.open('GET', this.url, true);

@@ -51,3 +51,15 @@ func SortPageEntriesBySlug(xs []PageEntry) {
 func SortTagEntriesByName(xs []TagEntry) {
 	slice.Sort(xs, func(i, j int) bool { return xs[i].Name < xs[j].Name })
 }
+
+func StoryFromEntries(entries []PageEntry) Story {
+	story := Story{}
+	if len(entries) == 0 {
+		story.Append(Paragraph("No results."))
+		return story
+	}
+	for _, entry := range entries {
+		story.Append(Entry(entry.Title, entry.Synopsis, entry.Owner+":"+entry.Slug))
+	}
+	return story
+}

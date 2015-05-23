@@ -16,23 +16,13 @@ type Index struct {
 	User kb.Slug
 }
 
-const selectPages = `
+func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry, error) {
+	rows, err := db.Query(`
 	SELECT
 		Owner,
 		Slug,
-		Data->'title' as Title,
-		Data->'synopsis' as Synopsis,
-		Tags,
-		Modified
-	FROM Pages
-`
-
-func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry, error) {
-	rows, err := db.Query(`SELECT
-		Owner,
-		Slug,
-		Data->'title' as Title,
-		Data->'synopsis' as Synopsis,
+		Data->>'title' as Title,
+		Data->>'synopsis' as Synopsis,
 		Tags,
 		Modified
 	FROM Pages
@@ -69,7 +59,7 @@ func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry
 func (db *Index) List() ([]kb.PageEntry, error) {
 	return db.selectPages(`
 		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
-			OR Owner IN (SELECT GroupID FROM Memberships WHERE User = $1)
+			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		ORDER BY Owner, Slug
 	`, db.User)
 }
@@ -84,8 +74,8 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 			unnest(Tags) as Tag,
 			count(*) as Count
 		FROM Pages
-		WHERE Owner IN (SELECT GroupID FROM Memberships WHERE User = $1)
-		   OR Owner IN (SELECT Name    FROM Groups WHERE Public = True)
+		WHERE Owner IN (SELECT Name    FROM Groups      WHERE Public = True)
+		   OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		GROUP BY Tag
 	`, db.User)
 	if err != nil {
@@ -108,7 +98,7 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	ntag := string(kb.Slugify(tag))
 	return db.selectPages(`
-		WHERE (NTags @> $1) 
+		WHERE (NormTags @> $1) 
 		  AND (    Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
 				OR Owner IN (SELECT GroupID FROM Memberships WHERE User = $2))
 		ORDER BY Owner, Slug
