@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"strings"
 	"unicode"
 )
 
@@ -90,17 +89,4 @@ func Slugify(s string) Slug {
 	}
 
 	return Slug(slug)
-}
-
-func SplitLink(link string) (owner Slug, page Slug) {
-	if strings.HasPrefix(link, "/") {
-		link = link[1:]
-	}
-	slug := Slugify(link)
-
-	i := strings.LastIndex(string(slug), ":")
-	if i < 0 {
-		return "", slug
-	}
-	return slug[:i], slug[i+1:]
 }

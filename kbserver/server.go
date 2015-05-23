@@ -56,9 +56,23 @@ func (server *Server) main(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func tokenizeLink(link string) (owner kb.Slug, page kb.Slug) {
+	if strings.HasPrefix(link, "/") {
+		link = link[1:]
+	}
+	slug := kb.Slugify(link)
+
+	i := strings.LastIndex(string(slug), ":")
+	if i < 0 {
+		return "", slug
+	}
+	return slug[:i], slug
+}
+
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimSuffix(r.URL.Path, ".json")
-	group, slug := kb.SplitLink(path)
+
+	group, slug := tokenizeLink(path)
 	if group == "" {
 		server.Router.ServeHTTP(w, r)
 		return

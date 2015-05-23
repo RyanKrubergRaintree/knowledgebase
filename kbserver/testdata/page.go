@@ -10,7 +10,7 @@ import (
 func NewPage(owner string, title string) *kb.Page {
 	page := &kb.Page{
 		Owner:    kb.Slugify(owner),
-		Slug:     kb.Slugify(title),
+		Slug:     kb.Slugify(owner + ":" + title),
 		Title:    title,
 		Synopsis: lorem.Paragraph(1, 1),
 		Story: kb.Story{

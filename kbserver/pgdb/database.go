@@ -63,8 +63,8 @@ func (db *Database) Initialize() error {
 		);
 
 		CREATE TABLE Pages (
-			Owner     TEXT  NOT NULL REFERENCES Groups(ID),
-			Slug      TEXT  NOT NULL,
+			Owner     TEXT  NOT NULL REFERENCES Groups(ID), -- e.g. community
+			Slug      TEXT  NOT NULL PRIMARY KEY, -- e.g. community:welcome-visitor
 			Data      JSONB NOT NULL,
 			Version   INT   NOT NULL DEFAULT 0,
 			
@@ -72,9 +72,7 @@ func (db *Database) Initialize() error {
 			NormTags  TEXT[] NOT NULL DEFAULT '{}',
 
 			Created  TIMESTAMP NOT NULL DEFAULT current_timestamp,
-			Modified TIMESTAMP NOT NULL DEFAULT current_timestamp,
-
-			CONSTRAINT Pages_PKEY PRIMARY KEY (Owner, Slug)
+			Modified TIMESTAMP NOT NULL DEFAULT current_timestamp
 		);
 
 		-- Triggers to automatically update modified date
