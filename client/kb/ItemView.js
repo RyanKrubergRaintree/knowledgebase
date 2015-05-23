@@ -113,7 +113,7 @@ ItemView['tags'] = React.createClass({
 				return React.DOM.a({
 					className: "tag",
 					key: i,
-					href: '/index/tags/' + Slugify(tag)
+					href: '/index/tag/' + Slugify(tag)
 				}, tag);
 			}),
 			React.DOM.div({className:"clear-fix"})

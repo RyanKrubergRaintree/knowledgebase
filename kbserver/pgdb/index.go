@@ -97,18 +97,51 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 
 func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	ntag := string(kb.Slugify(tag))
+	ntags := stringSlice{ntag}
 	return db.selectPages(`
 		WHERE (NormTags @> $1) 
 		  AND (    Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
-				OR Owner IN (SELECT GroupID FROM Memberships WHERE User = $2))
+				OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $2))
 		ORDER BY Owner, Slug
-	`, ntag, db.User)
+	`, ntags, db.User)
+}
+
+func (db *Index) Groups() ([]kbserver.Group, error) {
+	rows, err := db.Query(`
+		SELECT ID, Name, Public, Description
+		FROM Groups
+		WHERE Public = True
+		   OR ID IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
+	`, db.User)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var groups []kbserver.Group
+	for rows.Next() {
+		var group kbserver.Group
+		rows.Scan(&group.ID, &group.Name, &group.Public, &group.Description)
+		groups = append(groups, group)
+	}
+	return groups, nil
+}
+
+func (db *Index) ByGroup(group kb.Slug) ([]kb.PageEntry, error) {
+	if !db.CanRead(db.User, group) {
+		return nil, kbserver.ErrUserNotAllowed
+	}
+
+	return db.selectPages(`
+		WHERE (Owner = $1) 
+		ORDER BY Owner, Slug
+	`, group)
 }
 
 func (db *Index) RecentChanges(n int) ([]kb.PageEntry, error) {
 	return db.selectPages(`
 		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
-			OR Owner IN (SELECT GroupID FROM Memberships WHERE User = $1)
+			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		ORDER BY Modified DESC, Owner, Slug
 		LIMIT $2
 	`, db.User, n)

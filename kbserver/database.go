@@ -22,13 +22,14 @@ type Database interface {
 }
 
 type Users interface {
+	ByID(id kb.Slug) (User, error)
 	Create(user User) error
 	Delete(id kb.Slug) error
-	ByName(id kb.Slug) (User, error)
 	List() ([]User, error)
 }
 
 type Groups interface {
+	ByID(id kb.Slug) (Group, error)
 	Create(group Group) error
 	Delete(group kb.Slug) error
 	List() ([]Group, error)
@@ -52,6 +53,9 @@ type Index interface {
 
 	Tags() ([]kb.TagEntry, error)
 	ByTag(tag string) ([]kb.PageEntry, error)
+
+	Groups() ([]Group, error)
+	ByGroup(group kb.Slug) ([]kb.PageEntry, error)
 
 	RecentChanges(n int) ([]kb.PageEntry, error)
 }

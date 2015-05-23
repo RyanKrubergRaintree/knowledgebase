@@ -43,27 +43,12 @@ func (db *Pages) tx() (*sql.Tx, error) {
 	return tx, nil
 }
 
-func (db *Pages) CanWrite() (result bool) {
-	err := db.QueryRow(`SELECT
-		EXISTS(SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2)
-	`, db.User, db.Group).Scan(&result)
-	return (err == nil) && result
-}
-
-func (db *Pages) CanRead() (result bool) {
-	err := db.QueryRow(`SELECT
-		(SELECT Public FROM Groups WHERE ID = $2)
-     	OR EXISTS( SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2 )
-	`, db.User, db.Group).Scan(&result)
-	return (err == nil) && result
-}
-
 func (db *Pages) Create(page *kb.Page) error {
 	if page.Owner != db.Group {
 		return fmt.Errorf("mismatching page.Owner (%s) and group (%s)", page.Owner, db.Group)
 	}
 
-	if !db.CanWrite() {
+	if !db.CanWrite(db.User, db.Group) {
 		return kbserver.ErrUserNotAllowed
 	}
 
@@ -94,7 +79,7 @@ func (db *Pages) Load(slug kb.Slug) (*kb.Page, error) {
 }
 
 func (db *Pages) LoadRaw(slug kb.Slug) ([]byte, error) {
-	if !db.CanRead() {
+	if !db.CanRead(db.User, db.Group) {
 		return nil, kbserver.ErrUserNotAllowed
 	}
 
@@ -119,7 +104,7 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 	if page.Slug != slug {
 		return fmt.Errorf("mismatching page.Slug (%s) and slug (%s)", page.Slug, slug)
 	}
-	if !db.CanWrite() {
+	if !db.CanWrite(db.User, db.Group) {
 		return kbserver.ErrUserNotAllowed
 	}
 
@@ -146,7 +131,7 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 //func (db *Pages) SaveRaw(slug kb.Slug, page []byte) error {}
 
 func (db *Pages) List() ([]kb.PageEntry, error) {
-	if !db.CanRead() {
+	if !db.CanRead(db.User, db.Group) {
 		return nil, kbserver.ErrUserNotAllowed
 	}
 

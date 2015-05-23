@@ -1,6 +1,8 @@
 package pgdb
 
 import (
+	"database/sql"
+
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
@@ -8,6 +10,23 @@ import (
 func (db *Database) Groups() kbserver.Groups { return &Groups{db} }
 
 type Groups struct{ *Database }
+
+func (db *Groups) ByID(name kb.Slug) (kbserver.Group, error) {
+	var group kbserver.Group
+	err := db.QueryRow(`
+		SELECT
+			ID, Name, Public, Description
+		FROM Groups
+		WHERE ID = $1
+	`, name).Scan(&group.ID, &group.Name, &group.Public, &group.Description)
+	if err == sql.ErrNoRows {
+		return group, kbserver.ErrUserNotExist
+	}
+	if err != nil {
+		return group, err
+	}
+	return group, nil
+}
 
 func (db *Groups) Create(group kbserver.Group) error {
 	return db.exec(`

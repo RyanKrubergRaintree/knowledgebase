@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
@@ -87,4 +88,19 @@ func (db *Database) Initialize() error {
 		BEFORE UPDATE ON Pages
 		FOR EACH ROW EXECUTE PROCEDURE UpdateModifiedDate();
 	`)
+}
+
+func (db *Database) CanWrite(user, group kb.Slug) (result bool) {
+	err := db.QueryRow(`SELECT
+		EXISTS(SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2)
+	`, user, group).Scan(&result)
+	return (err == nil) && result
+}
+
+func (db *Database) CanRead(user, group kb.Slug) (result bool) {
+	err := db.QueryRow(`SELECT
+		(SELECT Public FROM Groups WHERE ID = $2)
+     	OR EXISTS( SELECT FROM Memberships WHERE UserID = $1 AND GroupID = $2 )
+	`, user, group).Scan(&result)
+	return (err == nil) && result
 }

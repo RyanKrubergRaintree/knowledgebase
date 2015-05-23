@@ -25,7 +25,7 @@ func (db *Users) Delete(name kb.Slug) error {
 	return db.exec(`DELETE FROM Users WHERE Name = ?`, name)
 }
 
-func (db *Users) ByName(name kb.Slug) (kbserver.User, error) {
+func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 	var user kbserver.User
 	err := db.QueryRow(`
 		SELECT
@@ -35,9 +35,12 @@ func (db *Users) ByName(name kb.Slug) (kbserver.User, error) {
 		JOIN Memberships ON (Users.ID = Memberships.UserID)
 		GROUP BY Users.ID
 		WHERE Users.ID = $1
-	`, name).Scan(&user.Name, &user.Name, &user.Email, &user.Description, &user.Groups)
+	`, name).Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Groups)
 	if err == sql.ErrNoRows {
 		return user, kbserver.ErrUserNotExist
+	}
+	if err != nil {
+		return user, err
 	}
 	return user, nil
 }
