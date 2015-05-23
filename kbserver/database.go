@@ -17,6 +17,10 @@ var (
 type Database interface {
 	Users() Users
 	Groups() Groups
+
+	CanRead(user, group kb.Slug) bool
+	CanWrite(user, group kb.Slug) bool
+
 	PagesByGroup(user, group kb.Slug) Pages
 	IndexByUser(user kb.Slug) Index
 }

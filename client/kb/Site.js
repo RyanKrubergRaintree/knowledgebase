@@ -42,7 +42,7 @@ KB.Site = (function(){
 				a({
 					className:"button userinfo",
 					id:"userinfo",
-					href:"/user:"+ Slugify(Global.User)
+					href:"/user:info/"+ Slugify(Global.User)
 				},
 					Global.User
 				),

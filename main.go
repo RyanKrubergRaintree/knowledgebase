@@ -10,9 +10,12 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 
-	"github.com/raintreeinc/knowledgebase/kbindex"
-	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
+	"github.com/raintreeinc/knowledgebase/kbgroup"
+	"github.com/raintreeinc/knowledgebase/kbpage"
+	"github.com/raintreeinc/knowledgebase/kbtag"
 	"github.com/raintreeinc/knowledgebase/kbuser"
+
+	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
 
 	"github.com/gorilla/sessions"
 
@@ -91,7 +94,9 @@ func main() {
 	server := kbserver.New(*domain, db, presenter, context)
 
 	// add systems
-	server.AddSystem(kbindex.New(server))
+	server.AddSystem(kbgroup.New(server))
+	server.AddSystem(kbpage.New(server))
+	server.AddSystem(kbtag.New(server))
 	server.AddSystem(kbuser.New(server))
 
 	// protect server with authentication
