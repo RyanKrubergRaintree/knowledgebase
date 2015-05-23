@@ -58,19 +58,3 @@ func (db *Groups) List() ([]kbserver.Group, error) {
 	}
 	return groups, nil
 }
-
-func (db *Groups) AddMember(group, user kb.Slug) error {
-	return db.exec(`
-		INSERT INTO Memberships
-		(GroupID, UserID)
-		VALUES ($1, $2)`,
-		group, user)
-}
-
-func (db *Groups) RemoveMember(group, user kb.Slug) error {
-	return db.exec(`
-		DELETE
-		FROM Memberships
-		WHERE GroupID = $1 AND UserID = $2
-	`, group, user)
-}

@@ -31,6 +31,7 @@ func (sys *System) init() {
 	m := sys.Router
 	m.HandleFunc("/group:groups", sys.groups).Methods("GET")
 	m.HandleFunc("/group:{groupid}-details", sys.info).Methods("GET")
+	m.HandleFunc("/group:{groupid}-members", sys.members).Methods("GET")
 	m.HandleFunc("/group:{groupid}", sys.pages).Methods("GET")
 }
 
@@ -150,5 +151,51 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 		Slug:  "group:groups",
 		Title: "Groups",
 		Story: story,
+	})
+}
+
+func (sys *System) members(w http.ResponseWriter, r *http.Request) {
+	user, err := sys.Server.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	groups := sys.Server.Groups()
+
+	groupval := mux.Vars(r)["groupid"]
+	if groupval == "" {
+		http.Error(w, "Group param is missing", http.StatusBadRequest)
+		return
+	}
+	groupid := kb.Slugify(groupval)
+
+	if !sys.Server.CanWrite(user.ID, groupid) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
+	group, err := sys.Server.Groups().ByID(groupid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	members, err := groups.MembersOf(groupid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	el := "<ul>"
+	for _, member := range members {
+		el += "<li>" + member.Name + "</li>"
+	}
+	el += "</ul>"
+
+	kbserver.WriteJSON(w, r, &kb.Page{
+		Owner: "group",
+		Slug:  "group:" + groupid + "-members",
+		Title: group.Name + " Members",
+		Story: kb.Story{kb.HTML(el)},
 	})
 }

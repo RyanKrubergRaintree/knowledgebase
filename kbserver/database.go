@@ -40,6 +40,7 @@ type Groups interface {
 
 	AddMember(group, user kb.Slug) error
 	RemoveMember(group, user kb.Slug) error
+	MembersOf(group kb.Slug) ([]User, error)
 }
 
 type Pages interface {

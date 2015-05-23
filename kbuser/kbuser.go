@@ -75,7 +75,7 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 
 	el := "<p><b>Member of:</b></p><ul>"
 	for _, group := range info.Groups {
-		el += "<li><a href='group:pages/" + group + "'>" + group + "</a></li>"
+		el += "<li><a href='group:" + group + "'>" + group + "</a></li>"
 	}
 	el += "</ul>"
 	story.Append(kb.HTML(el))
