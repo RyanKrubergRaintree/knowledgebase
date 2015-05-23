@@ -18,13 +18,20 @@ KB.Site = (function(){
 	})
 
 	var Header = React.createClass({
+		openHome: function(ev){
+			var lineup = this.props.Lineup;
+			lineup.clear();
+			lineup.openLink(Global.HomePage);
+			ev.preventDefault();
+			ev.stopPropagation();
+		},
 		displayName: "Header",
 		render: function(){
 			var a = React.DOM.a;
 			return React.DOM.div({
 				id:"header"
 			},
-				a({className:"button logo", href:"/", title:"Home"}),
+				a({className:"button logo", href:"#", title:"Home", onClick: this.openHome}),
 				React.DOM.form({className:"search"},
 					React.DOM.input({placeholder:"Search..."}),
 					React.DOM.button({
@@ -32,7 +39,13 @@ KB.Site = (function(){
 						type: "submit",
 						tabIndex: -1
 					})),
-				a({className:"button userinfo", id:"userinfo", href:"/user:"+ Slugify(Global.User)}, Global.User),
+				a({
+					className:"button userinfo",
+					id:"userinfo",
+					href:"/user:"+ Slugify(Global.User)
+				},
+					Global.User
+				),
 				React.createElement(HeaderMenu, {
 					items: [
 						{key:"0", href: "#", caption: "New Page"},
