@@ -1,4 +1,5 @@
-//import "/kb/Stage.View.js"
+import "lineup.js";
+import "stage.view.js";
 
 KB.Lineup.View = (function(){
 	var Lineup = React.createClass({

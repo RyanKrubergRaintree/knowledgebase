@@ -1,7 +1,7 @@
-// import "/kb/Lineup.js"
-// import "/kb/KB.js"
-// import "/kb/Convert.js"
-// import "/kb/Stage.js"
+import "lineup.js";
+import "kb.js";
+import "convert.js";
+import "stage.js";
 
 KB.Crumbs = (function(){
 	"use strict";

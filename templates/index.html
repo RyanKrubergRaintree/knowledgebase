@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <head>
-	{{ template "head.html" }}
-	<link rel="stylesheet" type="text/css" href="/assets/css/lineup.css">
-	<link rel="stylesheet" type="text/css" href="/assets/css/items.css">
+	{{ template "head.html" . }}
+	
+	<script src="/assets/js/React.js"></script>
+	<script src="/client/global.js"></script>
 
-	<script src="/assets/js/cookies.js"></script>
+	<script>
+	Global.UserName = "{{User.Name}}";
+	Global.HomePage = "Community:Welcome";
+	</script>
+
 	<script>window.Hash.restore()</script>
 </head>
 <body><div id="site"></div></body>
-<script>
-Global.HomePage = "Community:Welcome";
-Global.User = "{{User.Name}}";
-
-initialize(document.getElementById("site"));
-</script>
+{{ Include }}

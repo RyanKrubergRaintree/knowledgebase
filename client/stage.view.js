@@ -1,6 +1,6 @@
-//import "/util/SmoothScroll.js"
-//import "/kb/Stage.js"
-//import "/kb/Page.View.js"
+import "util/SmoothScroll.js";
+import "stage.js";
+import "page.view.js";
 
 KB.Stage.View = (function(){
 	var StageButtons = React.createClass({

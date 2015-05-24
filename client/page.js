@@ -1,4 +1,4 @@
-//import "/kb/KB.js"
+import "kb.js";
 
 KB.Page = (function(){
 	"use strict";

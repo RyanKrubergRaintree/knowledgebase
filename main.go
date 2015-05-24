@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/raintreeinc/livebundle"
+
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
@@ -31,6 +33,8 @@ var (
 	database = flag.String("database", "user=root dbname=knowledgebase sslmode=disable", "database `params`")
 	domain   = flag.String("domain", "", "`domain`")
 	conffile = flag.String("config", "knowledgebase.toml", "farm configuration")
+
+	development = flag.Bool("development", true, "development mode")
 
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
@@ -64,12 +68,11 @@ func main() {
 	log.Printf("Starting %s on %s", *domain, *addr)
 
 	// Serve static files
-	assets := kbserver.NewFiles(*assetsdir)
-	http.Handle("/assets/", http.StripPrefix("/assets/", assets))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(*assetsdir))))
 
-	// Serve javascript source
-	source := kbserver.NewSource(*clientdir, true)
-	http.Handle("/lib/", http.StripPrefix("/lib/", source))
+	// Serve client
+	client := livebundle.New(*clientdir, "/client/", *development)
+	http.Handle("/client/", client)
 
 	// Load database
 	db, err := pgdb.New(*database)
@@ -88,7 +91,7 @@ func main() {
 		"ShortTitle": "KB",
 		"Title":      "Knowledge Base",
 		"Company":    "Raintree Systems Inc.",
-	}, source, context)
+	}, client, context)
 
 	// create KnowledgeBase server
 	server := kbserver.New(*domain, db, presenter, context)

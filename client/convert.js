@@ -1,4 +1,4 @@
-// import "/kb/Slug.js"
+import "slug.js";
 
 Convert = {};
 (function(Convert){

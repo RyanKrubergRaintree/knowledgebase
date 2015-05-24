@@ -1,27 +1,19 @@
-// import "/global/polyfills.js"
-
-Global = {
-	User: "",
-	HomePage: "",
-
-	Lineup: null,
-	Crumbs: null,
-};
-
-// import "/kb/Crumbs.js"
-// import "/kb/Lineup.js"
+import "global.js";
+import "crumbs.js";
+import "lineup.js";
 
 Global.Lineup = new KB.Lineup();
 Global.Crumbs = new KB.Crumbs(Global.Lineup);
 
-// import "/kb/Site.js"
+import "site.js";
 function initialize(mountNode){
 	React.initializeTouchEvents(true);
-	React.render(React.createElement(KB.Site, {
-		Lineup: Global.Lineup
-	}), mountNode);
+	var site = React.createElement(KB.Site, {Lineup: Global.Lineup});
+	React.render(site, mountNode);
 
 	Global.Crumbs.initLineup(Global.HomePage);
 	window.addEventListener("click",
 		Global.Lineup.handleClickLink.bind(Global.Lineup));
 }
+
+initialize(document.getElementById("site"));

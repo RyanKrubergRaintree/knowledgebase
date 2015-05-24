@@ -1,6 +1,6 @@
-//import "/util/SmoothScroll.js"
-//import "/kb/Page.js"
-//import "/kb/ItemView.js"
+import "util/SmoothScroll.js";
+import "page.js";
+import "item.view.js";
 
 KB.Page.View = (function(){
 	var Page = React.createClass({

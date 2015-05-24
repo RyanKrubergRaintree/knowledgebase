@@ -1,5 +1,5 @@
-// import "/kb/unicode/Identifier.js"
-// import "/kb/unicode/RuneName.js"
+import "unicode/identifier.js";
+import "unicode/runename.js";
 
 // Slugify converts text to a slug
 //

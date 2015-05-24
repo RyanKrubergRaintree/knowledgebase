@@ -8,18 +8,8 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-type Files struct {
-	dir string
-}
-
-func NewFiles(dir string) *Files {
-	return &Files{
-		dir: dir,
-	}
-}
-
-func (a *Files) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, SafeFile(a.dir, r.URL.Path))
+type Sources interface {
+	Include() string
 }
 
 type presenter struct {
@@ -27,16 +17,16 @@ type presenter struct {
 	Glob     string
 	SiteInfo interface{}
 	Context  Context
-	Source   *Source
+	Sources  Sources
 }
 
-func NewPresenter(dir, glob string, siteinfo interface{}, source *Source, context Context) Presenter {
+func NewPresenter(dir, glob string, siteinfo interface{}, sources Sources, context Context) Presenter {
 	return &presenter{
 		Dir:      dir,
 		Glob:     glob,
 		SiteInfo: siteinfo,
 		Context:  context,
-		Source:   source,
+		Sources:  sources,
 	}
 }
 
@@ -48,7 +38,9 @@ func (a *presenter) Present(w http.ResponseWriter, r *http.Request, tname string
 				user, _ := a.Context.CurrentUser(w, r)
 				return user
 			},
-			"SourceFiles": func() []string { return a.Source.Files() },
+			"Include": func() template.HTML {
+				return template.HTML(a.Sources.Include())
+			},
 		},
 	).ParseGlob(filepath.Join(a.Dir, a.Glob))
 	if err != nil {

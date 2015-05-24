@@ -1,7 +1,7 @@
-//import "/util/ObjectId.js"
-//import "/util/Notifier.js"
-//import "/kb/KB.js"
-//import "/kb/Page.js"
+import "util/ObjectId.js";
+import "util/notifier.js";
+import "kb.js";
+import "page.js";
 
 KB.Stage = (function(){
 	"use strict";

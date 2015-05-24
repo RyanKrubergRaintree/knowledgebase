@@ -1,0 +1,65 @@
+.external-link::after {
+	display: inline-block;
+	font: normal normal normal 24px/1 MaterialDesignIcons;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transform: translate(0, 0);
+	content: "\f365";
+}
+
+.item {
+	position: relative;
+
+	padding: 0 10px;
+	margin: 0.01px;
+	min-height: 16px;
+}
+
+.item:hover {
+	background: rgba(0,0,0,0.02);
+}
+
+.item-drag {
+	position: absolute;
+	top: 0; right: -8px; bottom: 0;
+	width: 16px;
+
+	cursor: move;
+
+	background-image: url("drag.png");
+	background-repeat: no-repeat repeat;
+	background-position: center center;
+}
+
+.content-tags {
+}
+
+.content-tags .tag {
+	float: left;
+	display: block;
+	text-decoration: none;
+	color: inherit;
+
+	border: 1px solid #E5E5E5;
+	margin-right: 8px;
+	padding: 0 8px;
+
+	font-size: 12px;
+
+	transition: border 0.3s ease-in-out;
+}
+
+.content-tags .tag:hover {
+	border: 1px solid #7DC6FF;
+}
+
+.content-entry .entry-owner {
+	float: right;
+	font-size: 10px;
+}
+
+.content-entry .entry-synopsis {
+	font-size: 12px;
+}

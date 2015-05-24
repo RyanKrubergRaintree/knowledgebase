@@ -1,5 +1,5 @@
-// import /kb/Convert.js
-// import /kb/Resolve.js
+import "convert.js";
+import "resolve.js";
 
 ItemView = {};
 

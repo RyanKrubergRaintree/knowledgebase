@@ -1,5 +1,5 @@
-//import "/kb/KB.js"
-//import "/kb/Lineup.View.js"
+import "kb.js"
+import "lineup.view.js"
 
 KB.Site = (function(){
 	"use strict"
@@ -70,6 +70,18 @@ KB.Site = (function(){
 
 	var Site = React.createClass({
 		displayName: "Site",
+
+		componentDidMount: function(){
+			var self = this;
+			window.LiveBundleChange = function(){
+				self.forceUpdate();
+			};
+		},
+
+		componentWillUnmount: function(){
+			window.LiveBundleChange = function(){};
+		},
+
 		render: function(){
 			return React.DOM.div({},
 				React.createElement(Header,  this.props),

@@ -1,7 +1,7 @@
-// import "/util/Notifier.js"
-// import "/kb/KB.js"
-// import "/kb/Convert.js"
-// import "/kb/Stage.js"
+import "util/notifier.js";
+import "kb.js";
+import "convert.js";
+import "stage.js";
 
 KB.Lineup = (function(){
 	"use strict";
