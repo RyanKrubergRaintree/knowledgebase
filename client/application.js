@@ -1,11 +1,11 @@
 import "global.js";
 import "crumbs.js";
 import "lineup.js";
+import "site.js";
 
 Global.Lineup = new KB.Lineup();
 Global.Crumbs = new KB.Crumbs(Global.Lineup);
 
-import "site.js";
 function initialize(mountNode){
 	React.initializeTouchEvents(true);
 	var site = React.createElement(KB.Site, {Lineup: Global.Lineup});
