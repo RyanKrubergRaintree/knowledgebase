@@ -107,9 +107,6 @@ func main() {
 	auth.Register(os.Getenv("APPKEY"), url, auth.ClientsFromEnv())
 	front := auth.New(server, context, presenter)
 
-	// allow cross origin requests on sub-domains
-	cors := kbserver.AllowSubdomainCORS(*domain, front)
-
-	http.Handle("/", cors)
+	http.Handle("/", front)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
