@@ -61,7 +61,32 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	name := kb.Slugify(sys.name)
 	switch slug {
-	case name + ":conversion-errors":
+	case name + ":errors":
+		page := &kb.Page{}
+		page.Slug = name + ":errors"
+		page.Title = "Errors"
+		page.Modified = time.Now()
+
+		page.Story.Append(kb.HTML("<h3>Loading</h3>"))
+		for _, err := range store.errLoad {
+			page.Story.Append(kb.Paragraph(err.Error()))
+		}
+
+		page.Story.Append(kb.HTML("<h3>Mapping</h3>"))
+		for _, err := range store.errMapping {
+			page.Story.Append(kb.Paragraph(err.Error()))
+		}
+
+		page.Story.Append(kb.HTML("<h3>Converting</h3>"))
+		for _, errs := range store.errConvert {
+			text := "<h4>[" + string(errs.slug) + "]</h4>"
+			for _, err := range errs.errors {
+				text += "<p>" + err.Error() + "</p>"
+			}
+			page.Story.Append(kb.HTML(text))
+		}
+		kbserver.WriteJSON(w, r, page)
+		return
 	case name + ":all-pages":
 		page := &kb.Page{
 			Slug:     name + ":all-pages",
