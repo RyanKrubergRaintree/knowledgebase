@@ -79,7 +79,7 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		page.Story.Append(kb.HTML("<h3>Converting</h3>"))
 		for _, errs := range store.errConvert {
-			text := "<h4>[" + string(errs.slug) + "]</h4>"
+			text := "<h4>[[" + string(errs.slug) + "]]</h4>"
 			for _, err := range errs.errors {
 				text += "<p>" + err.Error() + "</p>"
 			}
