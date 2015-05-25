@@ -53,7 +53,7 @@ func tokenizeLink(link string) (owner kb.Slug, page kb.Slug) {
 	}
 	slug := kb.Slugify(link)
 
-	i := strings.LastIndex(string(slug), ":")
+	i := strings.Index(string(slug), ":")
 	if i < 0 {
 		return "", slug
 	}

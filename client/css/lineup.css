@@ -121,8 +121,8 @@
 	margin-left: 10px;
 }
 
-.page-story img { width: 100%; }
-.page-story video { width: 100%; }
+.page-story img { max-width: 100%; }
+.page-story video { max-width: 100%; }
 
 .round-scrollbar::-webkit-scrollbar {
 	width: 20px;
