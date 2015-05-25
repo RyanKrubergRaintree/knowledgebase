@@ -88,23 +88,21 @@ func (conv *convert) run() {
 		}
 	}
 
-	// create meta information
-	tags := convertTags(topic.Keywords)
-	meta := make(kb.Meta)
-	if len(tags) > 0 {
-		meta["tags"] = tags
-	}
-	meta["kind"] = "help"
-
 	// create the page header
 	conv.Page = &kb.Page{
-		PageHeader: kb.PageHeader{
-			Slug:     conv.Slug,
-			Title:    conv.Topic.Title,
-			Date:     kb.NewDate(info.ModTime()),
-			Synopsis: conv.Topic.Synopsis,
-			Meta:     meta,
-		},
+		Slug:     conv.Slug,
+		Title:    conv.Topic.Title,
+		Modified: info.ModTime(),
+		Synopsis: conv.Topic.Synopsis,
+	}
+
+	tags := convertTags(topic.Keywords)
+	if len(tags) > 0 {
+		conv.Page.Story.Append(kb.Tags(tags...))
+	}
+
+	if conv.Topic.Synopsis != "" {
+		conv.Page.Story.Append(kb.Paragraph(conv.Topic.Synopsis))
 	}
 
 	defer func() {
@@ -115,6 +113,7 @@ func (conv *convert) run() {
 
 	conv.parse(bodytext)
 	conv.addRelatedLinks()
+	conv.dropEmpty()
 	conv.assignIDs()
 }
 
@@ -175,6 +174,22 @@ func (conv *convert) asLink(topic *Topic) string {
 	slug := string(conv.Mapping.ByTopic[topic])
 	title := topic.Title
 	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
+}
+
+func (conv *convert) dropEmpty() {
+	s := conv.Page.Story
+	s = s[:0:cap(s)]
+	for _, item := range conv.Page.Story {
+		if item.Type() == "paragraph" || item.Type() == "html" {
+			if item["text"] != "" {
+				s.Append(item)
+
+			}
+		} else {
+			s.Append(item)
+		}
+	}
+	conv.Page.Story = s
 }
 
 func (conv *convert) assignIDs() {

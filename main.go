@@ -12,6 +12,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 
+	"github.com/raintreeinc/knowledgebase/kbdita"
 	"github.com/raintreeinc/knowledgebase/kbgroup"
 	"github.com/raintreeinc/knowledgebase/kbpage"
 	"github.com/raintreeinc/knowledgebase/kbtag"
@@ -35,6 +36,7 @@ var (
 	conffile = flag.String("config", "knowledgebase.toml", "farm configuration")
 
 	development = flag.Bool("development", true, "development mode")
+	ditamap     = flag.String("dita", "", "ditamap file for showing live dita")
 
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
@@ -60,6 +62,9 @@ func main() {
 	}
 	if os.Getenv("DOMAIN") != "" {
 		*domain = os.Getenv("DOMAIN")
+	}
+	if os.Getenv("DITAMAP") != "" {
+		*ditamap = os.Getenv("DITAMAP")
 	}
 
 	log.Printf("Starting with database %s\n", *database)
@@ -101,6 +106,10 @@ func main() {
 	server.AddSystem(kbpage.New(server))
 	server.AddSystem(kbtag.New(server))
 	server.AddSystem(kbuser.New(server))
+
+	if *ditamap != "" {
+		server.AddSystem(kbdita.New("dita", *ditamap, server))
+	}
 
 	// protect server with authentication
 	url := "http://" + *domain

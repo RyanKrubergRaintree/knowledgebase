@@ -7,12 +7,13 @@ import (
 
 // Page represents a federated wiki page
 type Page struct {
-	Owner    Slug    `json:"owner"`
-	Slug     Slug    `json:"slug"`
-	Title    string  `json:"title"`
-	Synopsis string  `json:"synopsis,omitempty"`
-	Story    Story   `json:"story,omitempty"`
-	Journal  Journal `json:"journal,omitempty"`
+	Owner    Slug      `json:"owner"`
+	Slug     Slug      `json:"slug"`
+	Title    string    `json:"title"`
+	Synopsis string    `json:"synopsis,omitempty"`
+	Modified time.Time `json:"modified,omitempty"`
+	Story    Story     `json:"story,omitempty"`
+	Journal  Journal   `json:"journal,omitempty"`
 }
 
 // Story is the viewable content of the page
