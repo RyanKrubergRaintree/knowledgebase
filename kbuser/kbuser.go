@@ -12,14 +12,14 @@ import (
 var _ kbserver.System = &System{}
 
 type System struct {
-	Server *kbserver.Server
-	Router *mux.Router
+	server *kbserver.Server
+	router *mux.Router
 }
 
 func New(server *kbserver.Server) *System {
 	sys := &System{
-		Server: server,
-		Router: mux.NewRouter(),
+		server: server,
+		router: mux.NewRouter(),
 	}
 	sys.init()
 	return sys
@@ -28,12 +28,12 @@ func New(server *kbserver.Server) *System {
 func (sys *System) Name() string { return "User" }
 
 func (sys *System) init() {
-	m := sys.Router
+	m := sys.router
 	m.HandleFunc("/user:{userid}", sys.userinfo).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.Router.ServeHTTP(w, r)
+	sys.router.ServeHTTP(w, r)
 }
 
 func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 	}
 	userid := kb.Slugify(userval)
 
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -55,7 +55,7 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	info, err := sys.Server.Users().ByID(user.ID)
+	info, err := sys.server.Users().ByID(user.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

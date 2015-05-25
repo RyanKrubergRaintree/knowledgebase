@@ -12,14 +12,14 @@ import (
 var _ kbserver.System = &System{}
 
 type System struct {
-	Server *kbserver.Server
-	Router *mux.Router
+	server *kbserver.Server
+	router *mux.Router
 }
 
 func New(server *kbserver.Server) *System {
 	sys := &System{
-		Server: server,
-		Router: mux.NewRouter(),
+		server: server,
+		router: mux.NewRouter(),
 	}
 	sys.init()
 	return sys
@@ -28,22 +28,22 @@ func New(server *kbserver.Server) *System {
 func (sys *System) Name() string { return "Tag" }
 
 func (sys *System) init() {
-	m := sys.Router
+	m := sys.router
 	m.HandleFunc("/tag:tags", sys.tags).Methods("GET")
 	m.HandleFunc("/tag:{tagid}", sys.pages).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.Router.ServeHTTP(w, r)
+	sys.router.ServeHTTP(w, r)
 }
 
 func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	index := sys.Server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(user.ID)
 
 	tagval := mux.Vars(r)["tagid"]
 	if tagval == "" {
@@ -66,12 +66,12 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) tags(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	index := sys.Server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(user.ID)
 
 	entries, err := index.Tags()
 	if err != nil {

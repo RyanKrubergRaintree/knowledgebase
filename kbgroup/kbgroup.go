@@ -12,14 +12,14 @@ import (
 var _ kbserver.System = &System{}
 
 type System struct {
-	Server *kbserver.Server
-	Router *mux.Router
+	server *kbserver.Server
+	router *mux.Router
 }
 
 func New(server *kbserver.Server) *System {
 	sys := &System{
-		Server: server,
-		Router: mux.NewRouter(),
+		server: server,
+		router: mux.NewRouter(),
 	}
 	sys.init()
 	return sys
@@ -28,7 +28,7 @@ func New(server *kbserver.Server) *System {
 func (sys *System) Name() string { return "Group" }
 
 func (sys *System) init() {
-	m := sys.Router
+	m := sys.router
 	m.HandleFunc("/group:groups", sys.groups).Methods("GET")
 	m.HandleFunc("/group:{groupid}-details", sys.info).Methods("GET")
 	m.HandleFunc("/group:{groupid}-members", sys.members).Methods("GET")
@@ -36,7 +36,7 @@ func (sys *System) init() {
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.Router.ServeHTTP(w, r)
+	sys.router.ServeHTTP(w, r)
 }
 
 func (sys *System) info(w http.ResponseWriter, r *http.Request) {
@@ -47,18 +47,18 @@ func (sys *System) info(w http.ResponseWriter, r *http.Request) {
 	}
 	groupid := kb.Slugify(groupval)
 
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if !sys.Server.Database.CanRead(user.ID, groupid) {
+	if !sys.server.Database.CanRead(user.ID, groupid) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
-	group, err := sys.Server.Groups().ByID(groupid)
+	group, err := sys.server.Groups().ByID(groupid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -85,12 +85,12 @@ func (sys *System) info(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	index := sys.Server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(user.ID)
 
 	groupval := mux.Vars(r)["groupid"]
 	if groupval == "" {
@@ -105,7 +105,7 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	group, err := sys.Server.Groups().ByID(groupid)
+	group, err := sys.server.Groups().ByID(groupid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -124,12 +124,12 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	index := sys.Server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(user.ID)
 
 	entries, err := index.Groups()
 	if err != nil {
@@ -155,12 +155,12 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) members(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.Server.CurrentUser(w, r)
+	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
-	groups := sys.Server.Groups()
+	groups := sys.server.Groups()
 
 	groupval := mux.Vars(r)["groupid"]
 	if groupval == "" {
@@ -169,12 +169,12 @@ func (sys *System) members(w http.ResponseWriter, r *http.Request) {
 	}
 	groupid := kb.Slugify(groupval)
 
-	if !sys.Server.CanWrite(user.ID, groupid) {
+	if !sys.server.CanWrite(user.ID, groupid) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 
-	group, err := sys.Server.Groups().ByID(groupid)
+	group, err := sys.server.Groups().ByID(groupid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
