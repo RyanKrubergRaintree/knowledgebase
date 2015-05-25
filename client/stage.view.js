@@ -107,13 +107,13 @@ KB.Stage.View = (function(){
 		},
 		componentDidMount: function(){
 			this.props.stage.on("changed", this.changed, this);
-			this.props.stage.requestPage();
+			this.props.stage.pull();
 		},
 		componentWillReceiveProps: function(nextprops){
 			if(this.props.stage !== nextprops.stage){
 				this.props.stage.remove(this);
 				nextprops.stage.on("changed", this.changed, this);
-				nextprops.stage.requestPage();
+				nextprops.stage.pull();
 			}
 		},
 		componentWillUnmount: function() {

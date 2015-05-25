@@ -5,12 +5,13 @@ import "item.view.js";
 KB.Page.View = (function(){
 	var Page = React.createClass({
 		displayName: "Page",
+
 		render: function(){
 			var stage = this.props.stage,
 				page = this.props.page;
 
 			return React.DOM.div(
-				{className: "page"},
+				{ className: "page" },
 				React.DOM.h1(null, page.title),
 				React.createElement(Story, {
 					stage: stage,
