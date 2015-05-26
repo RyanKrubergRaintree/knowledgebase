@@ -66,6 +66,7 @@ KB.Stage.View = (function(){
 			this.setState({
 				wide: !this.state.wide
 			});
+			window.setTimeout(this.activate, 100);
 		},
 
 		activate: function(ev){
