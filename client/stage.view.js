@@ -108,6 +108,7 @@ KB.Stage.View = (function(){
 		componentDidMount: function(){
 			this.props.stage.on("changed", this.changed, this);
 			this.props.stage.pull();
+			this.activate();
 		},
 		componentWillReceiveProps: function(nextprops){
 			if(this.props.stage !== nextprops.stage){
