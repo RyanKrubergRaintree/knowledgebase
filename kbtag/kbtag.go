@@ -40,6 +40,9 @@ func (sys *System) init() {
 	m.HandleFunc("/tag:{tagid}", sys.pages).Methods("GET")
 }
 
+//TODO
+func (sys *System) Pages() []kb.PageEntry { return nil }
+
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }

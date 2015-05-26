@@ -33,6 +33,9 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
+//TODO
+func (sys *System) Pages() []kb.PageEntry { return nil }
+
 func (sys *System) init() {
 	m := sys.router
 	m.HandleFunc("/page:pages", sys.pages).Methods("GET")

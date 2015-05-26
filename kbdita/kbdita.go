@@ -57,6 +57,14 @@ func (sys *System) init() {
 	go sys.monitor()
 }
 
+func (sys *System) Pages() (r []kb.PageEntry) {
+	store := sys.store.Load().(*store)
+	for _, page := range store.pages {
+		r = append(r, kb.PageEntryFrom(page))
+	}
+	return
+}
+
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	store := sys.store.Load().(*store)
 	path := strings.TrimPrefix(r.URL.Path, "/")

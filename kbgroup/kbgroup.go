@@ -34,6 +34,9 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
+//TODO
+func (sys *System) Pages() []kb.PageEntry { return nil }
+
 func (sys *System) init() {
 	m := sys.router
 	m.HandleFunc("/group:groups", sys.groups).Methods("GET")
@@ -92,21 +95,12 @@ func (sys *System) info(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) systemPages(sysId kb.Slug, w http.ResponseWriter, r *http.Request) {
-	//	entries, err := index.ByGroup(groupid)
-	//	if err != nil {
-	//		http.Error(w, err.Error(), http.StatusInternalServerError)
-	//		return
-	//	}
-	//
-	//	group, err := sys.server.Groups().ByID(groupid)
-	//	if err != nil {
-	//		http.Error(w, err.Error(), http.StatusInternalServerError)
-	//		return
-	//	}
-	//
-	//	story := kb.StoryFromEntries(entries)
-	group := sys.server.Systems[sysId].Info()
-	story := kb.Story{}
+	sysgroup := sys.server.Systems[sysId]
+	group := sysgroup.Info()
+
+	entries := sysgroup.Pages()
+	kb.SortPageEntriesBySlug(entries)
+	story := kb.StoryFromEntries(entries)
 	story.Prepend(kb.Paragraph(group.Description))
 
 	kbserver.WriteJSON(w, r, &kb.Page{

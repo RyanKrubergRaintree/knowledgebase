@@ -15,7 +15,7 @@ type Presenter interface {
 
 type System interface {
 	Info() Group
-	//TODO: Pages() []*PageEntry
+	Pages() []kb.PageEntry
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 

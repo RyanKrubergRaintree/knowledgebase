@@ -39,6 +39,8 @@ func (sys *System) init() {
 	m.HandleFunc("/user:{userid}", sys.userinfo).Methods("GET")
 }
 
+func (sys *System) Pages() []kb.PageEntry { return nil }
+
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }
