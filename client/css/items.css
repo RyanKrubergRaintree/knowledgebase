@@ -11,9 +11,9 @@
 
 .item {
 	position: relative;
+	overflow: hidden; /* for disabling margin-collapse */
 
 	padding: 0 10px;
-	margin: 0.01px;
 	min-height: 16px;
 
 	background: #fff;
@@ -24,6 +24,10 @@
 		height 0.1s ease-in-out,
 		min-height 0.1s ease-in-out,
 		box-shadow 0.1s ease-in-out;
+}
+
+.item p {
+	margin: 8px 0;
 }
 
 .item:hover {
@@ -56,6 +60,11 @@
 	border: 0;
 }
 
+.content-unknown {
+	border: 1px solid #f00;
+	padding: 8px;
+}
+
 .content-tags {
 }
 
@@ -85,4 +94,13 @@
 
 .content-entry .entry-synopsis {
 	font-size: 12px;
+}
+
+.content-code {
+	white-space: pre;
+	background: #F2F2F2;
+	padding: 6px 3px;
+	margin: 14px 0;
+	overflow: auto;
+	font-family: monospace;
 }

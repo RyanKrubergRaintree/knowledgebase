@@ -63,7 +63,7 @@ var actionfns = map[string]func(p *Page, a Action) error{
 
 		after := action.Str("after")
 		if after == "" {
-			p.Story.Append(item)
+			p.Story.Prepend(item)
 			return nil
 		}
 		return p.Story.InsertAfter(after, item)

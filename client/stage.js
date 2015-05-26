@@ -83,6 +83,10 @@ KB.Stage = (function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
 
+		get canModify(){
+			return true;
+		},
+
 		updateStatus_: function(xhr){
 			var ok = success(xhr);
 			this.state = 'loaded';
@@ -104,8 +108,10 @@ KB.Stage = (function(){
 			var version = this.page.version;
 			this.page.apply(op);
 
+			/*
 			this.patches_.push(op);
 			this.nextPatch_();
+			*/
 
 			this.changed();
 		},

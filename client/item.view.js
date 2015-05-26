@@ -10,6 +10,48 @@ KB.Item.Content = {};
 KB.Item.View = React.createClass({
 	displayName: "Item",
 
+	dragStart: function(ev, node, item){
+		var stage = this.props.stage,
+			item = this.props.item;
+
+		if(stage.canModify){
+			ev.dataTransfer.dropEffect = 'all';
+		} else {
+			ev.dataTransfer.dropEffect = 'move';
+		}
+
+		var off = mouseOffset(ev);
+		ev.dataTransfer.setDragImage(this.getDOMNode(), off.x, off.y);
+
+		var data = {
+			item: item,
+			title: stage.page.title,
+			url: stage.url,
+			text: stage.page.synopsis
+		};
+		ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+
+		function mouseOffset(ev){
+			ev = ev.nativeEvent || ev;
+			return {
+				x: ev.offsetX || ev.layerX || 0,
+				y: ev.offsetY || ev.layerY || 0
+			};
+		}
+	},
+	drag: function(ev){ ev.preventDefault(); },
+	dragEnd: function(ev){
+		var stage = this.props.stage,
+			item = this.props.item;
+		if(ev.dataTransfer.dropEffect == 'move'){
+			stage.patch({
+				type: 'remove',
+				id: item.id
+			});
+		}
+		ev.preventDefault();
+	},
+
 	startEditing: function(ev){
 		var stage = this.props.stage,
 			item = this.props.item;
@@ -34,11 +76,17 @@ KB.Item.View = React.createClass({
 		return React.DOM.div(
 			{
 				className: "item" + editing,
-				onDoubleClick: this.startEditing
+				onDoubleClick: this.startEditing,
+				"data-id": item.id
 			},
 			React.DOM.div({
 				className:"item-drag",
-				title: "Move or copy item."
+				title: "Move or copy item.",
+				draggable: true,
+
+				onDragStart: this.dragStart,
+				onDrag: this.drag,
+				onDragEnd: this.dragEnd
 			}),
 			React.createElement(view, {
 				stage: stage,
@@ -51,9 +99,13 @@ KB.Item.View = React.createClass({
 KB.Item.Content.Unknown = React.createClass({
 	displayName: 'Unknown',
 	render: function(){
-		return React.DOM.div({
-			className: 'item-content content-unknown'
-		}, this.props.item.text);
+		var item = this.props.item;
+		return React.DOM.div(
+			{ className: 'item-content content-unknown' },
+			React.DOM.span({style: {"float": "right"}}, item.type),
+			React.DOM.p({}, item.text),
+			React.DOM.div({className:"clear-fix"})
+		);
 	}
 });
 
@@ -108,7 +160,7 @@ KB.Item.Content['reference'] = React.createClass({
 	displayName: 'Reference',
 	render: function(){
 		var item = this.props.item;
-		var url = Convert.LinkToReference(item.link).url;
+		var url = item.url;
 		var loc = Convert.URLToLocation(url);
 		var external = loc.origin && (loc.origin != window.location.origin);
 

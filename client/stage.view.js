@@ -13,6 +13,21 @@ KB.Stage.View = (function(){
 			this.props.stage.close();
 		},
 
+		createFactory: function(ev){
+			var item = {
+				id: GenerateID(),
+				type: "factory",
+				text: ""
+			};
+
+			ev.dataTransfer.effectAllowed = 'copy';
+			var data = {
+				item: item
+			};
+
+			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+		},
+
 		render: function(){
 			var stage = this.props.stage;
 			var a = React.DOM.a;
@@ -20,10 +35,10 @@ KB.Stage.View = (function(){
 				{className: "stage-buttons"},
 				a({
 					className:"mdi mdi-playlist-plus",
-					draggable: true,
+					title:"Drag to page to add an item.",
 					style: { cursor: "move" },
-					title:"Drag to page to add an item."
-					//TODO: add drag start handling
+					draggable: true,
+					onDragStart: this.createFactory
 				}),
 				a({
 					className:"mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),
@@ -68,7 +83,6 @@ KB.Stage.View = (function(){
 			});
 			window.setTimeout(this.activate, 100);
 		},
-
 		activate: function(ev){
 			if(typeof ev == 'undefined'){
 				SmoothScroll.to(this.getDOMNode());
@@ -92,11 +106,11 @@ KB.Stage.View = (function(){
 					onToggleWidth: this.toggleWidth
 				}),
 				React.DOM.div(
-					{className:"stage-scroll round-scrollbar"},
+					{ className:"stage-scroll round-scrollbar"},
 					React.createElement(StageInfo, this.props),
 					React.createElement(KB.Page.View, {
 						stage: this.props.stage,
-						page: this.props.stage.page
+						page: this.props.stage.page,
 					})
 				)
 			);

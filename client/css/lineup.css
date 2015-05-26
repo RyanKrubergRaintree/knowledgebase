@@ -144,3 +144,7 @@
 .round-scrollbar::-webkit-scrollbar-thumb:hover {
 	border: 1px solid #7DC6FF;
 }
+
+.page-story { border-bottom: 20px solid #fff; }
+.drop-before { border-top: 20px solid #ff0 !important; }
+.drop-after { border-bottom: 20px solid #ff0 !important; }
