@@ -15,8 +15,8 @@
 .stage {
 	position: relative;
 	flex: none;
-	width: 99%;
-	max-width: 465px;
+	width: 100%;
+	max-width: 500px;
 
 	transition:
 		width 0.3s ease-in-out,
@@ -30,18 +30,18 @@
 
 /* 465 * 1.5 ~= 700 */
 @media(min-width:  700px) {
-	.stage { width: 49%; }
-	.stage-wide { width: 99%; }
+	.stage { width: 50%; }
+	.stage-wide { width: 100%; }
 }
 /* 465 * 2.5 ~= 1163 */
 @media(min-width: 1163px) {
-	.stage { width: 33%; }
-	.stage-wide { width: 66%; }
+	.stage { width: 33.3%; }
+	.stage-wide { width: 66.3%; }
 }
 /* 465 * 3.5 ~= 1628 */
 @media(min-width: 1628px) {
-	.stage { width: 24.5%; }
-	.stage-wide { width: 49%; }
+	.stage { width: 25%; }
+	.stage-wide { width: 50%; }
 }
 
 .stage-buttons {
