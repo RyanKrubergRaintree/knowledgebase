@@ -82,7 +82,6 @@ KB.Stage = (function(){
 		changed: function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
-
 		get canModify(){
 			return true;
 		},

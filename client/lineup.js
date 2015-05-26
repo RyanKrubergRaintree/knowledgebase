@@ -74,7 +74,6 @@ KB.Lineup = (function(){
 			}
 		},
 
-
 		// url
 		// title
 		// link

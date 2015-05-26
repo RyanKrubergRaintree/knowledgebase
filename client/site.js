@@ -17,6 +17,73 @@ KB.Site = (function(){
 		}
 	})
 
+	var Search = React.createClass({
+		lastStageId: undefined,
+		search: function(ev){
+			var Lineup = this.props.Lineup;
+			var query = this.refs.query.getDOMNode().value.trim();
+			this.lastStageId = Lineup.open({
+				url: "/page:search?q="+query,
+				title: 'Search "' + query + '"',
+				insteadOf: this.lastStageId
+			});
+			ev.preventDefault();
+		},
+		keyDown: function(ev){
+			var Lineup = this.props.Lineup;
+			if(ev.keyCode == 27){// esc
+				Lineup.closeLast();
+				return;
+			}
+
+			if((ev.keyCode == 13) && (ev.ctrlKey || ev.shiftKey)){
+				if(ev.ctrlKey){
+					Lineup.clear();
+				}
+
+				var query = this.refs.query.getDOMNode().value.trim();
+				Lineup.open({url: convert.LinkToURL(query), link:query});
+				ev.preventDefault();
+				return;
+			}
+
+			var stages = document.getElementsByClassName('stage');
+			if(stages.length == 0){
+				return;
+			};
+
+			var stage = stages[stages.length-1];
+			var middle = stage.getElementsByClassName('stage-scroll')[0];
+
+			switch(ev.keyCode){
+			case 33: // pageup
+				middle.scrollTop -= middle.clientHeight
+				break;
+			case 34: // pagedown
+				middle.scrollTop += middle.clientHeight
+				break;
+			}
+		},
+		render: function(){
+			return React.DOM.form(
+				{
+					className:"search",
+					onSubmit: this.search
+				},
+				React.DOM.input({
+					ref: "query",
+					placeholder:"Search...",
+					onKeyDown: this.keyDown
+				}),
+				React.DOM.button({
+					className:"search-icon mdi mdi-magnify",
+					type: "submit",
+					tabIndex: -1
+				})
+			);
+		}
+	})
+
 	var Header = React.createClass({
 		openHome: function(ev){
 			var lineup = this.props.Lineup;
@@ -32,13 +99,7 @@ KB.Site = (function(){
 				id:"header"
 			},
 				a({className:"button logo", href:"#", title:"Home", onClick: this.openHome}),
-				React.DOM.form({className:"search"},
-					React.DOM.input({placeholder:"Search..."}),
-					React.DOM.button({
-						className:"search-icon mdi mdi-magnify",
-						type: "submit",
-						tabIndex: -1
-					})),
+				React.createElement(Search, this.props),
 				a({
 					className:"button userinfo",
 					id:"userinfo",
