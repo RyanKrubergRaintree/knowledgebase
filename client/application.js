@@ -17,3 +17,24 @@ function initialize(mountNode){
 }
 
 initialize(document.getElementById("site"));
+
+
+// closing of the last page
+window.addEventListener("keydown", function(ev){
+	function elementIsEditable(elem){
+		return elem && (
+			((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
+			(elem.nodeName === 'TEXTAREA') ||
+			(elem.contentEditable === 'true')
+	 	);
+	}
+
+	if(ev.defaultPrevented || elementIsEditable(ev.target)){
+		return;
+	}
+	if(ev.keyCode == 27){
+		Global.Lineup.closeLast();
+		ev.preventDefault();
+		ev.stopPropagation();
+	}
+});

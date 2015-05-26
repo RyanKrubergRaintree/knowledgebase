@@ -57,7 +57,8 @@ KB.Lineup = (function(){
 		},
 
 		closeLast: function(){
-			if(this.stages.length > 0){
+			// always keep one stage open
+			if(this.stages.length > 1){
 				this.stages[this.stages.length-1].close();
 			}
 		},
