@@ -1,11 +1,54 @@
 import "convert.js";
 import "resolve.js";
-
-ItemView = {};
+import "item.js";
+import "item.editor.js";
 
 'use strict';
 
-ItemView.Unknown = React.createClass({
+KB.Item.Content = {};
+
+KB.Item.View = React.createClass({
+	displayName: "Item",
+
+	startEditing: function(ev){
+		var stage = this.props.stage,
+			item = this.props.item;
+
+		stage.editing.start(item.id);
+
+		ev.preventDefault();
+		ev.stopPropagation();
+	},
+
+	render: function(){
+		var stage = this.props.stage,
+			item = this.props.item;
+
+		var view = KB.Item.Content[item.type] || KB.Item.Content.Unknown;
+		var editing = '';
+		if(stage.editing.item(item.id)){
+			view = KB.Item.Editor;
+			editing = ' item-editing';
+		}
+
+		return React.DOM.div(
+			{
+				className: "item" + editing,
+				onDoubleClick: this.startEditing
+			},
+			React.DOM.div({
+				className:"item-drag",
+				title: "Move or copy item."
+			}),
+			React.createElement(view, {
+				stage: stage,
+				item: item
+			})
+		);
+	}
+});
+
+KB.Item.Content.Unknown = React.createClass({
 	displayName: 'Unknown',
 	render: function(){
 		return React.DOM.div({
@@ -14,7 +57,7 @@ ItemView.Unknown = React.createClass({
 	}
 });
 
-ItemView['image'] = React.createClass({
+KB.Item.Content['image'] = React.createClass({
 	displayName: 'Image',
 	render: function(){
 		return React.DOM.div({
@@ -26,7 +69,7 @@ ItemView['image'] = React.createClass({
 	}
 });
 
-ItemView['paragraph'] = React.createClass({
+KB.Item.Content['paragraph'] = React.createClass({
 	displayName: 'Paragraph',
 	render: function(){
 		var stage = this.props.stage;
@@ -39,7 +82,7 @@ ItemView['paragraph'] = React.createClass({
 	}
 });
 
-ItemView['html'] = React.createClass({
+KB.Item.Content['html'] = React.createClass({
 	displayName: 'HTML',
 	render: function(){
 		var stage = this.props.stage;
@@ -52,7 +95,7 @@ ItemView['html'] = React.createClass({
 	}
 });
 
-ItemView['code'] = React.createClass({
+KB.Item.Content['code'] = React.createClass({
 	displayName: 'Code',
 	render: function(){
 		return React.DOM.div({
@@ -61,7 +104,7 @@ ItemView['code'] = React.createClass({
 	}
 });
 
-ItemView['reference'] = React.createClass({
+KB.Item.Content['reference'] = React.createClass({
 	displayName: 'Reference',
 	render: function(){
 		var item = this.props.item;
@@ -80,7 +123,7 @@ ItemView['reference'] = React.createClass({
 	}
 });
 
-ItemView['entry'] = React.createClass({
+KB.Item.Content['entry'] = React.createClass({
 	displayName: 'Entry',
 	render: function(){
 		var item = this.props.item;
@@ -100,7 +143,7 @@ ItemView['entry'] = React.createClass({
 	}
 });
 
-ItemView['tags'] = React.createClass({
+KB.Item.Content['tags'] = React.createClass({
 	displayName: 'Tags',
 	render: function(){
 		var item = this.props.item,

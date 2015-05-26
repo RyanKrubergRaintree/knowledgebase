@@ -10,6 +10,42 @@ KB.Stage = (function(){
 		return (200 <= xhr.status) && (xhr.status < 300);
 	}
 
+	function Editing(stage){
+		this.stage = stage;
+		this.items = {};
+	}
+	Editing.prototype = {
+		start: function(id){
+			this.items[id] = true;
+			this.pack();
+			this.stage.changed();
+		},
+		stop: function(id){
+			delete this.items[id];
+			this.pack();
+			this.stage.changed();
+		},
+		// removes all non-existing items
+		pack: function(){
+			var t = {};
+			var page = this.stage.page;
+			for(var i = 0; i < page.story.length; i++){
+				var item = page.story[i];
+				if(this.items[item.id]){
+					t[item.id] = true;
+				}
+			}
+			this.items = t;
+		},
+		clear: function(){
+			this.items = {};
+			this.changed();
+		},
+		item: function(id){
+			return this.items[id];
+		},
+	};
+
 	// Stage represents a staging area where modifications/loading are done.
 	function Stage(ref, page){
 		this.id = GenerateID();
@@ -22,6 +58,8 @@ KB.Stage = (function(){
 		page.title = page.title || ref.title || "";
 
 		this.page = new KB.Page(page);
+		this.editing = new Editing(this);
+
 		this.notifier = new Notifier();
 		this.notifier.mixto(this);
 
@@ -63,7 +101,7 @@ KB.Stage = (function(){
 		},
 
 		patch: function(op){
-			var version = page.version;
+			var version = this.page.version;
 			this.page.apply(op);
 
 			this.patches_.push(op);

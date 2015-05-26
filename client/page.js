@@ -24,11 +24,15 @@ KB.Page = (function(){
 		indexOf_: function(id){
 			var story = this.story;
 			for(var i = 0; i < story.length; i += 1){
-				if(story[i].id == itemId){
+				if(story[i].id == id){
 					return i;
 				}
 			}
-			throw new Error('Item "' + itemId + '" does not exist.');
+			throw new Error('Item "' + id + '" does not exist.');
+		},
+
+		itemById: function(id){
+			return this.story[this.indexOf_(id)];
 		},
 
 		apply: function(op){
@@ -45,7 +49,7 @@ KB.Page = (function(){
 	};
 
 	var OP = {};
-	OP.add = function(page, stroy, op){
+	OP.add = function(page, story, op){
 		if(op.after != null){
 			var i = page.indexOf_(op.after);
 			story.splice(i+1, 0, op.item);
@@ -54,17 +58,17 @@ KB.Page = (function(){
 		}
 	};
 
-	OP.remove = function(page, stroy, op){
+	OP.remove = function(page, story, op){
 		var i = page.indexOf_(op.id);
 		story.splice(i, 1);
 	};
 
-	OP.edit = function(page, stroy, op){
+	OP.edit = function(page, story, op){
 		var i = page.indexOf_(op.id);
 		story[i] = op.item;
 	};
 
-	OP.move = function(page, stroy, op){
+	OP.move = function(page, story, op){
 		var from = page.indexOf_(op.id),
 			item = story.splice(from, 1)[0];
 		if(op.after != null){
