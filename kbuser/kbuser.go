@@ -25,7 +25,14 @@ func New(server *kbserver.Server) *System {
 	return sys
 }
 
-func (sys *System) Name() string { return "User" }
+func (sys *System) Info() kbserver.Group {
+	return kbserver.Group{
+		ID:          "user",
+		Name:        "User",
+		Public:      true,
+		Description: "Displays user information.",
+	}
+}
 
 func (sys *System) init() {
 	m := sys.router

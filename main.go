@@ -108,7 +108,7 @@ func main() {
 	server.AddSystem(kbuser.New(server))
 
 	if *ditamap != "" {
-		server.AddSystem(kbdita.New("dita", *ditamap, server))
+		server.AddSystem(kbdita.New("Dita", *ditamap, server))
 	}
 
 	// protect server with authentication

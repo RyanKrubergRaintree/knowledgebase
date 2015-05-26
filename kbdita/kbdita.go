@@ -43,7 +43,14 @@ func New(name, ditamap string, server *kbserver.Server) *System {
 	return sys
 }
 
-func (sys *System) Name() string { return sys.name }
+func (sys *System) Info() kbserver.Group {
+	return kbserver.Group{
+		ID:          kb.Slugify(sys.name),
+		Name:        sys.name,
+		Public:      true,
+		Description: "Displays \"" + sys.ditamap + "\" content.",
+	}
+}
 
 func (sys *System) init() {
 	sys.store.Store(newstore())

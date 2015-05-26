@@ -25,7 +25,14 @@ func New(server *kbserver.Server) *System {
 	return sys
 }
 
-func (sys *System) Name() string { return "Group" }
+func (sys *System) Info() kbserver.Group {
+	return kbserver.Group{
+		ID:          "group",
+		Name:        "Group",
+		Public:      true,
+		Description: "Displays group information.",
+	}
+}
 
 func (sys *System) init() {
 	m := sys.router
@@ -84,6 +91,33 @@ func (sys *System) info(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (sys *System) systemPages(sysId kb.Slug, w http.ResponseWriter, r *http.Request) {
+	//	entries, err := index.ByGroup(groupid)
+	//	if err != nil {
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+	//
+	//	group, err := sys.server.Groups().ByID(groupid)
+	//	if err != nil {
+	//		http.Error(w, err.Error(), http.StatusInternalServerError)
+	//		return
+	//	}
+	//
+	//	story := kb.StoryFromEntries(entries)
+	group := sys.server.Systems[sysId].Info()
+	story := kb.Story{}
+	story.Prepend(kb.Paragraph(group.Description))
+
+	kbserver.WriteJSON(w, r, &kb.Page{
+		Owner:    "group",
+		Slug:     "group:" + sysId,
+		Title:    group.Name,
+		Synopsis: group.Description,
+		Story:    story,
+	})
+}
+
 func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 	user, err := sys.server.CurrentUser(w, r)
 	if err != nil {
@@ -98,6 +132,11 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	groupid := kb.Slugify(groupval)
+
+	if _, isSystem := sys.server.Systems[groupid]; isSystem {
+		sys.systemPages(groupid, w, r)
+		return
+	}
 
 	entries, err := index.ByGroup(groupid)
 	if err != nil {
@@ -142,6 +181,14 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 		story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
+			story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
+		}
+	}
+
+	if len(sys.server.Systems) > 0 {
+		story.Append(kb.HTML("<h2>System Groups:</h2>"))
+		for _, system := range sys.server.Systems {
+			entry := system.Info()
 			story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
 		}
 	}

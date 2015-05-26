@@ -14,7 +14,8 @@ type Presenter interface {
 }
 
 type System interface {
-	Name() string
+	Info() Group
+	//TODO: Pages() []*PageEntry
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
@@ -39,10 +40,10 @@ func New(domain string, db Database, presenter Presenter, context Context) *Serv
 }
 
 func (server *Server) AddSystem(system System) {
-	slug := kb.Slugify(system.Name())
+	slug := system.Info().ID
 	_, exists := server.Systems[slug]
 	if exists {
-		panic("System " + system.Name() + " already exists.")
+		panic("System " + system.Info().Name + " already exists.")
 	}
 	server.Systems[slug] = system
 }

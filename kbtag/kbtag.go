@@ -25,7 +25,14 @@ func New(server *kbserver.Server) *System {
 	return sys
 }
 
-func (sys *System) Name() string { return "Tag" }
+func (sys *System) Info() kbserver.Group {
+	return kbserver.Group{
+		ID:          "tag",
+		Name:        "Tag",
+		Public:      true,
+		Description: "Displays tag indexes.",
+	}
+}
 
 func (sys *System) init() {
 	m := sys.router
