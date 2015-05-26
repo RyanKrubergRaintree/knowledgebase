@@ -1,8 +1,6 @@
 package pgdb
 
 import (
-	"errors"
-
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
@@ -65,7 +63,15 @@ func (db *Index) List() ([]kb.PageEntry, error) {
 }
 
 func (db *Index) Search(text string) ([]kb.PageEntry, error) {
-	return nil, errors.New("not implemented")
+	return db.selectPages(`
+		WHERE  (Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
+			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1))
+		AND
+			to_tsvector('english', 
+				coalesce(cast(Data->'title' AS TEXT),'') || ' ' || 
+				coalesce(cast(Data->'story' AS TEXT), '')
+			) @@ to_tsquery('english', $2);
+	`, db.User, text)
 }
 
 func (db *Index) Tags() ([]kb.TagEntry, error) {
@@ -77,6 +83,7 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 		WHERE Owner IN (SELECT Name    FROM Groups      WHERE Public = True)
 		   OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		GROUP BY Tag
+		LIMIT 30
 	`, db.User)
 	if err != nil {
 		return nil, err

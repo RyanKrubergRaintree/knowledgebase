@@ -40,6 +40,7 @@ func (sys *System) init() {
 	m := sys.router
 	m.HandleFunc("/page:pages", sys.pages).Methods("GET")
 	m.HandleFunc("/page:recent-changes", sys.recentChanges).Methods("GET")
+	m.HandleFunc("/page:search", sys.search).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +64,28 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 		Owner: "page",
 		Slug:  "page:pages",
 		Title: "Pages",
+		Story: kb.StoryFromEntries(entries),
+	})
+}
+
+func (sys *System) search(w http.ResponseWriter, r *http.Request) {
+	user, err := sys.server.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	index := sys.server.IndexByUser(user.ID)
+
+	q := r.URL.Query().Get("q")
+	entries, err := index.Search(q)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	kbserver.WriteJSON(w, r, &kb.Page{
+		Owner: "page",
+		Slug:  "page:search",
+		Title: "Search \"" + q + "\"",
 		Story: kb.StoryFromEntries(entries),
 	})
 }
