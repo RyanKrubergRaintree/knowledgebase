@@ -50,6 +50,7 @@ KB.Stage = (function(){
 	function Stage(ref, page){
 		this.id = GenerateID();
 
+		this.creating = ref.url == null;
 		this.url = ref.url;
 		this.link = ref.link;
 		this.title = ref.title;
@@ -81,10 +82,6 @@ KB.Stage = (function(){
 		},
 		changed: function(){
 			this.notifier.emit({type: "changed", stage: this});
-		},
-
-		get canCreate(){
-			return this.url == null;
 		},
 
 		get canModify(){
@@ -189,6 +186,50 @@ KB.Stage = (function(){
 			this.changed();
 		},
 		pullError_: function(ev){
+			this.state = "failed";
+			this.lastStatus = "failed";
+			this.lastStatusText = "";
+			this.lastError = "";
+			this.changed();
+		},
+
+		create: function(){
+			if(!this.creating){ return; }
+			this.url = "/" + this.link;
+
+			var xhr = new XMLHttpRequest();
+			xhr.withCredentials = true;
+			xhr.addEventListener('load', this.createDone_.bind(this), false);
+			xhr.addEventListener('error', this.createError_.bind(this), false);
+
+			xhr.open('PUT', this.url, true);
+			xhr.setRequestHeader('Accept', 'application/json');
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.send({
+				title: this.title,
+				slug: this.link
+			});
+
+			this.changed();
+		},
+		createDone_: function(ev){
+			var xhr = ev.target;
+			if(!this.updateStatus_(xhr)){
+				this.changed();
+				return;
+			}
+			this.creating = false;
+
+			var data = JSON.parse(xhr.response),
+			page = new KB.Page(data);
+			if(xhr.responseURL){
+				this.url = xhr.responseURL;
+			}
+			this.page = page;
+			this.state = "loaded";
+			this.changed();
+		},
+		createError_: function(ev){
 			this.state = "failed";
 			this.lastStatus = "failed";
 			this.lastStatusText = "";

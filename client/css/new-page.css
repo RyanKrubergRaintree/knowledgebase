@@ -13,11 +13,24 @@
 	width: 100%;
 }
 
-.new-page .group div {
-	margin: 8px;
+.new-page form .link {
+	display: block;
+	min-height: 16px;
+	margin-left: 8px;
 }
 
-.new-page .group [type=radio] {
+.new-page form .group div {
+	margin: 0;
+	padding: 8px;
+	margin-left: 8px;
+	border: 1px solid #FFF;
+}
+
+.new-page form .group .checked {
+	border: 1px solid #7DC6FF;
+}
+
+.new-page form .group [type=radio] {
 	margin-right: 16px;
 }
 

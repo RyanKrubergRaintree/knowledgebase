@@ -59,11 +59,25 @@ KB.Stage.View = (function(){
 		render: function(){
 			var table = React.DOM.table,
 			 	tr = React.DOM.tr,
-			 	td = React.DOM.td;
+			 	td = React.DOM.td,
+			 	stage = this.props.stage;
 
-			return table({className:"stage-info"},
-				tr(null, td(null, "Link"),  td(null, this.props.stage.link)),
-				tr(null, td(null, "State"), td(null, this.props.stage.state))
+			var error = null;
+			if(stage.state == "error" && (stage.lastError != "")){
+				error = table(
+					{className: "stage-error"},
+					tr(null, td(null, stage.lastStatusText)),
+					tr(null, td(null, stage.lastError))
+				);
+			}
+
+			return React.DOM.div(
+				null,
+				table({className:"stage-info"},
+					tr(null, td(null, "Link"),  td(null, stage.link)),
+					tr(null, td(null, "State"), td(null, stage.state))
+				),
+				error
 			);
 		}
 	});
@@ -82,42 +96,83 @@ KB.Stage.View = (function(){
 	var NewPage = React.createClass({
 		displayName: "NewPage",
 		tryCreate: function(ev){
+			var stage = this.props.stage;
+
+			stage.title = this.state.title;
+			stage.link  = Slugify(this.state.owner + ":" + stage.title);
+			stage.create();
+
 			ev.preventDefault();
 			ev.stopPropagation();
 		},
+
+		getInitialState: function(){
+			return {
+				title: this.props.stage.title,
+				owner: extractGroup(this.props.stage.link) || "community"
+			};
+		},
+
+		ownerChanged: function(ev){
+			this.setState({
+				owner: ev.currentTarget.value
+			});
+		},
+
+		titleChanged: function(){
+			this.setState({
+				title: this.refs.title.getDOMNode().value
+			});
+		},
+
 		render: function(){
+			var self = this;
 			var stage = this.props.stage;
 			var groups = [
 				{id: "community", name: "Community"},
 				{id: "engineering", name: "Engineering"}
 			];
+
+			var title = this.state.title,
+				owner = this.state.owner,
+				link = Slugify(owner + ":" + title);
+
 			return React.DOM.div(
 				{ className: "page new-page" },
 				React.DOM.form({
 					onSubmit: this.tryCreate
 				},
+					React.DOM.label({}, "Link"),
+					React.DOM.span({className:"link"}, link),
 					React.DOM.label({
 						htmlFor: "new-page-title",
 					}, "Title"),
 					React.DOM.input({
 						id: "new-page-title",
 						className: "title",
+						ref: "title",
 						defaultValue: stage.title,
+						onChange: this.titleChanged,
 						autoFocus: true
 					}),
-					React.DOM.label({}, "Page owner"),
+					React.DOM.label({}, "Owner"),
 					React.DOM.div(
 						{ className: "group" },
 						groups.map(function(group, i){
+							var checked = owner == group.id;
 							return (
 								React.DOM.div(
-									{ key: group.id },
+									{
+										key: group.id,
+										className: checked ? "checked" : ""
+									},
 									React.DOM.input({
 										id: "group-" + group.id,
 										type: 'radio',
 										name: 'group',
 										value: group.id,
-										defaultChecked: i == 0
+										onChange: self.ownerChanged,
+										checked: checked
 									}),
 									React.DOM.label({
 										htmlFor: "group-" + group.id
@@ -159,10 +214,7 @@ KB.Stage.View = (function(){
 			var wide = this.state.wide ? " stage-wide" : "";
 			var stage = this.props.stage;
 
-			var creating = stage.canCreate &&
-				((stage.url == null) || (stage.state == "not-found"));
-
-			if(creating){
+			if(stage.creating){
 				return React.DOM.div(
 					{
 						className: "stage" + wide,
