@@ -110,15 +110,8 @@ func main() {
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
 	context := kbserver.NewContext(*domain, store)
 
-	// presenter
-	presenter := kbserver.NewPresenter(*templatesdir, "*.html", map[string]string{
-		"ShortTitle": "KB",
-		"Title":      "Knowledge Base",
-		"Company":    "Raintree Systems Inc.",
-	}, client, context, db)
-
 	// create KnowledgeBase server
-	server := kbserver.New(*domain, db, presenter, context)
+	server := kbserver.New(*domain, *templatesdir, db, client, context)
 
 	// add systems
 	server.AddSystem(kbadmin.New(server))
@@ -134,7 +127,7 @@ func main() {
 	// protect server with authentication
 	url := "http://" + *domain
 	auth.Register(os.Getenv("APPKEY"), url, auth.ClientsFromEnv())
-	front := auth.New(server, context, presenter)
+	front := auth.New(server)
 
 	http.Handle("/", front)
 	log.Fatal(http.ListenAndServe(*addr, nil))

@@ -2,15 +2,17 @@ package kbserver
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-type Presenter interface {
-	Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error
+type Sources interface {
+	Include() string
 }
 
 type System interface {
@@ -20,19 +22,21 @@ type System interface {
 }
 
 type Server struct {
-	Domain string
+	Domain    string
+	Templates string
 	Database
-	Presenter
+	Sources
 	Context
 
 	Systems map[kb.Slug]System
 }
 
-func New(domain string, db Database, presenter Presenter, context Context) *Server {
+func New(domain, templates string, db Database, sources Sources, context Context) *Server {
 	return &Server{
 		Domain:    domain,
+		Templates: templates,
 		Database:  db,
-		Presenter: presenter,
+		Sources:   sources,
 		Context:   context,
 
 		Systems: make(map[kb.Slug]System),
@@ -195,4 +199,39 @@ func HandleError(w http.ResponseWriter, err error) {
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) error {
+	ts, err := template.New("").Funcs(
+		template.FuncMap{
+			"Site": func() interface{} {
+				return map[string]string{
+					"ShortTitle": "KB",
+					"Title":      "Knowledge Base",
+					"Company":    "Raintree Systems Inc.",
+				}
+			},
+			"User": func() kb.User {
+				user, _ := server.CurrentUser(w, r)
+				return user
+			},
+			"UserGroups": func() []string {
+				user, _ := server.CurrentUser(w, r)
+				info, _ := server.Users().ByID(user.ID)
+				return info.Groups
+			},
+			"Include": func() template.HTML {
+				return template.HTML(server.Sources.Include())
+			},
+		},
+	).ParseGlob(filepath.Join(server.Templates, "*.html"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+
+	if err := ts.ExecuteTemplate(w, tname, data); err != nil {
+		return err
+	}
+	return nil
 }

@@ -12,17 +12,11 @@ import (
 const authPath = "/system/auth"
 
 type Front struct {
-	kbserver.Presenter
-	Context kbserver.Context
-	Server  http.Handler
+	*kbserver.Server
 }
 
-func New(server http.Handler, context kbserver.Context, presenter kbserver.Presenter) *Front {
-	return &Front{
-		Presenter: presenter,
-		Context:   context,
-		Server:    server,
-	}
+func New(server *kbserver.Server) *Front {
+	return &Front{server}
 }
 
 func (front *Front) login(w http.ResponseWriter, r *http.Request) {
