@@ -3,6 +3,7 @@ package pgdb
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kbserver"
@@ -26,7 +27,7 @@ func (db *Database) exec(query string, args ...interface{}) error {
 	return err
 }
 
-func (db *Database) reset() error {
+func (db *Database) Destroy() error {
 	return db.exec(`
 		DROP SCHEMA public CASCADE;
 		CREATE SCHEMA public;
@@ -37,8 +38,8 @@ func (db *Database) reset() error {
 }
 
 func (db *Database) Initialize() error {
-	_ = db.reset()
-	return db.exec(`
+	//TODO: fix this setup
+	err := db.exec(`
 		CREATE TABLE Groups (
 			ID      TEXT   PRIMARY KEY,
 			Name    TEXT   NOT NULL,
@@ -87,6 +88,8 @@ func (db *Database) Initialize() error {
 		BEFORE UPDATE ON Pages
 		FOR EACH ROW EXECUTE PROCEDURE UpdateModifiedDate();
 	`)
+	log.Println(err)
+	return nil
 }
 
 func (db *Database) CanWrite(user, group kb.Slug) (result bool) {

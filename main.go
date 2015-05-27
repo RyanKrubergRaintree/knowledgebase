@@ -19,8 +19,6 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbtag"
 	"github.com/raintreeinc/knowledgebase/kbuser"
 
-	"github.com/raintreeinc/knowledgebase/kbserver/testdata"
-
 	"github.com/gorilla/sessions"
 
 	_ "github.com/lib/pq"
@@ -86,7 +84,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	testdata.SetupDatabase(db)
+	// create default groups
+	db.Groups().Create(kbserver.Group{
+		ID:          "community",
+		Name:        "Community",
+		Public:      true,
+		Description: "All editing users",
+	})
+
+	db.Groups().Create(kbserver.Group{
+		ID:          "engineering",
+		Name:        "Engineering",
+		Public:      true,
+		Description: "Raintree Engineering",
+	})
+
+	db.Groups().Create(kbserver.Group{
+		ID:          "help",
+		Name:        "Help",
+		Public:      true,
+		Description: "Raintree Help",
+	})
 
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))

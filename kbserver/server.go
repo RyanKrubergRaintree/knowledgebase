@@ -89,6 +89,18 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, err := server.Users().ByID(user.ID); err != nil {
+		server.Users().Create(User{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+			Admin: false,
+		})
+
+		server.Groups().AddMember("community", user.ID)
+		server.Groups().AddMember("engineering", user.ID)
+	}
+
 	pages := server.PagesByGroup(user.ID, group)
 	switch r.Method {
 	case "GET":

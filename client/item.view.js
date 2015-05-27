@@ -118,6 +118,37 @@ KB.Item.Content.Unknown = React.createClass({
 	}
 });
 
+KB.Item.Content['factory'] = React.createClass({
+	displayName: 'Factory',
+	convert: function(ev){
+		var type = ev.currentTarget.dataset.type;
+		var stage = this.props.stage,
+			item = this.props.item;
+
+		stage.patch({
+			type: "edit",
+			id: item.id,
+			item: {
+				type: type,
+				id: item.id,
+				text: item.text
+			}
+		});
+
+		stage.editing.start(item.id);
+	},
+
+	render: function(){
+		return React.DOM.div(
+			{ className: 'item-content content-factory'	},
+			React.DOM.p({}, "Make item for containing:"),
+			React.DOM.button({onClick: this.convert, "data-type":"paragraph"}, "Paragraph"),
+			React.DOM.button({onClick: this.convert, "data-type":"html"}, "HTML"),
+			React.DOM.button({onClick: this.convert, "data-type":"code"}, "Code")
+		);
+	}
+});
+
 KB.Item.Content['image'] = React.createClass({
 	displayName: 'Image',
 	render: function(){
