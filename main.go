@@ -12,6 +12,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 
+	"github.com/raintreeinc/knowledgebase/kbadmin"
 	"github.com/raintreeinc/knowledgebase/kbdita"
 	"github.com/raintreeinc/knowledgebase/kbgroup"
 	"github.com/raintreeinc/knowledgebase/kbpage"
@@ -102,6 +103,7 @@ func main() {
 	server := kbserver.New(*domain, db, presenter, context)
 
 	// add systems
+	server.AddSystem(kbadmin.New(server))
 	server.AddSystem(kbgroup.New(server))
 	server.AddSystem(kbpage.New(server))
 	server.AddSystem(kbtag.New(server))

@@ -76,11 +76,12 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 	story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Info:</b></p>
 		<table>
-			<tr><td>ID</td><td>%s</td></tr>
-			<tr><td>Name</td><td>%s</td></tr>
-			<tr><td>Email</td><td>%s</td></tr>
+			<tr><td>ID</td><td>%v</td></tr>
+			<tr><td>Name</td><td>%v</td></tr>
+			<tr><td>Email</td><td>%v</td></tr>
+			<tr><td>Admin</td><td>%v</td></tr>
 		</table>
-	`, info.ID, info.Name, info.Email)))
+	`, info.ID, info.Name, info.Email, info.Admin)))
 
 	el := "<p><b>Member of:</b></p><ul>"
 	for _, group := range info.Groups {

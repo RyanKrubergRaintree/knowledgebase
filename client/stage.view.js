@@ -68,6 +68,70 @@ KB.Stage.View = (function(){
 		}
 	});
 
+	function extractGroup(link) {
+		if(link == null){
+			return "";
+		}
+		var i = link.indexOf(":")
+		if(i >= 0) {
+			return link.substr(0, i);
+		}
+		return "";
+	}
+
+	var NewPage = React.createClass({
+		displayName: "NewPage",
+		tryCreate: function(ev){
+			ev.preventDefault();
+			ev.stopPropagation();
+		},
+		render: function(){
+			var stage = this.props.stage;
+			var groups = [
+				{id: "community", name: "Community"},
+				{id: "engineering", name: "Engineering"}
+			];
+			return React.DOM.div(
+				{ className: "page new-page" },
+				React.DOM.form({
+					onSubmit: this.tryCreate
+				},
+					React.DOM.label({
+						htmlFor: "new-page-title",
+					}, "Title"),
+					React.DOM.input({
+						id: "new-page-title",
+						className: "title",
+						defaultValue: stage.title,
+						autoFocus: true
+					}),
+					React.DOM.label({}, "Page owner"),
+					React.DOM.div(
+						{ className: "group" },
+						groups.map(function(group, i){
+							return (
+								React.DOM.div(
+									{ key: group.id },
+									React.DOM.input({
+										id: "group-" + group.id,
+										type: 'radio',
+										name: 'group',
+										value: group.id,
+										defaultChecked: i == 0
+									}),
+									React.DOM.label({
+										htmlFor: "group-" + group.id
+									}, group.name)
+								)
+							);
+						})
+					),
+					React.DOM.button({ type: "submit" }, "Create")
+				)
+			);
+		}
+	})
+
 	var Stage = React.createClass({
 		displayName: "Stage",
 
@@ -94,6 +158,32 @@ KB.Stage.View = (function(){
 		render: function(){
 			var wide = this.state.wide ? " stage-wide" : "";
 			var stage = this.props.stage;
+
+			var creating = stage.canCreate &&
+				((stage.url == null) || (stage.state == "not-found"));
+
+			if(creating){
+				return React.DOM.div(
+					{
+						className: "stage" + wide,
+						onClick: this.activate,
+						'data-id': stage.id
+					},
+					React.createElement(StageButtons, {
+						stage: this.props.stage,
+						isWide: this.state.wide,
+						onToggleWidth: this.toggleWidth
+					}),
+					React.DOM.div(
+						{ className:"stage-scroll round-scrollbar"},
+						React.createElement(StageInfo, this.props),
+						React.createElement(NewPage, {
+							stage: this.props.stage
+						})
+					)
+				);
+			}
+
 			return React.DOM.div(
 				{
 					className: "stage" + wide,

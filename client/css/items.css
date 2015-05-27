@@ -60,6 +60,12 @@
 	border: 0;
 }
 
+.item-content textarea {
+	background: transparent;
+	width: 100%;
+	min-height: 80px;
+}
+
 .content-unknown {
 	border: 1px solid #f00;
 	padding: 8px;

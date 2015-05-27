@@ -82,6 +82,11 @@ KB.Stage = (function(){
 		changed: function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
+
+		get canCreate(){
+			return this.url == null;
+		},
+
 		get canModify(){
 			return true;
 		},
@@ -104,13 +109,13 @@ KB.Stage = (function(){
 		},
 
 		patch: function(op){
+			if(this.url == null){ return; }
+
 			var version = this.page.version;
 			this.page.apply(op);
 
-			/*
 			this.patches_.push(op);
 			this.nextPatch_();
-			*/
 
 			this.changed();
 		},
@@ -153,6 +158,8 @@ KB.Stage = (function(){
 
 
 		pull: function(){
+			if(this.url == null){ return; }
+
 			this.state = "loading";
 			this.changed();
 
@@ -190,6 +197,8 @@ KB.Stage = (function(){
 		},
 
 		destroy: function(){
+			if(this.url == null){ return; }
+
 			var xhr = new XMLHttpRequest();
 			xhr.withCredentials = true;
 			xhr.open('DELETE', jsonurl(this.url), true);

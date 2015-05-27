@@ -59,6 +59,7 @@ func SetupDatabase(db kbserver.Database) {
 			ID:          "egon-elbre",
 			Name:        "Egon Elbre",
 			Email:       "egonelbre@gmail.com",
+			Admin:       true,
 			Description: "Raintree Engineering",
 		}),
 		db.Groups().AddMember("engineering", "egon-elbre"),

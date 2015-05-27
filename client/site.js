@@ -92,6 +92,16 @@ KB.Site = (function(){
 			ev.preventDefault();
 			ev.stopPropagation();
 		},
+		createNewPage: function(ev){
+			var lineup = this.props.Lineup;
+			lineup.open({
+				url: null,
+				link: "",
+				title: ""
+			});
+			ev.preventDefault();
+			ev.stopPropagation();
+		},
 		displayName: "Header",
 		render: function(){
 			var a = React.DOM.a;
@@ -109,7 +119,7 @@ KB.Site = (function(){
 				),
 				React.createElement(HeaderMenu, {
 					items: [
-						{key:"0", href: "#", caption: "New Page"},
+						{key:"0", href: "#", onClick: this.createNewPage, caption: "New Page"},
 						{key:"1", href: "/page:recent-changes", caption: "Recent Changes"},
 						{key:"2", href: "/system/auth/logout", caption: "Logout"}
 					]

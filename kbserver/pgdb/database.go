@@ -51,6 +51,7 @@ func (db *Database) Initialize() error {
 			ID    TEXT   PRIMARY KEY,
 			Name  TEXT   NOT NULL,
 			Email TEXT   NOT NULL,
+			Admin BOOL   NOT NULL DEFAULT FALSE,
 			
 			Description TEXT NOT NULL DEFAULT ''
 		);
