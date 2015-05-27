@@ -83,6 +83,9 @@ KB.Stage = (function(){
 		changed: function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
+		urlChanged: function(){
+			this.notifier.emit({type: "urlChanged", stage: this});
+		},
 
 		get canCreate(){
 			//TODO: implement
@@ -187,7 +190,10 @@ KB.Stage = (function(){
 			var data = JSON.parse(xhr.response),
 			page = new KB.Page(data);
 			if(xhr.responseURL){
-				this.url = xhr.responseURL;
+				if(this.url != xhr.responseURL){
+					this.url = xhr.responseURL;
+					this.urlChanged();
+				}
 			}
 			this.page = page;
 			this.state = "loaded";
@@ -204,6 +210,7 @@ KB.Stage = (function(){
 		create: function(){
 			if(!this.creating){ return; }
 			this.url = "/" + this.link;
+			this.urlChanged();
 
 			var xhr = new XMLHttpRequest();
 			xhr.withCredentials = true;

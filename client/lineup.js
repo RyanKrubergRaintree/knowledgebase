@@ -92,6 +92,7 @@ KB.Lineup = (function(){
 			}
 
 			stage.on("closed", this.handleClose, this);
+			stage.on("urlChanged", this.handleURLChanged, this);
 			this.changed();
 			return stage.id;
 		},
@@ -106,6 +107,9 @@ KB.Lineup = (function(){
 			});
 			this.changed();
 		},
+		handleURLChanged: function(ev){
+			this.changed();
+		},
 
 		removeListeners: function(){
 			this.stages.map(function(stage){
@@ -116,6 +120,7 @@ KB.Lineup = (function(){
 			var self = this;
 			this.stages.map(function(stage){
 				stage.on("closed", self.handleClose, self);
+				stage.on("urlChanged", self.handleURLChanged, self);
 			});
 		},
 
