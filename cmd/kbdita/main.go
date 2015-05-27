@@ -14,9 +14,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/egonelbre/fedwiki"
-	"github.com/egonelbre/fedwiki/item"
-	"github.com/egonelbre/fedwiki/template"
+	"github.com/egonelbre/kb"
+	"github.com/egonelbre/kb/item"
+	"github.com/egonelbre/kb/template"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv"
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
@@ -35,20 +35,20 @@ var (
 )
 
 type convertErr struct {
-	Slug   fedwiki.Slug
+	Slug   kb.Slug
 	Fatal  error
 	Errors []error
 }
 
 type rendered struct {
-	Page *fedwiki.Page
+	Page *kb.Page
 	JSON []byte
 }
 
 type Store struct {
-	Pages   map[fedwiki.Slug]*rendered
-	Headers []*fedwiki.PageHeader
-	Slugs   []fedwiki.Slug
+	Pages   map[kb.Slug]*rendered
+	Headers []*kb.PageHeader
+	Slugs   []kb.Slug
 
 	Created time.Time
 
@@ -57,11 +57,11 @@ type Store struct {
 	ConvertErrs []convertErr
 }
 
-func (s *Store) ErrorPage() *fedwiki.Page {
-	page := &fedwiki.Page{}
+func (s *Store) ErrorPage() *kb.Page {
+	page := &kb.Page{}
 	page.Slug = "/system/errors"
 	page.Title = "Errors"
-	page.Date = fedwiki.NewDate(s.Created)
+	page.Date = kb.NewDate(s.Created)
 
 	page.Story.Append(item.HTML(`<form action='/system/reload' target="_blank" method='POST'><input type='submit' value='Reload'></form>`))
 
@@ -87,11 +87,11 @@ func (s *Store) ErrorPage() *fedwiki.Page {
 	return page
 }
 
-func (s *Store) HomePage() *fedwiki.Page {
-	page := &fedwiki.Page{}
+func (s *Store) HomePage() *kb.Page {
+	page := &kb.Page{}
 	page.Slug = "/home"
 	page.Title = "Home"
-	page.Date = fedwiki.NewDate(s.Created)
+	page.Date = kb.NewDate(s.Created)
 
 	content := "<h3>Pages:</h3>"
 	content += "<ul>"
@@ -111,7 +111,7 @@ func reload() (*Store, error) {
 	}
 
 	store := &Store{
-		Pages:   make(map[fedwiki.Slug]*rendered),
+		Pages:   make(map[kb.Slug]*rendered),
 		Created: time.Now(),
 	}
 
@@ -155,13 +155,13 @@ func reload() (*Store, error) {
 	return store, nil
 }
 
-type ByTitle []*fedwiki.PageHeader
+type ByTitle []*kb.PageHeader
 
 func (s ByTitle) Len() int           { return len(s) }
 func (s ByTitle) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 func (s ByTitle) Less(i, j int) bool { return s[i].Title < s[j].Title }
 
-type BySlug []fedwiki.Slug
+type BySlug []kb.Slug
 
 func (s BySlug) Len() int           { return len(s) }
 func (s BySlug) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
@@ -218,8 +218,8 @@ func main() {
 
 	templates := template.New(filepath.Join(*dirviews, "*"))
 
-	server := &fedwiki.Server{
-		Handler:  fedwiki.HandlerFunc(serve),
+	server := &kb.Server{
+		Handler:  kb.HandlerFunc(serve),
 		Template: templates,
 	}
 
@@ -249,12 +249,12 @@ func main() {
 
 func serve(r *http.Request) (code int, template string, data interface{}) {
 	if r.Method != "GET" {
-		return fedwiki.ErrorResponse(http.StatusForbidden, "Method %s is not allowed", r.Method)
+		return kb.ErrorResponse(http.StatusForbidden, "Method %s is not allowed", r.Method)
 	}
 
 	store, ok := global.Load().(*Store)
 	if !ok {
-		return fedwiki.ErrorResponse(http.StatusNotFound, "Page %s not loaded", r.URL.Path)
+		return kb.ErrorResponse(http.StatusNotFound, "Page %s not loaded", r.URL.Path)
 	}
 
 	switch r.URL.Path {
@@ -268,12 +268,12 @@ func serve(r *http.Request) (code int, template string, data interface{}) {
 		return http.StatusOK, "", store.HomePage()
 	}
 
-	slug := fedwiki.Slugify(r.URL.Path[1:])
+	slug := kb.Slugify(r.URL.Path[1:])
 	page, found := store.Pages[slug]
 	if found {
 		return http.StatusOK, "", page.Page
 	} else {
-		return fedwiki.ErrorResponse(http.StatusNotFound, "Page %s not found", r.URL.Path)
+		return kb.ErrorResponse(http.StatusNotFound, "Page %s not found", r.URL.Path)
 	}
 }
 

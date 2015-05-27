@@ -5,15 +5,15 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/egonelbre/fedwiki"
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Mapping struct {
 	Index   *Index
 	Topics  map[string]*Topic
-	BySlug  map[fedwiki.Slug]*Topic
-	ByTopic map[*Topic]fedwiki.Slug
+	BySlug  map[kb.Slug]*Topic
+	ByTopic map[*Topic]kb.Slug
 	Rules   *xmlconv.Rules
 }
 
@@ -47,14 +47,14 @@ func CreateMapping(index *Index) (*Mapping, []error) {
 	topics := index.Topics
 
 	var errors []error
-	byslug := make(map[fedwiki.Slug]*Topic, len(topics))
-	bytopic := make(map[*Topic]fedwiki.Slug, len(topics))
+	byslug := make(map[kb.Slug]*Topic, len(topics))
+	bytopic := make(map[*Topic]kb.Slug, len(topics))
 
 	// assign slugs to the topics
 	for _, topic := range topics {
 		topic.Title = titelize(topic.Title)
 		topic.ShortTitle = titelize(topic.ShortTitle)
-		slug := fedwiki.Slugify(topic.Title)
+		slug := kb.Slugify(topic.Title)
 
 		if other, clash := byslug[slug]; clash {
 			errors = append(errors, fmt.Errorf("clashing title \"%v\" in \"%v\" and \"%v\"", topic.Title, topic.Filename, other.Filename))
@@ -76,7 +76,7 @@ func CreateMapping(index *Index) (*Mapping, []error) {
 			continue
 		}
 
-		slug := fedwiki.Slugify(topic.ShortTitle)
+		slug := kb.Slugify(topic.ShortTitle)
 		if _, exists := byslug[slug]; exists {
 			continue
 		}

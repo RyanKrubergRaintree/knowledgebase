@@ -3,13 +3,13 @@ package ditaconv
 import (
 	"encoding/xml"
 
-	"github.com/egonelbre/fedwiki"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 func convertTags(keywords []string) []string {
 	tags := []string{}
 	for _, tag := range keywords {
-		slug := string(fedwiki.Slugify(tag))
+		slug := string(kb.Slugify(tag))
 		if slug == "" || slug == "-" {
 			continue
 		}

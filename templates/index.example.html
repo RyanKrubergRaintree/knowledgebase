@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<head>
+	{{ template "head.html" }}
+</head>
+<body>
+	<script>window.Hash.restore()</script>
+	<div id="header"> 
+		<a class="button logo" href="#" title="Home"></a>
+		<form class="search">
+			<input placeholder="Search..."></input>
+			<button class="search-icon" type="submit" tabindex="-1">&#128269;</button>
+		</form>
+		<a class="button userinfo" id="userinfo" href="#">{{ User.Name }}</a>
+		<div id="header-menu">
+			<a href="#">New Page</a>
+			<a href="#">Company</a>
+			<a href="#">Recent-Changes</a>
+			<a href="/system/auth/logout">Logout</a>
+		</div>
+	</div>
+
+	<div id="content">
+		<div id="pages">
+			<div class="page-size">
+				<div class="page-buttons">
+					<a class="mdi mdi-playlist-plus" title="Add an item." href="#"></a>
+					<a class="mdi mdi-arrow-expand" title="Toggle page width." href="#"></a>
+					<a class="mdi mdi-close" title="Close page." href="#"></a>
+				</div>
+				<div class="page-scroll round-scrollbar">
+					<table class="page-meta">
+						<tr><td>Link</td><td>help:Hello World</td></tr>
+						<tr><td>Created by</td><td>Raintree Systems Help</td></tr>
+						<tr><td>Shared with</td><td>Everyone</td></tr>
+					</table>
+					<div class="page-content">
+						<h1>Hello World</h1>
+						<div class="page-story">
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+							quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+							consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+							cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+							proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+							quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+							consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+							cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+							proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+							quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+							consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+							cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+							proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+							quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+							consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+							cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+							proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+							tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+							quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+							consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+							cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+							proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		var pages = document.getElementById("pages");
+		var first = pages.children[0];
+		pages.appendChild(first.cloneNode(true));
+		pages.appendChild(first.cloneNode(true));
+		pages.appendChild(first.cloneNode(true));
+	</script>
+</body>

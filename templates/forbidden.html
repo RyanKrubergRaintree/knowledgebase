@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+	{{ template "head.html" }}
+	<link rel="stylesheet" type="text/css" href="/assets/css/auth.css">
+</head>
+<body>
+	<div id="header">
+		<div class="title">{{ Site.Title }}</div>
+	</div>
+
+	<div class="main">
+		<h1 class="logo"></h1>
+	</div>
+
+	<div id="content">
+		<div id="logins">
+			<h2 class="title">Access denied.</h2>
+			<h3>{{.Message}}</h3>
+		</div>
+	</div>
+</body>

@@ -1,50 +1,58 @@
-'use strict';
+"use strict";
 
-export class Notifier {
-	constructor(){
-		this.listeners = [];
-		this.lastKey = 0;
-	}
+function Notifier(){
+	this.listeners = [];
+}
 
-	listen(fn, recv){
-		if(typeof fn === 'undefined'){
-			throw new Error("fn must be defined");
-		}
-		var listener = {
-			fn: fn,
-			recv: recv,
-			key: this.lastKey++
-		};
-		this.listeners.push(listener);
+Notifier.prototype = {
+	mixto: function(obj){
 		var self = this;
-		return function(){
-			self._remove(listener.key);
+		obj.on = function(event, handler, recv){
+			self.on(event, handler, recv);
 		};
-	}
-	unlisten(fn, recv){
-		this.listeners = this.listeners.filter(function(listener){
-			return !((listener.fn === fn) && (listener.recv === recv));
+		obj.off = function(event, handler, recv){
+			self.off(event, handler, recv);
+		};
+		obj.remove = function(recv){
+			self.remove(recv);
+		};
+	},
+	on: function(event, handler, recv){
+		this.listeners.push({
+			event: event,
+			handler: handler,
+			recv: recv
 		});
-	}
-
-	_remove(key){
-		this.listeners = this.listeners.filter(function(listener){
-			return listener.key !== key;
-		});
-	}
-
-	notify(){
-		var args = arguments;
+	},
+	off: function(event, handler, recv){
+		this.listeners = this.listeners.filter(
+			function(listener){
+				return !(
+					(listener.event === event) &&
+					(listener.handler === handler) &&
+					(listener.recv === recv)
+				);
+			}
+		);
+	},
+	remove: function(recv){
+		this.listeners = this.listeners.filter(
+			function(listener){
+				return !(listener.recv === recv);
+			}
+		);
+	},
+	emit: function(event){
 		var self = this;
 		window.setTimeout(function(){
-			self.update.apply(self, args);
+			self.handle(event);
 		}, 0);
-	}
-
-	update(){
-		var args = arguments;
+	},
+	handle: function(event){
 		this.listeners.map(function(listener){
-			listener.fn.apply(listener.recv, args);
+			if(listener.event == event.type){
+				listener.handler.call(listener.recv, event);
+			}
 		});
 	}
-}
+};

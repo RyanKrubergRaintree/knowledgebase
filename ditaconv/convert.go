@@ -8,9 +8,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/egonelbre/fedwiki/item"
-
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 var alwaysHTML = map[string]bool{
@@ -27,21 +26,21 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 		case "rttutorial":
 			conv.handleAttrs(start)
 			href := getAttr(start, "href")
-			conv.Page.Story.Append(item.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
+			conv.Page.Story.Append(kb.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
 		default:
 			text := conv.toHTML(decoder, start)
-			conv.Page.Story.Append(item.HTML(text))
+			conv.Page.Story.Append(kb.HTML(text))
 			conv.Errors = append(conv.Errors, fmt.Errorf("unhandled datatype \"%v\"", datatype))
 		}
 	case "img", "image":
 		_, err := conv.handleAttrs(start)
 		conv.check(err)
 		href := getAttr(start, "src")
-		conv.Page.Story.Append(item.Image("", href, ""))
+		conv.Page.Story.Append(kb.Image("", href, ""))
 	case "title":
 		title, _ := xmlconv.Text(decoder, start)
 		if title != "" {
-			conv.Page.Story.Append(item.HTML("<h3>" + title + "</h3>"))
+			conv.Page.Story.Append(kb.HTML("<h3>" + title + "</h3>"))
 		}
 	case "xref", "link", "a":
 		title, _ := xmlconv.Text(decoder, start)
@@ -49,17 +48,17 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			title = getAttr(start, "href")
 		}
 		href := getAttr(start, "href")
-		conv.Page.Story.Append(item.Reference(title, href, ""))
+		conv.Page.Story.Append(kb.Reference(title, href, ""))
 	default:
 		text := conv.toHTML(decoder, start)
 		if alwaysHTML[start.Name.Local] {
-			conv.Page.Story.Append(item.HTML(text))
+			conv.Page.Story.Append(kb.HTML(text))
 		} else {
 			// try to convert to paragraph
 			if para, ok := asParagraph(text); ok {
-				conv.Page.Story.Append(item.Paragraph(para))
+				conv.Page.Story.Append(kb.Paragraph(para))
 			} else {
-				conv.Page.Story.Append(item.HTML(text))
+				conv.Page.Story.Append(kb.HTML(text))
 			}
 		}
 	}

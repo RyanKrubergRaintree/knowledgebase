@@ -6,14 +6,12 @@ import (
 	"io"
 	"strings"
 
-	"github.com/egonelbre/fedwiki"
-	"github.com/egonelbre/fedwiki/item"
-
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 // Convert converts a topic to a federated wiki page
-func (mapping *Mapping) Convert(topic *Topic) (page *fedwiki.Page, fatal error, errs []error) {
+func (mapping *Mapping) Convert(topic *Topic) (page *kb.Page, fatal error, errs []error) {
 	// make a shallow copy of rules
 	rules := xmlconv.NewRules()
 	rules.Translate = mapping.Rules.Translate
@@ -27,7 +25,7 @@ func (mapping *Mapping) Convert(topic *Topic) (page *fedwiki.Page, fatal error, 
 		slug = "/" + slug
 	}
 	convert := &convert{
-		Page:    &fedwiki.Page{},
+		Page:    &kb.Page{},
 		Slug:    slug,
 		Topic:   topic,
 		Index:   mapping.Index,
@@ -43,9 +41,9 @@ func (mapping *Mapping) Convert(topic *Topic) (page *fedwiki.Page, fatal error, 
 }
 
 type convert struct {
-	Page *fedwiki.Page
+	Page *kb.Page
 
-	Slug    fedwiki.Slug
+	Slug    kb.Slug
 	Topic   *Topic
 	Index   *Index
 	Mapping *Mapping
@@ -90,23 +88,21 @@ func (conv *convert) run() {
 		}
 	}
 
-	// create meta information
-	tags := convertTags(topic.Keywords)
-	meta := make(fedwiki.Meta)
-	if len(tags) > 0 {
-		meta["tags"] = tags
-	}
-	meta["kind"] = "help"
-
 	// create the page header
-	conv.Page = &fedwiki.Page{
-		PageHeader: fedwiki.PageHeader{
-			Slug:     conv.Slug,
-			Title:    conv.Topic.Title,
-			Date:     fedwiki.NewDate(info.ModTime()),
-			Synopsis: conv.Topic.Synopsis,
-			Meta:     meta,
-		},
+	conv.Page = &kb.Page{
+		Slug:     conv.Slug,
+		Title:    conv.Topic.Title,
+		Modified: info.ModTime(),
+		Synopsis: conv.Topic.Synopsis,
+	}
+
+	tags := convertTags(topic.Keywords)
+	if len(tags) > 0 {
+		conv.Page.Story.Append(kb.Tags(tags...))
+	}
+
+	if conv.Topic.Synopsis != "" {
+		conv.Page.Story.Append(kb.Paragraph(conv.Topic.Synopsis))
 	}
 
 	defer func() {
@@ -117,6 +113,7 @@ func (conv *convert) run() {
 
 	conv.parse(bodytext)
 	conv.addRelatedLinks()
+	conv.dropEmpty()
 	conv.assignIDs()
 }
 
@@ -169,7 +166,7 @@ func (conv *convert) addRelatedLinks() {
 		}
 		text += "</ul>"
 
-		conv.Page.Story.Append(item.HTML(text))
+		conv.Page.Story.Append(kb.HTML(text))
 	}
 }
 
@@ -179,9 +176,25 @@ func (conv *convert) asLink(topic *Topic) string {
 	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
 }
 
+func (conv *convert) dropEmpty() {
+	s := conv.Page.Story
+	s = s[:0:cap(s)]
+	for _, item := range conv.Page.Story {
+		if item.Type() == "paragraph" || item.Type() == "html" {
+			if item["text"] != "" {
+				s.Append(item)
+
+			}
+		} else {
+			s.Append(item)
+		}
+	}
+	conv.Page.Story = s
+}
+
 func (conv *convert) assignIDs() {
 	s := conv.Page.Story
 	for _, item := range s {
-		item["id"] = fedwiki.NewID()
+		item["id"] = kb.NewID()
 	}
 }

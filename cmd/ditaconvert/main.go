@@ -10,9 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/egonelbre/fedwiki"
-
 	"github.com/raintreeinc/knowledgebase/ditaconv"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 var (
@@ -88,6 +87,6 @@ func main() {
 	}
 }
 
-func slugToFilename(slug fedwiki.Slug) string {
+func slugToFilename(slug kb.Slug) string {
 	return strings.Replace(string(slug), "/", "-", -1)
 }
