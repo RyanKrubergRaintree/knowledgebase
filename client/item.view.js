@@ -7,17 +7,20 @@ import "item.editor.js";
 
 KB.Item.Content = {};
 
+window.DropCanceled = null;
+
 KB.Item.View = React.createClass({
 	displayName: "Item",
 
 	dragStart: function(ev, node, item){
+		DropCanceled = false;
 		var stage = this.props.stage,
 			item = this.props.item;
 
 		if(stage.canModify){
-			ev.dataTransfer.dropEffect = 'all';
+			ev.dataTransfer.effectAllowed = 'all';
 		} else {
-			ev.dataTransfer.dropEffect = 'move';
+			ev.dataTransfer.effectAllowed = 'move';
 		}
 
 		var off = mouseOffset(ev);
@@ -30,6 +33,7 @@ KB.Item.View = React.createClass({
 			text: stage.page.synopsis
 		};
 		ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+		ev.dataTransfer.setData("kb/url", stage.url);
 
 		function mouseOffset(ev){
 			ev = ev.nativeEvent || ev;
@@ -41,8 +45,13 @@ KB.Item.View = React.createClass({
 	},
 	drag: function(ev){ ev.preventDefault(); },
 	dragEnd: function(ev){
+		if(window.DropCanceled){
+			ev.preventDefault();
+			return;
+		}
 		var stage = this.props.stage,
 			item = this.props.item;
+
 		if(ev.dataTransfer.dropEffect == 'move'){
 			stage.patch({
 				type: 'remove',

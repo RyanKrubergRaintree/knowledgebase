@@ -109,7 +109,7 @@ KB.Stage.View = (function(){
 		getInitialState: function(){
 			return {
 				title: this.props.stage.title,
-				owner: extractGroup(this.props.stage.link) || "community"
+				owner: extractGroup(this.props.stage.link) || Global.Groups[0] || ""
 			};
 		},
 
@@ -128,11 +128,6 @@ KB.Stage.View = (function(){
 		render: function(){
 			var self = this;
 			var stage = this.props.stage;
-			var groups = [
-				{id: "community", name: "Community"},
-				{id: "engineering", name: "Engineering"}
-			];
-
 			var title = this.state.title,
 				owner = this.state.owner,
 				link = Slugify(owner + ":" + title);
@@ -158,25 +153,26 @@ KB.Stage.View = (function(){
 					React.DOM.label({}, "Owner"),
 					React.DOM.div(
 						{ className: "group" },
-						groups.map(function(group, i){
-							var checked = owner == group.id;
+						// TODO: don't use global here
+						Global.Groups.map(function(group, i){
+							var checked = owner == group;
 							return (
 								React.DOM.div(
 									{
-										key: group.id,
+										key: group,
 										className: checked ? "checked" : ""
 									},
 									React.DOM.input({
-										id: "group-" + group.id,
+										id: "group-" + group,
 										type: 'radio',
 										name: 'group',
-										value: group.id,
+										value: group,
 										onChange: self.ownerChanged,
 										checked: checked
 									}),
 									React.DOM.label({
-										htmlFor: "group-" + group.id
-									}, group.name)
+										htmlFor: "group-" + group
+									}, group)
 								)
 							);
 						})

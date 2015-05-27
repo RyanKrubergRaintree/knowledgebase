@@ -119,7 +119,7 @@ func (db *Pages) Save(slug kb.Slug, page *kb.Page) error {
 	_, err = db.Exec(`
 		UPDATE Pages
 		SET	Tags = $1,
-		    NTags = $2
+		    NormTags = $2,
 			Data = $3,
 			Version = (Version + 1)
 		WHERE Owner = $4 AND Slug = $5

@@ -114,8 +114,9 @@ KB.Page.View = (function(){
 			}
 			var after = getAfter(page, drop);
 
-			ev.dataTransfer.dropEffect = this.dropEffectFor(ev);
-			var dropEffect = ev.dataTransfer.dropEffect;
+			var dropEffect = this.dropEffectFor(ev);
+
+			console.log(ev.nativeEvent);
 
 			var data = ev.dataTransfer.getData("kb/item");
 			if(data){
@@ -135,13 +136,15 @@ KB.Page.View = (function(){
 
 				// are we moving on the same page?
 				if((dropEffect === 'move') && (data.url === stage.url)){
-					// we should not broadcast the moving on the same page
-					ev.dataTransfer.dropEffect = 'none';
+					window.DropCanceled = true;
 					stage.patch({
 						type: 'move',
 						id: item.id,
 						after: after
 					});
+
+					ev.dataTransfer.effectAllowed = 'none';
+					ev.dataTransfer.dropEffect = 'none';
 					return;
 				}
 
@@ -151,7 +154,9 @@ KB.Page.View = (function(){
 					item: item,
 					after: after
 				});
+				ev.dataTransfer.dropEffect = dropEffect;
 			} else {
+				ev.dataTransfer.dropEffect = 'copy';
 				DropData(stage, after, ev.dataTransfer);
 			}
 		},

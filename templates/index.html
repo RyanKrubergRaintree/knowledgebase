@@ -8,6 +8,10 @@
 	<script>
 	Global.User = "{{User.Name}}";
 	Global.HomePage = "Community:Welcome";
+	{{ range $i, $group := UserGroups }}
+	Global.Groups[{{$i}}] = "{{$group}}"
+	{{ end }}
+	Global.Groups.sort();
 	</script>
 
 	<script>window.Hash.restore()</script>

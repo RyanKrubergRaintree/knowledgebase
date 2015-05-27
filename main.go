@@ -97,7 +97,7 @@ func main() {
 		"ShortTitle": "KB",
 		"Title":      "Knowledge Base",
 		"Company":    "Raintree Systems Inc.",
-	}, client, context)
+	}, client, context, db)
 
 	// create KnowledgeBase server
 	server := kbserver.New(*domain, db, presenter, context)

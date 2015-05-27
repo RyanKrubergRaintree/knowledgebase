@@ -1,7 +1,9 @@
 package kb
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -137,3 +139,24 @@ func (item Item) Type() string { return item.Val("type") }
 
 // ID returns the `item` identificator
 func (item Item) ID() string { return item.Val("id") }
+
+func ReadJSONPage(r io.Reader) (*Page, error) {
+	dec := json.NewDecoder(r)
+	page := &Page{}
+	err := dec.Decode(page)
+	if err != nil {
+		return nil, err
+	}
+	return page, nil
+}
+
+func ReadJSONAction(r io.Reader) (Action, error) {
+	dec := json.NewDecoder(r)
+	action := make(Action)
+	err := dec.Decode(&action)
+	if err != nil {
+		return nil, err
+	}
+
+	return action, nil
+}

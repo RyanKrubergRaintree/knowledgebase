@@ -84,27 +84,103 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := server.CurrentUser(w, r)
-	if err != nil {
+	if err != nil || !server.CanRead(user.ID, group) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	pages := server.PagesByGroup(user.ID, group)
-	data, err := pages.LoadRaw(slug)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	switch r.Method {
+	case "GET":
+		data, err := pages.LoadRaw(slug)
+		if err != nil {
+			HandleError(w, err)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(data)
+	case "PUT":
+		page, err := kb.ReadJSONPage(r.Body)
+		r.Body.Close()
+		if err != nil {
+			HandleError(w, err)
+			return
+		}
 
-	w.Write(data)
+		owner, _ := tokenizeLink(string(page.Slug))
+		if !server.CanWrite(user.ID, owner) {
+			http.Error(w, "not a member of the group", http.StatusUnauthorized)
+			return
+		}
+		page.Owner = owner
+
+		if page.Title == "" {
+			http.Error(w, "title missing", http.StatusBadRequest)
+			return
+		}
+
+		if err := pages.Create(page); err != nil {
+			HandleError(w, err)
+			return
+		}
+
+		WriteJSON(w, r, page)
+	case "PATCH":
+		action, err := kb.ReadJSONAction(r.Body)
+		r.Body.Close()
+		if err != nil {
+			HandleError(w, err)
+			return
+		}
+
+		data, _ := json.Marshal(action)
+		log.Println("PATCH", string(data))
+
+		if !server.CanWrite(user.ID, group) {
+			http.Error(w, "not a member of the group", http.StatusUnauthorized)
+			return
+		}
+
+		page, err := pages.Load(slug)
+		if err != nil {
+			HandleError(w, err)
+			return
+		}
+
+		if err := page.Apply(action); err != nil {
+			HandleError(w, err)
+			return
+		}
+
+		if err := pages.Save(slug, page); err != nil {
+			HandleError(w, err)
+		}
+	case "DELETE":
+		http.Error(w, "not implemented", http.StatusNotImplemented)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
 }
 
 func WriteJSON(w http.ResponseWriter, r *http.Request, v interface{}) {
+	w.Header().Set("Content-Type", "application/json")
 	data, err := json.Marshal(v)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		HandleError(w, err)
 		return
 	}
-
 	w.Write(data)
+}
+
+func HandleError(w http.ResponseWriter, err error) {
+	switch err {
+	case ErrPageExists:
+		http.Error(w, err.Error(), http.StatusForbidden)
+	case ErrPageNotExist:
+		http.Error(w, err.Error(), http.StatusNotFound)
+	case ErrUserNotAllowed:
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

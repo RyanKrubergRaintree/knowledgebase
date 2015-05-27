@@ -84,7 +84,12 @@ KB.Stage = (function(){
 			this.notifier.emit({type: "changed", stage: this});
 		},
 
+		get canCreate(){
+			//TODO: implement
+			return true;
+		},
 		get canModify(){
+			//TODO: implement
 			return true;
 		},
 
@@ -95,6 +100,9 @@ KB.Stage = (function(){
 				this.state = 'error';
 				if(xhr.status === 404){
 					this.state = 'not-found';
+					if(this.canCreate){
+						this.creating = true;
+					}
 				}
 			}
 
@@ -136,7 +144,7 @@ KB.Stage = (function(){
 			}
 		},
 		patchDone_: function(ev){
-			this.patching = false;
+			this.patching_ = false;
 			var xhr = ev.target;
 			if(!this.updateStatus_(xhr)){
 				//TODO: don't drop changes in case of errors
@@ -205,10 +213,10 @@ KB.Stage = (function(){
 			xhr.open('PUT', this.url, true);
 			xhr.setRequestHeader('Accept', 'application/json');
 			xhr.setRequestHeader('Content-Type', 'application/json');
-			xhr.send({
+			xhr.send(JSON.stringify({
 				title: this.title,
 				slug: this.link
-			});
+			}));
 
 			this.changed();
 		},
