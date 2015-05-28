@@ -1,4 +1,4 @@
-import "util/notifier.js";
+import "util/Notifier.js";
 import "kb.js";
 import "convert.js";
 import "stage.js";

@@ -1,5 +1,5 @@
 import "util/ObjectId.js";
-import "util/notifier.js";
+import "util/Notifier.js";
 import "kb.js";
 import "page.js";
 

@@ -37,33 +37,20 @@ func (sys *System) Info() kbserver.Group {
 func (sys *System) Pages() []kb.PageEntry { return nil }
 
 func (sys *System) init() {
-	m := sys.router
-	m.HandleFunc("/admin:upload-help", sys.uploadhelp).Methods("GET")
-	m.HandleFunc("/admin:upload-help", sys.loadhelp).Methods("POST")
+	sys.router.HandleFunc("/admin:upload-help", sys.uploadhelp).Methods("GET")
+	sys.router.HandleFunc("/admin:upload-help", sys.loadhelp).Methods("POST")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }
 
-func (sys *System) isAdmin(w http.ResponseWriter, r *http.Request) bool {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		return false
-	}
-
-	userinfo, err := sys.server.Users().ByID(user.ID)
-	if err != nil || !userinfo.Admin {
-		return false
-	}
-	return true
-}
-
 func (sys *System) uploadhelp(w http.ResponseWriter, r *http.Request) {
-	if !sys.isAdmin(w, r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	_, ok := sys.server.AccessAdmin(w, r)
+	if !ok {
 		return
 	}
+
 	story := kb.Story{}
 	story.Append(kb.HTML(`
 	<from>
@@ -80,9 +67,5 @@ func (sys *System) uploadhelp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) loadhelp(w http.ResponseWriter, r *http.Request) {
-	if !sys.isAdmin(w, r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
 
 }

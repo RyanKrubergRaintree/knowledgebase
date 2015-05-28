@@ -30,43 +30,49 @@ func (sys *System) Info() kbserver.Group {
 		ID:          "tag",
 		Name:        "Tag",
 		Public:      true,
-		Description: "Displays tag indexes.",
+		Description: "Displays tag index.",
 	}
 }
 
 func (sys *System) init() {
-	m := sys.router
-	m.HandleFunc("/tag:tags", sys.tags).Methods("GET")
-	m.HandleFunc("/tag:{tagid}", sys.pages).Methods("GET")
+	sys.router.HandleFunc("/tag:tags", sys.tags).Methods("GET")
+	sys.router.HandleFunc("/tag:{tag-id}", sys.pages).Methods("GET")
 }
 
-//TODO
-func (sys *System) Pages() []kb.PageEntry { return nil }
+func (sys *System) Pages() []kb.PageEntry {
+	return []kb.PageEntry{
+		{
+			Owner:    "tag",
+			Slug:     "tag:tags",
+			Title:    "Tags",
+			Synopsis: "Listing of all tags.",
+		},
+	}
+}
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }
 
 func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	userID, ok := sys.server.AccessAuth(w, r)
+	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(userID)
 
-	tagval := mux.Vars(r)["tagid"]
-	if tagval == "" {
-		http.Error(w, "Tag param is missing", http.StatusBadRequest)
+	tag := kbserver.SlugParam(r, "tag-id")
+	if tag == "" {
+		http.Error(w, "tag-id missing", http.StatusBadRequest)
 		return
 	}
 
-	tag := kb.Slugify(tagval)
 	entries, err := index.ByTag(string(tag))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	kbserver.WriteJSON(w, r, &kb.Page{
 		Owner: "tag",
 		Slug:  "tag:" + tag,
@@ -76,12 +82,11 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) tags(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	userID, ok := sys.server.AccessAuth(w, r)
+	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(user.ID)
+	index := sys.server.IndexByUser(userID)
 
 	entries, err := index.Tags()
 	if err != nil {

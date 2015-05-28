@@ -35,38 +35,27 @@ func (sys *System) Info() kbserver.Group {
 }
 
 func (sys *System) init() {
-	m := sys.router
-	m.HandleFunc("/user:{userid}", sys.userinfo).Methods("GET")
+	sys.router.HandleFunc("/user:current", sys.current).Methods("GET")
 }
-
-func (sys *System) Pages() []kb.PageEntry { return nil }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }
 
-func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
-	userval := mux.Vars(r)["userid"]
-	if userval == "" {
-		http.Error(w, "user id is missing", http.StatusBadRequest)
-		return
+func (sys *System) Pages() []kb.PageEntry {
+	return []kb.PageEntry{
+		{
+			Owner:    "user",
+			Slug:     "user:current",
+			Title:    "Current",
+			Synopsis: "Information about the current user.",
+		},
 	}
-	userid := kb.Slugify(userval)
+}
 
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if userid != user.ID {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-		return
-	}
-
-	info, err := sys.server.Users().ByID(user.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+func (sys *System) current(w http.ResponseWriter, r *http.Request) {
+	auth, user, ok := sys.server.AccessUserInfo(w, r)
+	if !ok {
 		return
 	}
 
@@ -81,10 +70,10 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 			<tr><td>Email</td><td>%v</td></tr>
 			<tr><td>Admin</td><td>%v</td></tr>
 		</table>
-	`, info.ID, info.Name, info.Email, info.Admin)))
+	`, user.ID, user.Name, user.Email, user.Admin)))
 
 	el := "<p><b>Member of:</b></p><ul>"
-	for _, group := range info.Groups {
+	for _, group := range user.Groups {
 		el += "<li><a href='group:" + group + "'>" + group + "</a></li>"
 	}
 	el += "</ul>"
@@ -97,12 +86,13 @@ func (sys *System) userinfo(w http.ResponseWriter, r *http.Request) {
 			<tr><td>Email</td><td>%s</td></tr>
 			<tr><td>Provider</td><td>%s</td></tr>
 		</table>
-	`, user.AuthID, user.ID, user.Email, user.Provider)))
+	`, auth.AuthID, auth.ID, auth.Email, auth.Provider)))
 
 	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "user",
-		Slug:  "user:" + userid,
-		Title: user.Name,
-		Story: story,
+		Owner:    "user",
+		Slug:     "user:current",
+		Title:    "Current",
+		Synopsis: "Information about the current user.",
+		Story:    story,
 	})
 }

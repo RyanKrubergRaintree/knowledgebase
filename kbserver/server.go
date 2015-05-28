@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/raintreeinc/knowledgebase/kb"
+
+	"github.com/gorilla/mux"
 )
 
 type Sources interface {
@@ -234,4 +236,112 @@ func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname stri
 		return err
 	}
 	return nil
+}
+
+type HandleUser func(userID kb.Slug, w http.ResponseWriter, r *http.Request)
+type HandleGroup func(userID, groupID kb.Slug, w http.ResponseWriter, r *http.Request)
+
+type Router struct {
+	*Server
+	*mux.Router
+}
+
+func NewRouter(server *Server) Router {
+	return Router{server, mux.NewRouter()}
+}
+
+func (s *Server) AccessAuth(w http.ResponseWriter, r *http.Request) (userID kb.Slug, ok bool) {
+	auth, err := s.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	return auth.ID, true
+}
+
+func (s *Server) AccessIndex(w http.ResponseWriter, r *http.Request) (index Index, ok bool) {
+	var userID kb.Slug
+	userID, ok = s.AccessAuth(w, r)
+	if !ok {
+		return
+	}
+
+	return s.Database.IndexByUser(userID), true
+}
+
+func (s *Server) AccessUserInfo(w http.ResponseWriter, r *http.Request) (auth kb.User, user User, ok bool) {
+	auth, err := s.CurrentUser(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	user, err = s.Users().ByID(auth.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	return auth, user, true
+}
+
+func (s *Server) AccessGroup(w http.ResponseWriter, r *http.Request) (userID, groupID kb.Slug, ok bool) {
+	userID, ok = s.AccessAuth(w, r)
+	if !ok {
+		return
+	}
+
+	groupID = SlugParam(r, "group-id")
+	ok = groupID != ""
+	if !ok {
+		http.Error(w, "group-id missing", http.StatusBadRequest)
+		return
+	}
+
+	return
+}
+
+func (s *Server) AccessGroupRead(w http.ResponseWriter, r *http.Request) (userID, groupID kb.Slug, ok bool) {
+	userID, groupID, ok = s.AccessGroup(w, r)
+	if !ok {
+		return
+	}
+	ok = s.CanRead(userID, groupID)
+	if !ok {
+		http.Error(w, "Not allowed to see this group.", http.StatusUnauthorized)
+	}
+	return
+}
+
+func (s *Server) AccessGroupWrite(w http.ResponseWriter, r *http.Request) (userID, groupID kb.Slug, ok bool) {
+	userID, groupID, ok = s.AccessGroup(w, r)
+	if !ok {
+		return
+	}
+	ok = s.CanWrite(userID, groupID)
+	if !ok {
+		http.Error(w, "Not a member of this group.", http.StatusUnauthorized)
+	}
+	return
+}
+
+func (s *Server) AccessAdmin(w http.ResponseWriter, r *http.Request) (userID kb.Slug, ok bool) {
+	userID, ok = s.AccessAuth(w, r)
+	if !ok {
+		return
+	}
+
+	ok = s.CanWrite(userID, "admin")
+	if !ok {
+		http.Error(w, "Not an administrator.", http.StatusUnauthorized)
+	}
+	return
+}
+
+func SlugParam(r *http.Request, name string) kb.Slug {
+	v := mux.Vars(r)[name]
+	if v == "" {
+		return ""
+	}
+	return kb.Slugify(v)
 }

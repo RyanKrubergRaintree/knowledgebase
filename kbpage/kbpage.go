@@ -33,14 +33,27 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-//TODO
-func (sys *System) Pages() []kb.PageEntry { return nil }
+func (sys *System) Pages() []kb.PageEntry {
+	return []kb.PageEntry{
+		{
+			Owner:    "page",
+			Slug:     "page:pages",
+			Title:    "Pages",
+			Synopsis: "List of all pages.",
+		},
+		{
+			Owner:    "page",
+			Slug:     "page:recent-changes",
+			Title:    "Recent Changes",
+			Synopsis: "Shows recently changed pages.",
+		},
+	}
+}
 
 func (sys *System) init() {
-	m := sys.router
-	m.HandleFunc("/page:pages", sys.pages).Methods("GET")
-	m.HandleFunc("/page:recent-changes", sys.recentChanges).Methods("GET")
-	m.HandleFunc("/page:search", sys.search).Methods("GET")
+	sys.router.HandleFunc("/page:pages", sys.pages).Methods("GET")
+	sys.router.HandleFunc("/page:recent-changes", sys.recentChanges).Methods("GET")
+	sys.router.HandleFunc("/page:search", sys.search).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -48,12 +61,10 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	index, ok := sys.server.AccessIndex(w, r)
+	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(user.ID)
 
 	entries, err := index.List()
 	if err != nil {
@@ -69,12 +80,10 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) search(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	index, ok := sys.server.AccessIndex(w, r)
+	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(user.ID)
 
 	q := r.URL.Query().Get("q")
 	entries, err := index.Search(q)
@@ -91,12 +100,10 @@ func (sys *System) search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (sys *System) recentChanges(w http.ResponseWriter, r *http.Request) {
-	user, err := sys.server.CurrentUser(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	index, ok := sys.server.AccessIndex(w, r)
+	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(user.ID)
 
 	entries, err := index.RecentChanges(30)
 	if err != nil {
