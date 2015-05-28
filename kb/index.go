@@ -1,6 +1,7 @@
 package kb
 
 import (
+	"html"
 	"time"
 
 	"github.com/bradfitz/slice"
@@ -59,7 +60,11 @@ func StoryFromEntries(entries []PageEntry) Story {
 		return story
 	}
 	for _, entry := range entries {
-		story.Append(Entry(entry.Title, entry.Synopsis, entry.Slug))
+		story.Append(Entry(
+			html.EscapeString(entry.Title),
+			html.EscapeString(entry.Synopsis),
+			entry.Slug,
+		))
 	}
 	return story
 }

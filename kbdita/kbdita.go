@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 	"os"
@@ -112,7 +113,7 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		content := "<ul>"
 		for _, slug := range store.slugs {
 			page := store.pages[slug]
-			content += fmt.Sprintf("<li><a href=\"%s\">%s</a></li>", slug, page.Title)
+			content += fmt.Sprintf("<li><a href=\"%s\">%s</a></li>", slug, html.EscapeString(page.Title))
 		}
 		content += "</ul>"
 

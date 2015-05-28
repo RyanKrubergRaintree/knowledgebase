@@ -100,7 +100,6 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
-			Admin: false,
 		})
 
 		server.Groups().AddMember("community", user.ID)

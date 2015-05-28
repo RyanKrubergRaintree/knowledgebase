@@ -50,7 +50,7 @@ func (s *stringSlice) Scan(src interface{}) error {
 
 func (s stringSlice) Value() (driver.Value, error) {
 	if s == nil {
-		return nil, nil
+		return []byte{}, nil
 	}
 
 	var buffer bytes.Buffer
@@ -65,5 +65,5 @@ func (s stringSlice) Value() (driver.Value, error) {
 	}
 	buffer.WriteString("}")
 
-	return string(buffer.Bytes()), nil
+	return buffer.Bytes(), nil
 }

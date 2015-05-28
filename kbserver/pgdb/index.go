@@ -19,8 +19,8 @@ func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry
 	SELECT
 		Owner,
 		Slug,
-		Data->>'title' as Title,
-		Data->>'synopsis' as Synopsis,
+		coalesce(Data->>'title', '') as Title,
+		coalesce(Data->>'synopsis', '') as Synopsis,
 		Tags,
 		Modified
 	FROM Pages
@@ -64,7 +64,7 @@ func (db *Index) List() ([]kb.PageEntry, error) {
 
 func (db *Index) Search(text string) ([]kb.PageEntry, error) {
 	return db.selectPages(`
-		WHERE  (Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
+		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE
 			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1))
 		AND
 			to_tsvector('english', 
@@ -105,6 +105,7 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	ntag := string(kb.Slugify(tag))
 	ntags := stringSlice{ntag}
+
 	return db.selectPages(`
 		WHERE (NormTags @> $1) 
 		  AND (    Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)

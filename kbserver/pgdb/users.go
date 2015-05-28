@@ -16,9 +16,9 @@ type Users struct{ *Database }
 func (db *Users) Create(user kbserver.User) error {
 	return db.exec(`
 		INSERT INTO Users 
-		(ID, Name, Email, Description, Admin)
+		(ID, Name, Email, Description)
 		VALUES ($1, $2, $3, $4, $5)`,
-		kb.Slugify(user.Name), user.Name, user.Email, user.Description, user.Admin)
+		kb.Slugify(user.Name), user.Name, user.Email, user.Description)
 }
 
 func (db *Users) Delete(name kb.Slug) error {
@@ -30,14 +30,14 @@ func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 	var groups stringSlice
 	err := db.QueryRow(`
 		SELECT
-			Users.ID, Users.Name, Users.Email, Users.Description, Users.Admin,
+			Users.ID, Users.Name, Users.Email, Users.Description,
 			array_agg(Groups.Name) as GroupNames
 		FROM Users
 		JOIN Memberships ON (Users.ID = Memberships.UserID)
 		JOIN Groups      ON (Memberships.GroupID = Groups.ID)
 		WHERE Users.ID = $1
 		GROUP BY Users.ID
-	`, name).Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Admin, &groups)
+	`, name).Scan(&user.ID, &user.Name, &user.Email, &user.Description, &groups)
 	user.Groups = []string(groups)
 	if err == sql.ErrNoRows {
 		return user, kbserver.ErrUserNotExist
@@ -51,7 +51,7 @@ func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 func (db *Users) List() ([]kbserver.User, error) {
 	rows, err := db.Query(`
 		SELECT
-			Users.ID, Users.Name, Users.Email, Users.Description, Users.Admin
+			Users.ID, Users.Name, Users.Email, Users.Description
 			array_agg(Groups.Name) as GroupNames
 		FROM Users
 		JOIN Memberships ON (Users.ID = Memberships.UserID)
@@ -67,7 +67,7 @@ func (db *Users) List() ([]kbserver.User, error) {
 	for rows.Next() {
 		var user kbserver.User
 		var groups stringSlice
-		rows.Scan(&user.ID, &user.Name, &user.Email, &user.Description, &user.Admin, &groups)
+		rows.Scan(&user.ID, &user.Name, &user.Email, &user.Description, &groups)
 		user.Groups = []string(groups)
 		users = append(users, user)
 	}

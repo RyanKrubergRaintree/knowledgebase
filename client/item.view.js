@@ -143,6 +143,7 @@ KB.Item.Content['factory'] = React.createClass({
 			{ className: 'item-content content-factory'	},
 			React.DOM.p({}, "Make item for containing:"),
 			React.DOM.button({onClick: this.convert, "data-type":"paragraph"}, "Paragraph"),
+			React.DOM.button({onClick: this.convert, "data-type":"tags"}, "Tags"),
 			React.DOM.button({onClick: this.convert, "data-type":"html"}, "HTML"),
 			React.DOM.button({onClick: this.convert, "data-type":"code"}, "Code")
 		);

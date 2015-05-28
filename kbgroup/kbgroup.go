@@ -2,6 +2,7 @@ package kbgroup
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -47,14 +48,16 @@ func (sys *System) Pages() []kb.PageEntry {
 
 func (sys *System) init() {
 	sys.router.HandleFunc("/group:groups", sys.groups).Methods("GET")
-	sys.router.HandleFunc("/group:{groupid}-details", sys.details).Methods("GET")
-	sys.router.HandleFunc("/group:{groupid}-members", sys.members).Methods("GET")
-	sys.router.HandleFunc("/group:{groupid}", sys.pages).Methods("GET")
+	sys.router.HandleFunc("/group:{group-id}-details", sys.details).Methods("GET")
+	sys.router.HandleFunc("/group:{group-id}-members", sys.members).Methods("GET")
+	sys.router.HandleFunc("/group:{group-id}", sys.pages).Methods("GET")
 }
 
 func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sys.router.ServeHTTP(w, r)
 }
+
+var esc = html.EscapeString
 
 func (sys *System) details(w http.ResponseWriter, r *http.Request) {
 	_, groupID, ok := sys.server.AccessGroupRead(w, r)
@@ -69,7 +72,6 @@ func (sys *System) details(w http.ResponseWriter, r *http.Request) {
 	}
 	story := kb.Story{}
 
-	//TODO: use sanitiziation
 	story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Info:</b></p>
 		<table>
@@ -78,12 +80,12 @@ func (sys *System) details(w http.ResponseWriter, r *http.Request) {
 			<tr><td>Public</td><td>%v</td></tr>
 			<tr><td>Description</td><td>%s</td></tr>
 		</table>
-	`, group.ID, group.Name, group.Public, group.Description)))
+	`, group.ID, esc(group.Name), group.Public, esc(group.Description))))
 
 	kbserver.WriteJSON(w, r, &kb.Page{
 		Owner: "group",
 		Slug:  "group:" + groupID + "-details",
-		Title: group.Name + " Details",
+		Title: esc(group.Name) + " Details",
 		Story: story,
 	})
 }
@@ -166,7 +168,11 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 		story.Append(kb.HTML("<h2>System Groups:</h2>"))
 		for _, system := range sys.server.Systems {
 			entry := system.Info()
-			story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
+			story.Append(kb.Entry(
+				esc(entry.Name),
+				esc(entry.Description),
+				"group:"+entry.ID,
+			))
 		}
 	}
 

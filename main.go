@@ -106,6 +106,13 @@ func main() {
 		Description: "Raintree Help",
 	})
 
+	db.Groups().Create(kbserver.Group{
+		ID:          "admin",
+		Name:        "Admin",
+		Public:      false,
+		Description: "Administrators",
+	})
+
 	// context
 	store := sessions.NewFilesystemStore("", []byte("some secret"))
 	context := kbserver.NewContext(*domain, store)

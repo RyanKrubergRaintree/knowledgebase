@@ -2,6 +2,7 @@ package kbuser
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -53,6 +54,8 @@ func (sys *System) Pages() []kb.PageEntry {
 	}
 }
 
+var esc = html.EscapeString
+
 func (sys *System) current(w http.ResponseWriter, r *http.Request) {
 	auth, user, ok := sys.server.AccessUserInfo(w, r)
 	if !ok {
@@ -61,22 +64,21 @@ func (sys *System) current(w http.ResponseWriter, r *http.Request) {
 
 	story := kb.Story{}
 
-	//TODO: use sanitiziation
 	story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Info:</b></p>
 		<table>
 			<tr><td>ID</td><td>%v</td></tr>
 			<tr><td>Name</td><td>%v</td></tr>
 			<tr><td>Email</td><td>%v</td></tr>
-			<tr><td>Admin</td><td>%v</td></tr>
 		</table>
-	`, user.ID, user.Name, user.Email, user.Admin)))
+	`, user.ID, esc(user.Name), esc(user.Email))))
 
 	el := "<p><b>Member of:</b></p><ul>"
 	for _, group := range user.Groups {
-		el += "<li><a href='group:" + group + "'>" + group + "</a></li>"
+		el += "<li><a href='group:" + esc(group) + "'>" + esc(group) + "</a></li>"
 	}
 	el += "</ul>"
+
 	story.Append(kb.HTML(el))
 	story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Authentication:</b></p>
@@ -86,7 +88,7 @@ func (sys *System) current(w http.ResponseWriter, r *http.Request) {
 			<tr><td>Email</td><td>%s</td></tr>
 			<tr><td>Provider</td><td>%s</td></tr>
 		</table>
-	`, auth.AuthID, auth.ID, auth.Email, auth.Provider)))
+	`, esc(auth.AuthID), auth.ID, esc(auth.Email), esc(auth.Provider))))
 
 	kbserver.WriteJSON(w, r, &kb.Page{
 		Owner:    "user",

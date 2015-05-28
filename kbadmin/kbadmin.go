@@ -33,8 +33,16 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-//TODO
-func (sys *System) Pages() []kb.PageEntry { return nil }
+func (sys *System) Pages() []kb.PageEntry {
+	return []kb.PageEntry{
+		{
+			Owner:    "admin",
+			Slug:     "admin:upload-help",
+			Title:    "Upload Help",
+			Synopsis: "Page for updating help.",
+		},
+	}
+}
 
 func (sys *System) init() {
 	sys.router.HandleFunc("/admin:upload-help", sys.uploadhelp).Methods("GET")

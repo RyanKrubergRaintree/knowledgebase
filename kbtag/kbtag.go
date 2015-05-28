@@ -1,6 +1,7 @@
 package kbtag
 
 import (
+	"html"
 	"net/http"
 	"strconv"
 
@@ -99,7 +100,10 @@ func (sys *System) tags(w http.ResponseWriter, r *http.Request) {
 		story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
-			story.Append(kb.Entry(entry.Name, strconv.Itoa(entry.Count)+" pages", kb.Slugify("tag:"+entry.Name)))
+			story.Append(kb.Entry(
+				html.EscapeString(entry.Name),
+				strconv.Itoa(entry.Count)+" pages",
+				kb.Slugify("tag:"+entry.Name)))
 		}
 	}
 
