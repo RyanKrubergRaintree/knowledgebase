@@ -58,7 +58,9 @@ KB.Item.View = React.createClass({
 				id: item.id
 			});
 		}
+
 		ev.preventDefault();
+		ev.stopPropagation();
 	},
 
 	startEditing: function(ev){
@@ -76,19 +78,21 @@ KB.Item.View = React.createClass({
 			item = this.props.item;
 
 		var view = KB.Item.Content[item.type] || KB.Item.Content.Unknown;
-		var editing = '';
+		var editingClass = '';
+		var isEditing = false;
 		if(stage.editing.item(item.id)){
 			view = KB.Item.Editor;
-			editing = ' item-editing';
+			editingClass = ' item-editing';
+			isEditing = true;
 		}
 
 		return React.DOM.div(
 			{
-				className: "item" + editing,
+				className: "item" + editingClass,
 				onDoubleClick: stage.canModify ? this.startEditing : null,
 				"data-id": item.id
 			},
-			React.DOM.div({
+			!isEditing ? React.DOM.div({
 				className:"item-drag",
 				title: "Move or copy item.",
 				draggable: true,
@@ -96,7 +100,7 @@ KB.Item.View = React.createClass({
 				onDragStart: this.dragStart,
 				onDrag: this.drag,
 				onDragEnd: this.dragEnd
-			}),
+			}) : null,
 			React.createElement(view, {
 				stage: stage,
 				item: item
@@ -117,6 +121,13 @@ KB.Item.Content.Unknown = React.createClass({
 		);
 	}
 });
+
+var ContentTypes = [
+	{name: "Text", type: "paragraph", desc: "simple text paragraph"},
+	{name: "Tags", type: "tags", desc: "tags for the page"},
+	{name: "HTML", type: "html", desc: "a subset of html for more advanced content"},
+	{name: "Code", type: "code", desc: "item especially designed for code"},
+];
 
 KB.Item.Content['factory'] = React.createClass({
 	displayName: 'Factory',
@@ -139,13 +150,21 @@ KB.Item.Content['factory'] = React.createClass({
 	},
 
 	render: function(){
+		var self = this;
+		var item = this.props.item;
 		return React.DOM.div(
 			{ className: 'item-content content-factory'	},
-			React.DOM.p({}, "Make item for containing:"),
-			React.DOM.button({onClick: this.convert, "data-type":"paragraph"}, "Paragraph"),
-			React.DOM.button({onClick: this.convert, "data-type":"tags"}, "Tags"),
-			React.DOM.button({onClick: this.convert, "data-type":"html"}, "HTML"),
-			React.DOM.button({onClick: this.convert, "data-type":"code"}, "Code")
+			React.DOM.p({}, item.text || "Add "),
+			ContentTypes.map(function(item){
+				return React.DOM.button(
+					{
+						key: item.type,
+						className: "factory-item",
+						"data-type": item.type,
+						title: item.desc,
+						onClick: self.convert
+					}, item.name);
+			})
 		);
 	}
 });
@@ -241,17 +260,19 @@ KB.Item.Content['tags'] = React.createClass({
 	render: function(){
 		var item = this.props.item,
 			stage = this.props.stage;
-		var tags = item.text.split(",");
 
+		var tags = item.text == "" ? [] : item.text.split(",");
 		return React.DOM.div({className: 'item-contet content-tags'},
-			tags.map(function(tag, i){
-				tag = tag.trim();
-				return React.DOM.a({
-					className: "tag",
-					key: i,
-					href: '/tag:' + Slugify(tag)
-				}, tag);
-			}),
+			tags.length > 0 ?
+				tags.map(function(tag, i){
+					tag = tag.trim();
+					return React.DOM.a({
+						className: "tag",
+						key: i,
+						href: '/tag:' + Slugify(tag)
+					}, tag);
+				})
+			: React.DOM.p({}, "Double click here to add page tags."),
 			React.DOM.div({className:"clear-fix"})
 		);
 	}

@@ -229,7 +229,11 @@ KB.Stage = (function(){
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			xhr.send(JSON.stringify({
 				title: this.title,
-				slug: this.link
+				slug: this.link,
+				story: [
+					{ id: GenerateID(), type: "tags" },
+					{ id: GenerateID(), type: "factory"}
+				]
 			}));
 
 			this.changed();

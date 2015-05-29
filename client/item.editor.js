@@ -4,7 +4,13 @@ import "item.js";
 'use strict';
 
 KB.Item.Editor = React.createClass({
-	commit: function(){
+	blur: function(ev){
+		var container = this.getDOMNode();
+		if(!container.contains(ev.relatedTarget)){
+			this.commit();
+		}
+	},
+	commit: function(ev){
 		var stage = this.props.stage,
 			item = this.props.item;
 
@@ -46,6 +52,20 @@ KB.Item.Editor = React.createClass({
 
 		stage.editing.stop(item.id);
 	},
+
+	remove: function(ev){
+		var stage = this.props.stage,
+			item = this.props.item;
+
+		stage.patch({
+			type: 'remove',
+			id: item.id
+		});
+
+		ev.preventDefault();
+		ev.stopPropagation();
+	},
+
 	handleKey: function(ev){
 		if(ev.keyCode == 27){
 			this.stopEditing();
@@ -97,13 +117,21 @@ KB.Item.Editor = React.createClass({
 		var stage = this.props.stage,
 			item = this.props.item;
 		return React.DOM.div(
-			{ className: "item-content content-editor" },
+			{
+				className: "item-content content-editor",
+				onBlur: this.blur
+			},
 			React.DOM.textarea({
 				ref: "text",
 				defaultValue: item.text,
-				onBlur: this.commit,
 				onKeyDown: this.handleKey,
 				autoFocus: true
+			}),
+			React.DOM.div({
+				className: "item-delete mdi mdi-delete",
+				title: "Delete this item.",
+				tabIndex: '1',
+				onClick: this.remove
 			})
 		)
 	}

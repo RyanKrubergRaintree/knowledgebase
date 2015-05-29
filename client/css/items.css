@@ -46,6 +46,46 @@
 	background-position: center center;
 }
 
+.item-delete {
+	position: absolute;
+	right: 30px;
+	bottom: 10px;
+
+	text-decoration: none;
+	z-index: 10;
+	background: #FFC5C5;
+
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	line-height: 30px;
+
+	cursor: pointer;
+
+	color: #333;
+	font-size: 20px;
+	border-radius: 30px;
+
+	transition: background 0.2s ease-in-out,
+				box-shadow 0.1s ease-in-out;
+
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+
+	box-shadow:
+		0 6px 10px 0 rgba(0, 0, 0, 0.3),
+		0 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.item-delete:hover {
+	background: #f44;
+}
+
+.item-delete:active {
+	box-shadow:
+		0 13px 25px 0 rgba(0, 0, 0, 0.3),
+		0 11px 7px 0 rgba(0, 0, 0, 0.19);
+}
+
 .item-editing {
 	margin: 8px 16px;
 	padding: 8px;
@@ -72,6 +112,18 @@
 }
 
 .content-tags {
+	margin: 8px 0;
+}
+
+.content-factory {
+	padding: 16px 8px;
+	background: #eee;
+}
+
+.content-factory .factory-item {
+	width: 80px;
+	margin-right: 10px;
+	cursor: pointer;
 }
 
 .content-tags .tag {
