@@ -155,9 +155,6 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data, _ := json.Marshal(action)
-		log.Println("PATCH", string(data))
-
 		if !server.CanWrite(user.ID, group) {
 			http.Error(w, "not a member of the group", http.StatusUnauthorized)
 			return
