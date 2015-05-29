@@ -141,7 +141,7 @@ func (db *Index) ByGroup(group kb.Slug) ([]kb.PageEntry, error) {
 	}
 
 	return db.selectPages(`
-		WHERE (Owner = $1) 
+		WHERE Owner = $1
 		ORDER BY Owner, Slug
 	`, group)
 }

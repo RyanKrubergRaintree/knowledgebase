@@ -35,16 +35,19 @@ func (s *stringSlice) Scan(src interface{}) error {
 	str = strings.Replace(str, `\\`, `\`, -1)
 	// remove braces
 	str = str[1 : len(str)-1]
+
+	if str == "" {
+		*s = stringSlice{}
+		return nil
+	}
+
 	csvReader := csv.NewReader(strings.NewReader(str))
-
 	slice, err := csvReader.Read()
-
 	if err != nil {
 		return err
 	}
 
-	(*s) = stringSlice(slice)
-
+	*s = stringSlice(slice)
 	return nil
 }
 

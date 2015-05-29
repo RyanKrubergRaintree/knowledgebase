@@ -124,9 +124,9 @@ KB.Item.Content.Unknown = React.createClass({
 
 var ContentTypes = [
 	{name: "Text", type: "paragraph", desc: "simple text paragraph"},
-	{name: "Tags", type: "tags", desc: "tags for the page"},
 	{name: "HTML", type: "html", desc: "a subset of html for more advanced content"},
 	{name: "Code", type: "code", desc: "item especially designed for code"},
+	{name: "Tags", type: "tags", desc: "tags for the page"},
 ];
 
 KB.Item.Content['factory'] = React.createClass({
@@ -154,7 +154,7 @@ KB.Item.Content['factory'] = React.createClass({
 		var item = this.props.item;
 		return React.DOM.div(
 			{ className: 'item-content content-factory'	},
-			React.DOM.p({}, item.text || "Add "),
+			React.DOM.p({}, item.text || "Create new "),
 			ContentTypes.map(function(item){
 				return React.DOM.button(
 					{
