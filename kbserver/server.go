@@ -68,6 +68,7 @@ func tokenizeLink(link string) (owner kb.Slug, page kb.Slug) {
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Allow", "GET")
 	if r.URL.Path == "/" {
 		err := server.Present(w, r, "index.html", nil)
 		if err != nil {
@@ -104,6 +105,10 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		server.Groups().AddMember("community", user.ID)
 		server.Groups().AddMember("engineering", user.ID)
+	}
+
+	if server.CanWrite(user.ID, group) {
+		w.Header().Set("Allow", "GET, PUT, PATCH, DELETE")
 	}
 
 	pages := server.PagesByGroup(user.ID, group)

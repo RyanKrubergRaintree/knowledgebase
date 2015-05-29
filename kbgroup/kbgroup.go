@@ -202,16 +202,19 @@ func (sys *System) members(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	story := kb.Story{}
+
 	el := "<ul>"
 	for _, member := range members {
-		el += "<li>" + member.Name + "</li>"
+		el += "<li>" + html.EscapeString(member.Name) + "</li>"
 	}
 	el += "</ul>"
+	story.Append(kb.HTML(el))
 
 	kbserver.WriteJSON(w, r, &kb.Page{
 		Owner: "group",
 		Slug:  "group:" + groupID + "-members",
 		Title: group.Name + " Members",
-		Story: kb.Story{kb.HTML(el)},
+		Story: story,
 	})
 }

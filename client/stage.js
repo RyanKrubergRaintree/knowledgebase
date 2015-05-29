@@ -54,6 +54,7 @@ KB.Stage = (function(){
 		this.url = ref.url;
 		this.link = ref.link;
 		this.title = ref.title;
+		this.allowed = ["GET", "HEAD"];
 
 		page = page || {};
 		page.title = page.title || ref.title || "";
@@ -88,15 +89,21 @@ KB.Stage = (function(){
 		},
 
 		get canCreate(){
-			//TODO: implement
-			return true;
+			return this.allowed.indexOf("PUT") >= 0;
 		},
 		get canModify(){
-			//TODO: implement
-			return true;
+			return this.allowed.indexOf("PATCH") >= 0;
+		},
+		get canDestroy(){
+			return this.allowed.indexOf("DELETE") >= 0;
 		},
 
 		updateStatus_: function(xhr){
+			var allowed = xhr.getResponseHeader("Allow");
+			if(typeof allowed === 'string'){
+				this.allowed = allowed.split(",").map(function(v){ return v.trim(); });
+			}
+
 			var ok = success(xhr);
 			this.state = 'loaded';
 			if(!ok){

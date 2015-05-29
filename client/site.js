@@ -42,7 +42,7 @@ KB.Site = (function(){
 				}
 
 				var query = this.refs.query.getDOMNode().value.trim();
-				Lineup.open({url: convert.LinkToURL(query), link:query});
+				Lineup.openLink(query);
 				ev.preventDefault();
 				return;
 			}

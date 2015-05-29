@@ -20,7 +20,7 @@ KB.Item.View = React.createClass({
 		if(stage.canModify){
 			ev.dataTransfer.effectAllowed = 'all';
 		} else {
-			ev.dataTransfer.effectAllowed = 'move';
+			ev.dataTransfer.effectAllowed = 'copy';
 		}
 
 		var off = mouseOffset(ev);
@@ -85,7 +85,7 @@ KB.Item.View = React.createClass({
 		return React.DOM.div(
 			{
 				className: "item" + editing,
-				onDoubleClick: this.startEditing,
+				onDoubleClick: stage.canModify ? this.startEditing : null,
 				"data-id": item.id
 			},
 			React.DOM.div({

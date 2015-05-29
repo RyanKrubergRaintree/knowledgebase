@@ -33,13 +33,13 @@ KB.Stage.View = (function(){
 			var a = React.DOM.a;
 			return React.DOM.div(
 				{className: "stage-buttons"},
-				a({
+				stage.canModify ? a({
 					className:"mdi mdi-playlist-plus",
 					title:"Drag to page to add an item.",
 					style: { cursor: "move" },
 					draggable: true,
 					onDragStart: this.createFactory
-				}),
+				}) : null,
 				a({
 					className:"mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),
 					title:"Toggle page width.",
