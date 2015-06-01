@@ -22,6 +22,9 @@ KB.Site = (function(){
 		search: function(ev){
 			var Lineup = this.props.Lineup;
 			var query = this.refs.query.getDOMNode().value.trim();
+			if(ev.shiftKey){
+				this.lastStageId = undefined;
+			}
 			this.lastStageId = Lineup.open({
 				url: "/page:search?q="+query,
 				title: 'Search "' + query + '"',
@@ -36,13 +39,20 @@ KB.Site = (function(){
 				return;
 			}
 
-			if((ev.keyCode == 13) && (ev.ctrlKey || ev.shiftKey)){
+			if(ev.keyCode == 13){
+				// open page directly
 				if(ev.ctrlKey){
-					Lineup.clear();
+					if(!ev.shiftKey){
+						Lineup.clear();
+					}
+
+					var query = this.refs.query.getDOMNode().value.trim();
+					Lineup.openLink(query);
+					ev.preventDefault();
+					return;
 				}
 
-				var query = this.refs.query.getDOMNode().value.trim();
-				Lineup.openLink(query);
+				this.search(ev);
 				ev.preventDefault();
 				return;
 			}
