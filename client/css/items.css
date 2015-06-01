@@ -36,14 +36,14 @@
 
 .item-drag {
 	position: absolute;
-	top: 0; right: -8px; bottom: 0;
+	top: 0; right: 0; bottom: 0;
 	width: 16px;
 
 	cursor: move;
 
 	background-image: url("/client/css/drag.png");
 	background-repeat: no-repeat repeat;
-	background-position: center center;
+	background-position: center right;
 }
 
 .item-delete {
