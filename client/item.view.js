@@ -261,7 +261,7 @@ KB.Item.Content['tags'] = React.createClass({
 		var item = this.props.item,
 			stage = this.props.stage;
 
-		var tags = item.text == "" ? [] : item.text.split(",");
+		var tags = typeof item.text == "undefined" ? [] : item.text.split(",");
 		return React.DOM.div({className: 'item-contet content-tags'},
 			tags.length > 0 ?
 				tags.map(function(tag, i){

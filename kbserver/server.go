@@ -91,20 +91,30 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := server.CurrentUser(w, r)
-	if err != nil || !server.CanRead(user.ID, group) {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	if _, err := server.Users().ByID(user.ID); err != nil {
-		server.Users().Create(User{
+	if _, err := server.Users().ByID(user.ID); err == ErrUserNotExist {
+		err = server.Users().Create(User{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
 		})
+		if err != nil {
+			log.Println("Failed creating user:", err)
+		}
 
-		server.Groups().AddMember("community", user.ID)
-		server.Groups().AddMember("engineering", user.ID)
+		err = server.Groups().AddMember("community", user.ID)
+		if err != nil {
+			log.Println("Failed adding to community:", err)
+		}
+	}
+
+	if !server.CanRead(user.ID, group) {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
 	if server.CanWrite(user.ID, group) {

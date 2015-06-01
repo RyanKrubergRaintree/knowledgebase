@@ -1,4 +1,4 @@
-SmoothScroll = (function(){
+window.SmoothScroll = (function(){
 	var timer = null,
 		speed = 0.09;
 

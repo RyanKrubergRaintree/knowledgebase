@@ -52,7 +52,7 @@ func (db *Database) Initialize() error {
 			ID    TEXT   PRIMARY KEY,
 			Name  TEXT   NOT NULL,
 			Email TEXT   NOT NULL,
-			
+
 			Description TEXT NOT NULL DEFAULT ''
 		);
 
@@ -60,7 +60,7 @@ func (db *Database) Initialize() error {
 			UserID  TEXT NOT NULL REFERENCES Users(ID),
 			GroupID TEXT NOT NULL REFERENCES Groups(ID),
 
-			CONSTRAINT Memberships_PKEY PRIMARY KEY (UserID, GroupID)			
+			CONSTRAINT Memberships_PKEY PRIMARY KEY (UserID, GroupID)
 		);
 
 		CREATE TABLE Pages (
@@ -68,7 +68,7 @@ func (db *Database) Initialize() error {
 			Slug      TEXT  NOT NULL PRIMARY KEY, -- e.g. community:welcome-visitor
 			Data      JSONB NOT NULL,
 			Version   INT   NOT NULL DEFAULT 0,
-			
+
 			Tags      TEXT[] NOT NULL DEFAULT '{}',
 			NormTags  TEXT[] NOT NULL DEFAULT '{}',
 

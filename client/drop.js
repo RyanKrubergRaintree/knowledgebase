@@ -1,6 +1,6 @@
 import "convert.js";
 
-DropData = (function(){
+this.DropData = (function(){
 	"use strict";
 	var rxCode = /[=><;{}\[\]]/;
 

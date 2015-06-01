@@ -56,7 +56,7 @@ func (db *Index) selectPages(filter string, args ...interface{}) ([]kb.PageEntry
 
 func (db *Index) List() ([]kb.PageEntry, error) {
 	return db.selectPages(`
-		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
+		WHERE  Owner IN (SELECT ID      FROM Groups      WHERE Public = TRUE)
 			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		ORDER BY Owner, Slug
 	`, db.User)
@@ -64,11 +64,11 @@ func (db *Index) List() ([]kb.PageEntry, error) {
 
 func (db *Index) Search(text string) ([]kb.PageEntry, error) {
 	return db.selectPages(`
-		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE
+		WHERE  Owner IN (SELECT ID      FROM Groups      WHERE Public = TRUE
 			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1))
 		AND
-			to_tsvector('english', 
-				coalesce(cast(Data->'title' AS TEXT),'') || ' ' || 
+			to_tsvector('english',
+				coalesce(cast(Data->'title' AS TEXT),'') || ' ' ||
 				coalesce(cast(Data->'story' AS TEXT), '')
 			) @@ to_tsquery('english', $2);
 	`, db.User, text)
@@ -80,7 +80,7 @@ func (db *Index) Tags() ([]kb.TagEntry, error) {
 			unnest(Tags) as Tag,
 			count(*) as Count
 		FROM Pages
-		WHERE Owner IN (SELECT Name    FROM Groups      WHERE Public = True)
+		WHERE Owner IN (SELECT ID      FROM Groups      WHERE Public = True)
 		   OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		GROUP BY Tag
 		LIMIT 30
@@ -107,8 +107,8 @@ func (db *Index) ByTag(tag string) ([]kb.PageEntry, error) {
 	ntags := stringSlice{ntag}
 
 	return db.selectPages(`
-		WHERE (NormTags @> $1) 
-		  AND (    Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
+		WHERE (NormTags @> $1)
+		  AND (    Owner IN (SELECT ID      FROM Groups      WHERE Public = TRUE)
 				OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $2))
 		ORDER BY Owner, Slug
 	`, ntags, db.User)
@@ -148,7 +148,7 @@ func (db *Index) ByGroup(group kb.Slug) ([]kb.PageEntry, error) {
 
 func (db *Index) RecentChanges(n int) ([]kb.PageEntry, error) {
 	return db.selectPages(`
-		WHERE  Owner IN (SELECT Name    FROM Groups      WHERE Public = TRUE)
+		WHERE  Owner IN (SELECT ID      FROM Groups      WHERE Public = TRUE)
 			OR Owner IN (SELECT GroupID FROM Memberships WHERE UserID = $1)
 		ORDER BY Modified DESC, Owner, Slug
 		LIMIT $2

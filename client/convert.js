@@ -1,6 +1,6 @@
 import "slug.js";
 
-Convert = {};
+this.Convert = {};
 (function(Convert){
 	"use strict";
 

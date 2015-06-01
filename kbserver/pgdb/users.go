@@ -15,9 +15,9 @@ type Users struct{ *Database }
 // Groups field will be ignored
 func (db *Users) Create(user kbserver.User) error {
 	return db.exec(`
-		INSERT INTO Users 
+		INSERT INTO Users
 		(ID, Name, Email, Description)
-		VALUES ($1, $2, $3, $4, $5)`,
+		VALUES ($1, $2, $3, $4)`,
 		kb.Slugify(user.Name), user.Name, user.Email, user.Description)
 }
 
@@ -51,7 +51,7 @@ func (db *Users) ByID(name kb.Slug) (kbserver.User, error) {
 func (db *Users) List() ([]kbserver.User, error) {
 	rows, err := db.Query(`
 		SELECT
-			Users.ID, Users.Name, Users.Email, Users.Description
+			Users.ID, Users.Name, Users.Email, Users.Description,
 			array_agg(Groups.Name) as GroupNames
 		FROM Users
 		JOIN Memberships ON (Users.ID = Memberships.UserID)

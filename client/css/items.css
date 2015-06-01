@@ -42,6 +42,7 @@
 	cursor: move;
 
 	background-image: url("drag.png");
+	background-image: url("css/drag.png");
 	background-repeat: no-repeat repeat;
 	background-position: center center;
 }
