@@ -65,17 +65,17 @@ func main() {
 	if os.Getenv("DITAMAP") != "" {
 		*ditamap = os.Getenv("DITAMAP")
 	}
+
 	if os.Getenv("DEVELOPMENT") != "" {
 		v, err := strconv.ParseBool(os.Getenv("DEVELOPMENT"))
-		if err != nil {
+		if err == nil {
 			*development = v
 		}
 	}
 
+	log.Printf("Development %v\n", *development)
 	log.Printf("Starting with database %s\n", *database)
-	log.Printf("Starting with domain %s\n", *domain)
-
-	log.Printf("Starting %s on %s", *domain, *addr)
+	log.Printf("Starting %s on %s\n", *domain, *addr)
 
 	// Serve static files
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(*assetsdir))))

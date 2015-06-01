@@ -4,15 +4,15 @@
 'use strict'
 
 function IsIdentiferCharacter(v){
-	var r = v.charCodeAt(0);	for(var i = 0; i < ident.length; i += 2){
-		if((ident[i] <= r) && (r < ident[i+1])){
+	var r = v.charCodeAt(0);	for(var i = 0; i < identifier.length; i += 2){
+		if((identifier[i] <= r) && (r < identifier[i+1])){
 			return true;
 		}
 	}
 	return false;
 }
 
-var ident = [
+var identifier = [
 	0x000030, 0x00003a, 0x000041, 0x00005b, 0x000061, 0x00007b, 0x0000aa, 0x0000ab,
 	0x0000b2, 0x0000b4, 0x0000b5, 0x0000b6, 0x0000b9, 0x0000bb, 0x0000bc, 0x0000bf,
 	0x0000c0, 0x0000d7, 0x0000d8, 0x0000f7, 0x0000f8, 0x0002c2, 0x0002c6, 0x0002d2,

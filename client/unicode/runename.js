@@ -1,4 +1,4 @@
-RuneName = {
+window.RuneName = {
 	'\u0021': "excl",
 	'\u0022': "quot",
 	'\u0023': "num",
