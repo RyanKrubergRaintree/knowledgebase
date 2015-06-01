@@ -20,8 +20,6 @@ func main() {
 		*database = os.Getenv("DATABASE")
 	}
 
-	ditamap := os.Getenv("DITAMAP")
-
 	// Load database
 	db, err := pgdb.New(*database)
 	if err != nil {
@@ -33,6 +31,4 @@ func main() {
 	for _, user := range users {
 		log.Printf("%+v\n", user)
 	}
-
-	//user, err := db.Users().ByID("usernaem")
 }
