@@ -108,7 +108,7 @@ KB.Site = (function(){
 			return React.DOM.div({
 				id:"header"
 			},
-				a({className:"button logo", href:"#", title:"Home", onClick: this.openHome}),
+				a({className:"button home mdi mdi-home", href:"#", title:"Home", onClick: this.openHome}),
 				React.createElement(Search, this.props),
 				a({
 					className:"button userinfo",

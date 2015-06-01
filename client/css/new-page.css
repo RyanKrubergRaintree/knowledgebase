@@ -58,8 +58,7 @@
 }
 
 .new-page form button[type=submit]:hover,
-.new-page form button[type=submit]:focus
-{
+.new-page form button[type=submit]:focus {
 	border: 1px solid #7DC6FF;
 }
 
