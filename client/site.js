@@ -102,6 +102,11 @@ KB.Site = (function(){
 			ev.preventDefault();
 			ev.stopPropagation();
 		},
+		logout: function(ev){
+			window.location.pathname = "/system/auth/logout";
+			ev.preventDefault();
+			ev.stopPropagation();
+		},
 		displayName: "Header",
 		render: function(){
 			var a = React.DOM.a;
@@ -121,7 +126,7 @@ KB.Site = (function(){
 					items: [
 						{key:"0", href: "#", onClick: this.createNewPage, caption: "New Page"},
 						{key:"1", href: "/page:recent-changes", caption: "Recent Changes"},
-						{key:"2", href: "/system/auth/logout", caption: "Logout"}
+						{key:"2", href: "#", onClick: this.logout, caption: "Logout"}
 					]
 				})
 			);

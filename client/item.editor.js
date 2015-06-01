@@ -121,6 +121,7 @@ KB.Item.Editor = React.createClass({
 				className: "item-content content-editor",
 				onBlur: this.blur
 			},
+			React.DOM.div({className: "item-type"}, item.type),
 			React.DOM.textarea({
 				ref: "text",
 				defaultValue: item.text,
