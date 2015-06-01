@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/raintreeinc/livebundle"
 
@@ -32,7 +33,6 @@ var (
 	addr     = flag.String("listen", ":80", "http server `address`")
 	database = flag.String("database", "user=root dbname=knowledgebase sslmode=disable", "database `params`")
 	domain   = flag.String("domain", "", "`domain`")
-	conffile = flag.String("config", "knowledgebase.toml", "farm configuration")
 
 	development = flag.Bool("development", true, "development mode")
 	ditamap     = flag.String("dita", "", "ditamap file for showing live dita")
@@ -64,6 +64,12 @@ func main() {
 	}
 	if os.Getenv("DITAMAP") != "" {
 		*ditamap = os.Getenv("DITAMAP")
+	}
+	if os.Getenv("DEVELOPMENT") != "" {
+		v, err := strconv.ParseBool(os.Getenv("DEVELOPMENT"))
+		if err != nil {
+			*development = v
+		}
 	}
 
 	log.Printf("Starting with database %s\n", *database)

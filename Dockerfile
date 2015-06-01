@@ -7,11 +7,11 @@ ADD . /kb
 
 RUN go build -o /kb/knowledgebase github.com/raintreeinc/knowledgebase
 
-ENV CLIENTDIR /kb/client
+ENV DEVELOPMENT false
 WORKDIR /kb/
 
 # expose services
 ENV PORT 80
 EXPOSE 80
 
-CMD ["/kb/knowledgebase", "-config", "/kb/knowledgebase.toml"]
+CMD ["/kb/knowledgebase"]
