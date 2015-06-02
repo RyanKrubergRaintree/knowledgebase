@@ -1,4 +1,4 @@
-package kbpage
+package page
 
 import (
 	"net/http"
@@ -8,23 +8,23 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	server *kbserver.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *System {
-	sys := &System{
+func New(server *kbserver.Server) *Module {
+	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
 		ID:          "page",
 		Name:        "Page",
@@ -33,7 +33,7 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-func (sys *System) Pages() []kb.PageEntry {
+func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{
 		{
 			Owner:    "page",
@@ -50,18 +50,18 @@ func (sys *System) Pages() []kb.PageEntry {
 	}
 }
 
-func (sys *System) init() {
-	sys.router.HandleFunc("/page:pages", sys.pages).Methods("GET")
-	sys.router.HandleFunc("/page:recent-changes", sys.recentChanges).Methods("GET")
-	sys.router.HandleFunc("/page:search", sys.search).Methods("GET")
+func (mod *Module) init() {
+	mod.router.HandleFunc("/page:pages", mod.pages).Methods("GET")
+	mod.router.HandleFunc("/page:recent-changes", mod.recentChanges).Methods("GET")
+	mod.router.HandleFunc("/page:search", mod.search).Methods("GET")
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.router.ServeHTTP(w, r)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mod.router.ServeHTTP(w, r)
 }
 
-func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	index, ok := sys.server.AccessIndex(w, r)
+func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
+	index, ok := mod.server.AccessIndex(w, r)
 	if !ok {
 		return
 	}
@@ -79,8 +79,8 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) search(w http.ResponseWriter, r *http.Request) {
-	index, ok := sys.server.AccessIndex(w, r)
+func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
+	index, ok := mod.server.AccessIndex(w, r)
 	if !ok {
 		return
 	}
@@ -99,8 +99,8 @@ func (sys *System) search(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) recentChanges(w http.ResponseWriter, r *http.Request) {
-	index, ok := sys.server.AccessIndex(w, r)
+func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
+	index, ok := mod.server.AccessIndex(w, r)
 	if !ok {
 		return
 	}

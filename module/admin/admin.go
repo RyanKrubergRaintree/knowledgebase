@@ -1,4 +1,4 @@
-package kbadmin
+package admin
 
 import (
 	"net/http"
@@ -8,23 +8,23 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	server *kbserver.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *System {
-	sys := &System{
+func New(server *kbserver.Server) *Module {
+	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
 		ID:          "admin",
 		Name:        "Admin",
@@ -33,7 +33,7 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-func (sys *System) Pages() []kb.PageEntry {
+func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{
 		{
 			Owner:    "admin",
@@ -44,17 +44,17 @@ func (sys *System) Pages() []kb.PageEntry {
 	}
 }
 
-func (sys *System) init() {
-	sys.router.HandleFunc("/admin:upload-help", sys.uploadhelp).Methods("GET")
-	sys.router.HandleFunc("/admin:upload-help", sys.loadhelp).Methods("POST")
+func (mod *Module) init() {
+	mod.router.HandleFunc("/admin:upload-help", mod.uploadhelp).Methods("GET")
+	mod.router.HandleFunc("/admin:upload-help", mod.loadhelp).Methods("POST")
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.router.ServeHTTP(w, r)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mod.router.ServeHTTP(w, r)
 }
 
-func (sys *System) uploadhelp(w http.ResponseWriter, r *http.Request) {
-	_, ok := sys.server.AccessAdmin(w, r)
+func (mod *Module) uploadhelp(w http.ResponseWriter, r *http.Request) {
+	_, ok := mod.server.AccessAdmin(w, r)
 	if !ok {
 		return
 	}
@@ -74,6 +74,6 @@ func (sys *System) uploadhelp(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) loadhelp(w http.ResponseWriter, r *http.Request) {
+func (mod *Module) loadhelp(w http.ResponseWriter, r *http.Request) {
 
 }

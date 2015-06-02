@@ -17,7 +17,7 @@ type Sources interface {
 	Include() string
 }
 
-type System interface {
+type Module interface {
 	Info() Group
 	Pages() []kb.PageEntry
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
@@ -30,7 +30,7 @@ type Server struct {
 	Sources
 	Context
 
-	Systems map[kb.Slug]System
+	Modules map[kb.Slug]Module
 }
 
 func New(domain, templates string, db Database, sources Sources, context Context) *Server {
@@ -41,17 +41,17 @@ func New(domain, templates string, db Database, sources Sources, context Context
 		Sources:   sources,
 		Context:   context,
 
-		Systems: make(map[kb.Slug]System),
+		Modules: make(map[kb.Slug]Module),
 	}
 }
 
-func (server *Server) AddSystem(system System) {
-	slug := system.Info().ID
-	_, exists := server.Systems[slug]
+func (server *Server) AddModule(module Module) {
+	slug := module.Info().ID
+	_, exists := server.Modules[slug]
 	if exists {
-		panic("System " + system.Info().Name + " already exists.")
+		panic("Module " + module.Info().Name + " already exists.")
 	}
-	server.Systems[slug] = system
+	server.Modules[slug] = module
 }
 
 func tokenizeLink(link string) (owner kb.Slug, page kb.Slug) {
@@ -85,8 +85,8 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if sys, ok := server.Systems[group]; ok {
-		sys.ServeHTTP(w, r)
+	if mod, ok := server.Modules[group]; ok {
+		mod.ServeHTTP(w, r)
 		return
 	}
 

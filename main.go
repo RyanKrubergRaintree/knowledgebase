@@ -13,12 +13,12 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
 
-	"github.com/raintreeinc/knowledgebase/kbadmin"
-	"github.com/raintreeinc/knowledgebase/kbdita"
-	"github.com/raintreeinc/knowledgebase/kbgroup"
-	"github.com/raintreeinc/knowledgebase/kbpage"
-	"github.com/raintreeinc/knowledgebase/kbtag"
-	"github.com/raintreeinc/knowledgebase/kbuser"
+	"github.com/raintreeinc/knowledgebase/module/admin"
+	"github.com/raintreeinc/knowledgebase/module/dita"
+	"github.com/raintreeinc/knowledgebase/module/group"
+	"github.com/raintreeinc/knowledgebase/module/page"
+	"github.com/raintreeinc/knowledgebase/module/tag"
+	"github.com/raintreeinc/knowledgebase/module/user"
 
 	"github.com/gorilla/sessions"
 
@@ -127,14 +127,14 @@ func main() {
 	server := kbserver.New(*domain, *templatesdir, db, client, context)
 
 	// add systems
-	server.AddSystem(kbadmin.New(server))
-	server.AddSystem(kbgroup.New(server))
-	server.AddSystem(kbpage.New(server))
-	server.AddSystem(kbtag.New(server))
-	server.AddSystem(kbuser.New(server))
+	server.AddModule(admin.New(server))
+	server.AddModule(group.New(server))
+	server.AddModule(page.New(server))
+	server.AddModule(tag.New(server))
+	server.AddModule(user.New(server))
 
 	if *ditamap != "" {
-		server.AddSystem(kbdita.New("Dita", *ditamap, server))
+		server.AddModule(dita.New("Dita", *ditamap, server))
 	}
 
 	// protect server with authentication

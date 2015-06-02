@@ -1,4 +1,4 @@
-package kbdita
+package dita
 
 import (
 	"encoding/json"
@@ -24,9 +24,9 @@ import (
 )
 
 var _ *kb.Page
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	name    string
 	ditamap string
 	server  *kbserver.Server
@@ -34,40 +34,40 @@ type System struct {
 	store atomic.Value
 }
 
-func New(name, ditamap string, server *kbserver.Server) *System {
-	sys := &System{
+func New(name, ditamap string, server *kbserver.Server) *Module {
+	mod := &Module{
 		name:    name,
 		ditamap: ditamap,
 		server:  server,
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
-		ID:          kb.Slugify(sys.name),
-		Name:        sys.name,
+		ID:          kb.Slugify(mod.name),
+		Name:        mod.name,
 		Public:      true,
-		Description: "Displays \"" + sys.ditamap + "\" content.",
+		Description: "Displays \"" + mod.ditamap + "\" content.",
 	}
 }
 
-func (sys *System) init() {
-	sys.store.Store(newstore())
-	go sys.monitor()
+func (mod *Module) init() {
+	mod.store.Store(newstore())
+	go mod.monitor()
 }
 
-func (sys *System) Pages() (r []kb.PageEntry) {
-	store := sys.store.Load().(*store)
+func (mod *Module) Pages() (r []kb.PageEntry) {
+	store := mod.store.Load().(*store)
 	for _, page := range store.pages {
 		r = append(r, kb.PageEntryFrom(page))
 	}
 	return
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	store := sys.store.Load().(*store)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	store := mod.store.Load().(*store)
 	path := strings.TrimPrefix(r.URL.Path, "/")
 	slug := kb.Slugify(path)
 	if data, ok := store.raw[slug]; ok {
@@ -75,7 +75,7 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	name := kb.Slugify(sys.name)
+	name := kb.Slugify(mod.name)
 	switch slug {
 	case name + ":errors":
 		page := &kb.Page{}
@@ -124,24 +124,24 @@ func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
-func (sys *System) reload() {
+func (mod *Module) reload() {
 	start := time.Now()
-	sys.store.Store(load(sys.name, sys.ditamap))
+	mod.store.Store(load(mod.name, mod.ditamap))
 	log.Println("DITA reloaded (", time.Since(start), ")")
 }
 
-func (sys *System) monitor() {
+func (mod *Module) monitor() {
 	modified := time.Now()
-	sys.reload()
+	mod.reload()
 	for range time.Tick(1 * time.Second) {
-		filepath.Walk(filepath.Dir(sys.ditamap),
+		filepath.Walk(filepath.Dir(mod.ditamap),
 			func(_ string, info os.FileInfo, err error) error {
 				if err != nil {
 					return err
 				}
 				if info.ModTime().After(modified) {
 					modified = time.Now()
-					sys.reload()
+					mod.reload()
 					return errors.New("stop iterate")
 				}
 				return nil

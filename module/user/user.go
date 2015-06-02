@@ -1,4 +1,4 @@
-package kbuser
+package user
 
 import (
 	"fmt"
@@ -10,23 +10,23 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	server *kbserver.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *System {
-	sys := &System{
+func New(server *kbserver.Server) *Module {
+	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
 		ID:          "user",
 		Name:        "User",
@@ -35,15 +35,15 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-func (sys *System) init() {
-	sys.router.HandleFunc("/user:current", sys.current).Methods("GET")
+func (mod *Module) init() {
+	mod.router.HandleFunc("/user:current", mod.current).Methods("GET")
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.router.ServeHTTP(w, r)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mod.router.ServeHTTP(w, r)
 }
 
-func (sys *System) Pages() []kb.PageEntry {
+func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{
 		{
 			Owner:    "user",
@@ -56,8 +56,8 @@ func (sys *System) Pages() []kb.PageEntry {
 
 var esc = html.EscapeString
 
-func (sys *System) current(w http.ResponseWriter, r *http.Request) {
-	auth, user, ok := sys.server.AccessUserInfo(w, r)
+func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
+	auth, user, ok := mod.server.AccessUserInfo(w, r)
 	if !ok {
 		return
 	}

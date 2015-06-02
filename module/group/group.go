@@ -1,4 +1,4 @@
-package kbgroup
+package group
 
 import (
 	"fmt"
@@ -10,23 +10,23 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	server *kbserver.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *System {
-	sys := &System{
+func New(server *kbserver.Server) *Module {
+	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
 		ID:          "group",
 		Name:        "Group",
@@ -35,7 +35,7 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-func (sys *System) Pages() []kb.PageEntry {
+func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{
 		{
 			Owner:    "group",
@@ -46,26 +46,26 @@ func (sys *System) Pages() []kb.PageEntry {
 	}
 }
 
-func (sys *System) init() {
-	sys.router.HandleFunc("/group:groups", sys.groups).Methods("GET")
-	sys.router.HandleFunc("/group:{group-id}-details", sys.details).Methods("GET")
-	sys.router.HandleFunc("/group:{group-id}-members", sys.members).Methods("GET")
-	sys.router.HandleFunc("/group:{group-id}", sys.pages).Methods("GET")
+func (mod *Module) init() {
+	mod.router.HandleFunc("/group:groups", mod.groups).Methods("GET")
+	mod.router.HandleFunc("/group:{group-id}-details", mod.details).Methods("GET")
+	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("GET")
+	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.router.ServeHTTP(w, r)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mod.router.ServeHTTP(w, r)
 }
 
 var esc = html.EscapeString
 
-func (sys *System) details(w http.ResponseWriter, r *http.Request) {
-	_, groupID, ok := sys.server.AccessGroupRead(w, r)
+func (mod *Module) details(w http.ResponseWriter, r *http.Request) {
+	_, groupID, ok := mod.server.AccessGroupRead(w, r)
 	if !ok {
 		return
 	}
 
-	group, err := sys.server.Groups().ByID(groupID)
+	group, err := mod.server.Groups().ByID(groupID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -90,8 +90,8 @@ func (sys *System) details(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) systemPages(sysId kb.Slug, w http.ResponseWriter, r *http.Request) {
-	sysgroup := sys.server.Systems[sysId]
+func (mod *Module) modulePages(sysId kb.Slug, w http.ResponseWriter, r *http.Request) {
+	sysgroup := mod.server.Modules[sysId]
 	group := sysgroup.Info()
 
 	entries := sysgroup.Pages()
@@ -108,24 +108,24 @@ func (sys *System) systemPages(sysId kb.Slug, w http.ResponseWriter, r *http.Req
 	})
 }
 
-func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	userID, groupID, ok := sys.server.AccessGroup(w, r)
+func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
+	userID, groupID, ok := mod.server.AccessGroup(w, r)
 	if !ok {
 		return
 	}
-	if _, isSystem := sys.server.Systems[groupID]; isSystem {
-		sys.systemPages(groupID, w, r)
+	if _, isSystem := mod.server.Modules[groupID]; isSystem {
+		mod.modulePages(groupID, w, r)
 		return
 	}
 
-	index := sys.server.IndexByUser(userID)
+	index := mod.server.IndexByUser(userID)
 	entries, err := index.ByGroup(groupID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	group, err := sys.server.Groups().ByID(groupID)
+	group, err := mod.server.Groups().ByID(groupID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -143,8 +143,8 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
-	index, ok := sys.server.AccessIndex(w, r)
+func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
+	index, ok := mod.server.AccessIndex(w, r)
 	if !ok {
 		return
 	}
@@ -164,10 +164,10 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if len(sys.server.Systems) > 0 {
-		story.Append(kb.HTML("<h2>System Groups:</h2>"))
-		for _, system := range sys.server.Systems {
-			entry := system.Info()
+	if len(mod.server.Modules) > 0 {
+		story.Append(kb.HTML("<h2>Modules:</h2>"))
+		for _, Module := range mod.server.Modules {
+			entry := Module.Info()
 			story.Append(kb.Entry(
 				esc(entry.Name),
 				esc(entry.Description),
@@ -184,19 +184,19 @@ func (sys *System) groups(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) members(w http.ResponseWriter, r *http.Request) {
-	_, groupID, ok := sys.server.AccessGroupWrite(w, r)
+func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
+	_, groupID, ok := mod.server.AccessGroupWrite(w, r)
 	if !ok {
 		return
 	}
 
-	group, err := sys.server.Groups().ByID(groupID)
+	group, err := mod.server.Groups().ByID(groupID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	members, err := sys.server.Groups().MembersOf(groupID)
+	members, err := mod.server.Groups().MembersOf(groupID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

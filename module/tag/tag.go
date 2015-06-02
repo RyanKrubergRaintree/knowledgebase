@@ -1,4 +1,4 @@
-package kbtag
+package tag
 
 import (
 	"html"
@@ -10,23 +10,23 @@ import (
 	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.System = &System{}
+var _ kbserver.Module = &Module{}
 
-type System struct {
+type Module struct {
 	server *kbserver.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *System {
-	sys := &System{
+func New(server *kbserver.Server) *Module {
+	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
 	}
-	sys.init()
-	return sys
+	mod.init()
+	return mod
 }
 
-func (sys *System) Info() kbserver.Group {
+func (mod *Module) Info() kbserver.Group {
 	return kbserver.Group{
 		ID:          "tag",
 		Name:        "Tag",
@@ -35,12 +35,12 @@ func (sys *System) Info() kbserver.Group {
 	}
 }
 
-func (sys *System) init() {
-	sys.router.HandleFunc("/tag:tags", sys.tags).Methods("GET")
-	sys.router.HandleFunc("/tag:{tag-id}", sys.pages).Methods("GET")
+func (mod *Module) init() {
+	mod.router.HandleFunc("/tag:tags", mod.tags).Methods("GET")
+	mod.router.HandleFunc("/tag:{tag-id}", mod.pages).Methods("GET")
 }
 
-func (sys *System) Pages() []kb.PageEntry {
+func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{
 		{
 			Owner:    "tag",
@@ -51,16 +51,16 @@ func (sys *System) Pages() []kb.PageEntry {
 	}
 }
 
-func (sys *System) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sys.router.ServeHTTP(w, r)
+func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mod.router.ServeHTTP(w, r)
 }
 
-func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
-	userID, ok := sys.server.AccessAuth(w, r)
+func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
+	userID, ok := mod.server.AccessAuth(w, r)
 	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(userID)
+	index := mod.server.IndexByUser(userID)
 
 	tag := kbserver.SlugParam(r, "tag-id")
 	if tag == "" {
@@ -82,12 +82,12 @@ func (sys *System) pages(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (sys *System) tags(w http.ResponseWriter, r *http.Request) {
-	userID, ok := sys.server.AccessAuth(w, r)
+func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
+	userID, ok := mod.server.AccessAuth(w, r)
 	if !ok {
 		return
 	}
-	index := sys.server.IndexByUser(userID)
+	index := mod.server.IndexByUser(userID)
 
 	entries, err := index.Tags()
 	if err != nil {
