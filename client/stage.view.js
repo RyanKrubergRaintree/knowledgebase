@@ -33,7 +33,7 @@ KB.Stage.View = (function(){
 			var a = React.DOM.a;
 			return React.DOM.div(
 				{className: "stage-buttons"},
-				stage.canModify ? a({
+				stage.canModify() ? a({
 					className:"mdi mdi-playlist-plus",
 					title:"Drag to page to add an item.",
 					style: { cursor: "move" },

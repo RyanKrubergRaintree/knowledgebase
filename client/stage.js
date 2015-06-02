@@ -88,13 +88,13 @@ KB.Stage = (function(){
 			this.notifier.emit({type: "urlChanged", stage: this});
 		},
 
-		get canCreate(){
+		canCreate: function(){
 			return this.allowed.indexOf("PUT") >= 0;
 		},
-		get canModify(){
+		canModify: function(){
 			return this.allowed.indexOf("PATCH") >= 0;
 		},
-		get canDestroy(){
+		canDestroy: function(){
 			return this.allowed.indexOf("DELETE") >= 0;
 		},
 
@@ -110,7 +110,7 @@ KB.Stage = (function(){
 				this.state = 'error';
 				if(xhr.status === 404){
 					this.state = 'not-found';
-					if(this.canCreate){
+					if(this.canCreate()){
 						this.creating = true;
 					}
 				}
@@ -142,8 +142,8 @@ KB.Stage = (function(){
 
 				var xhr = new XMLHttpRequest();
 				xhr.withCredentials = true;
-				xhr.addEventListener('load', this.patchDone_.bind(this), false);
-				xhr.addEventListener('error', this.patchError_.bind(this), false);
+				xhr.onload = this.patchDone_.bind(this);
+				xhr.onerror = this.patchError_.bind(this);
 
 				xhr.open("PATCH", this.url, true);
 
@@ -180,8 +180,8 @@ KB.Stage = (function(){
 
 			var xhr = new XMLHttpRequest();
 			xhr.withCredentials = true;
-			xhr.addEventListener('load', this.pullDone_.bind(this), false);
-			xhr.addEventListener('error', this.pullError_.bind(this), false);
+			xhr.onload = this.pullDone_.bind(this);
+			xhr.onerror = this.pullError_.bind(this);
 
 			xhr.open('GET', this.url, true);
 			xhr.setRequestHeader('Accept', 'application/json');
@@ -194,7 +194,7 @@ KB.Stage = (function(){
 				return;
 			}
 
-			var data = JSON.parse(xhr.response),
+			var data = ParseJSON(xhr.responseText),
 			page = new KB.Page(data);
 			if(xhr.responseURL){
 				if(this.url != xhr.responseURL){
@@ -221,8 +221,8 @@ KB.Stage = (function(){
 
 			var xhr = new XMLHttpRequest();
 			xhr.withCredentials = true;
-			xhr.addEventListener('load', this.createDone_.bind(this), false);
-			xhr.addEventListener('error', this.createError_.bind(this), false);
+			xhr.onload = this.createDone_.bind(this);
+			xhr.onerror = this.createError_.bind(this);
 
 			xhr.open('PUT', this.url, true);
 			xhr.setRequestHeader('Accept', 'application/json');
@@ -246,7 +246,7 @@ KB.Stage = (function(){
 			}
 			this.creating = false;
 
-			var data = JSON.parse(xhr.response),
+			var data = ParseJSON(xhr.responseText),
 			page = new KB.Page(data);
 			if(xhr.responseURL){
 				this.url = xhr.responseURL;
@@ -270,8 +270,8 @@ KB.Stage = (function(){
 			xhr.withCredentials = true;
 			xhr.open('DELETE', jsonurl(this.url), true);
 
-			xhr.addEventListener('load', this.destroyDone_.bind(this), false);
-			xhr.addEventListener('error', this.destroyError_.bind(this), false);
+			xhr.onload = this.destroyDone_.bind(this);
+			xhr.onerror = this.destroyError_.bind(this);
 
 			xhr.send();
 			return xhr;

@@ -17,7 +17,7 @@ KB.Item.View = React.createClass({
 		var stage = this.props.stage,
 			item = this.props.item;
 
-		if(stage.canModify){
+		if(stage.canModify()){
 			ev.dataTransfer.effectAllowed = 'all';
 		} else {
 			ev.dataTransfer.effectAllowed = 'copy';
@@ -89,7 +89,7 @@ KB.Item.View = React.createClass({
 		return React.DOM.div(
 			{
 				className: "item" + editingClass,
-				onDoubleClick: stage.canModify ? this.startEditing : null,
+				onDoubleClick: stage.canModify() ? this.startEditing : null,
 				"data-id": item.id
 			},
 			!isEditing ? React.DOM.div({

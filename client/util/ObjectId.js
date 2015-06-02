@@ -9,8 +9,6 @@
 *
 */
 
-if (!document) var document = { cookie: '' }; // fix crashes on node
-
 function GenerateID(){
 	return (new ObjectId()).toString();
 }

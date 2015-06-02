@@ -1,8 +1,30 @@
-var docCookies = {
+'use strict';
+
+this.DeepClone = function DeepClone(obj){
+	var copy = JSON.parse(JSON.stringify(obj));
+	copy.constructor = obj.constructor;
+	copy.prototype = obj.prototype;
+	copy.__proto__ = obj.__proto__;
+	return copy;
+};
+
+this.ParseJSON = function ParseJSON(data){
+	try {
+		var result = JSON.parse(data);
+	} catch (err) {
+		console.error('Parsing failed:', data);
+		throw err;
+	}
+	return result;
+};
+
+this.DocumentCookies = {
 	getItem: function (sKey) {
+		return;
 		return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
 	},
 	setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+		return;
 		if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
 		var sExpires = "";
 		if (vEnd) {
@@ -22,6 +44,7 @@ var docCookies = {
 		return true;
 	},
 	removeItem: function (sKey, sPath, sDomain) {
+		return;
 		if (!sKey || !this.hasItem(sKey)) { return false; }
 		document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + ( sDomain ? "; domain=" + sDomain : "") + ( sPath ? "; path=" + sPath : "");
 		return true;
@@ -36,15 +59,15 @@ var docCookies = {
 	}
 };
 
-window.Hash = {
+this.Hash = {
 	save: function(){
-		docCookies.setItem("last-hash", document.location.hash, Infinity, "/");
+		DocumentCookies.setItem("last-hash", document.location.hash, Infinity, "/");
 	},
 	restore: function(){
-		var lastHash = docCookies.getItem("hash");
+		var lastHash = DocumentCookies.getItem("hash");
 		if(lastHash && (document.location.hash == "")){
 			document.location.hash = lastHash;
 		}
-		docCookies.removeItem("hash");
+		DocumentCookies.removeItem("hash");
 	}
 };

@@ -25,7 +25,7 @@ KB.Item.Editor = React.createClass({
 		}
 
 		if(item.text != text){
-			var next = Object.clone(item);
+			var next = DeepClone(item);
 			next.text = text;
 			stage.patch({
 				id: next.id,

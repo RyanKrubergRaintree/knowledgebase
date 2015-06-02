@@ -112,7 +112,7 @@ this.DropData = (function(){
 			};
 		}
 
-		console.log("Unhandled drop item:", Object.clone(dataTransfer));
+		console.log("Unhandled drop item:", DeepClone(dataTransfer));
 	}
 
 	return function(stage, after, dataTransfer){

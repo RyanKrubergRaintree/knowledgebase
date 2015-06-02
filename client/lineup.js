@@ -177,7 +177,11 @@ KB.Lineup = (function(){
 			if(stage){
 				var locFrom = Convert.URLToLocation(stage.url);
 				var locTo = Convert.URLToLocation(url);
-				url = "//" + locFrom.host + locTo.pathname;
+				if(locFrom.host == ""){
+					url = "/" + locTo.pathname;
+				} else {
+					url = "//" + locFrom.host + locTo.pathname;
+				}
 			}
 
 			var link = target.dataset.link || ref.link;

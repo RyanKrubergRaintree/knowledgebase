@@ -1,15 +1,15 @@
 import "util/SmoothScroll.js";
 import "page.js";
 import "item.view.js";
-import "util/drag.js"
-import "drop.js"
+import "util/drag.js";
+import "drop.js";
 
 KB.Page.View = (function(){
 	// ensure that we clear all the place-holders
-	document.removeEventListener("dragend", clearDropPosition);
-	document.removeEventListener("drop", clearDropPosition);
-	document.addEventListener("dragend", clearDropPosition);
-	document.addEventListener("drop", clearDropPosition);
+	window.removeEventListener("dragend", clearDropPosition);
+	window.removeEventListener("drop", clearDropPosition);
+	window.addEventListener("dragend", clearDropPosition);
+	window.addEventListener("drop", clearDropPosition);
 
 	function clearDropPosition(){
 		var els = document.getElementsByClassName("drop-after");
@@ -72,7 +72,7 @@ KB.Page.View = (function(){
 		dragEnter: function(ev){},
 		dragOver: function(ev){
 			clearDropPosition();
-			if(!this.props.stage.canModify){
+			if(!this.props.stage.canModify()){
 				return;
 			}
 
@@ -104,7 +104,7 @@ KB.Page.View = (function(){
 				page = stage.page;
 
 			clearDropPosition();
-			if(!stage.canModify){
+			if(!stage.canModify()){
 				return;
 			}
 
@@ -120,7 +120,7 @@ KB.Page.View = (function(){
 
 			var data = ev.dataTransfer.getData("kb/item");
 			if(data){
-				var data = JSON.parse(data);
+				var data = ParseJSON(data);
 				var item = data.item;
 
 				if(data.url && (data.url !== page.url)){
