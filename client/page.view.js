@@ -200,7 +200,7 @@ KB.Page.View = (function(){
 				{className: "page-story"},
 				story.map(function(item, i){
 					return React.createElement(KB.Item.View, {
-						key: item.id || i,
+						key: i + "|" + item.id,
 						stage: stage,
 						item: item
 					});
