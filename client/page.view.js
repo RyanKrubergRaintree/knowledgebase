@@ -116,8 +116,6 @@ KB.Page.View = (function(){
 
 			var dropEffect = this.dropEffectFor(ev);
 
-			console.log(ev.nativeEvent);
-
 			var data = ev.dataTransfer.getData("kb/item");
 			if(data){
 				var data = ParseJSON(data);
