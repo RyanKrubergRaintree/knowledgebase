@@ -1,17 +1,14 @@
-FROM golang:1.4
+FROM debian:wheezy
 
-ADD . /go/src/github.com/raintreeinc/knowledgebase
-RUN go get github.com/raintreeinc/knowledgebase
-
-ADD . /kb
-
-RUN go build -o /kb/knowledgebase github.com/raintreeinc/knowledgebase
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 ENV DEVELOPMENT false
+
+ADD . /kb
 WORKDIR /kb/
 
-# expose services
 ENV PORT 80
 EXPOSE 80
 
-CMD ["/kb/knowledgebase"]
+RUN ["chmod", "+x", "/kb/.bin/run"]
+CMD ["/kb/.bin/run"]

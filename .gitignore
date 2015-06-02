@@ -7,6 +7,8 @@
 # Folders
 _obj
 _test
+.deploy
+.bin
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -26,10 +28,3 @@ _testmain.go
 *.bat
 
 *.sublime-workspace
-
-client/bundle.js
-client/bundle.html
-client/vendor/jspm/npm/**
-client/vendor/jspm/github/**
-
-cmd/kbdita/pages/**
