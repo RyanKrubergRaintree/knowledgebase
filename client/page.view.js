@@ -37,7 +37,7 @@ KB.Page.View = (function(){
 			return; // as first
 		}
 
-		var id = drop.node.dataset.id;
+		var id = GetDataAttribute(drop.node, "id");
 		if(id == null){
 			return; // as first
 		}

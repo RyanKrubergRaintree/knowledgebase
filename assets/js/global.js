@@ -59,6 +59,14 @@ this.DocumentCookies = {
 	}
 };
 
+this.GetDataAttribute = function(el, name){
+	if(typeof el.dataset !== "undefined"){
+		return el.dataset[name];
+	} else {
+		return el.getAttribute("data-" + name);
+	}
+};
+
 this.Hash = {
 	save: function(){
 		DocumentCookies.setItem("last-hash", document.location.hash, Infinity, "/");

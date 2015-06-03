@@ -160,7 +160,8 @@ KB.Lineup = (function(){
 			for(var i = 0; i < 32; i += 1){
 				if(el == null){ return null; }
 				if(el.classList.contains("stage")){
-					return this.stageById(el.dataset.id);
+					var id = GetDataAttribute(el, "id");
+					return this.stageById(id);
 				}
 				el = el.parentElement;
 			}
@@ -168,6 +169,9 @@ KB.Lineup = (function(){
 		},
 
 		handleOpenLink: function(ev){
+			ev.preventDefault();
+			ev.stopPropagation();
+
 			var target = ev.target;
 			var stage = this.findStageFromElement(target);
 
@@ -184,7 +188,8 @@ KB.Lineup = (function(){
 				}
 			}
 
-			var link = target.dataset.link || ref.link;
+			var link = GetDataAttribute(target, "link");
+			var link = link || ref.link;
 			var title = target.innerText;
 
 			if(ev.button == 1){
@@ -201,8 +206,6 @@ KB.Lineup = (function(){
 					after: stage && stage.id
 				});
 			}
-
-			ev.preventDefault();
 		},
 
 		handleClickLink: function(ev){

@@ -18,7 +18,6 @@ function initialize(mountNode){
 
 initialize(document.getElementById("site"));
 
-
 // closing of the last page
 window.addEventListener("keydown", function(ev){
 	function elementIsEditable(elem){

@@ -132,7 +132,7 @@ var ContentTypes = [
 KB.Item.Content['factory'] = React.createClass({
 	displayName: 'Factory',
 	convert: function(ev){
-		var type = ev.currentTarget.dataset.type;
+		var type = GetDataAttribute(ev.currentTarget, "type");
 		var stage = this.props.stage,
 			item = this.props.item;
 
