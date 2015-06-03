@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbdita"
 	"github.com/raintreeinc/knowledgebase/kbserver"
 	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
+	"github.com/raintreeinc/knowledgebase/module/dita"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv"
 
@@ -59,7 +59,7 @@ func main() {
 	}
 
 	group := db.PagesByGroup("help-uploader", "help")
-	mapping.Rules.Merge(kbdita.RaintreeDITA())
+	mapping.Rules.Merge(dita.RaintreeDITA())
 
 	for _, topic := range mapping.BySlug {
 		page, fatal, errs := mapping.Convert(topic)

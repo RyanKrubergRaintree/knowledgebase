@@ -9,7 +9,7 @@ KB.Crumbs = (function(){
 	// converts to
 	// #┃ref1┃ref2┃ref3
 	function toHash(stages){
-		return "# " + stages.map(Convert.ReferenceToLink).join('| ');
+		return '#' + stages.map(Convert.ReferenceToLink).join('|');
 	}
 
 	// converts from
