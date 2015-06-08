@@ -109,8 +109,26 @@ KB.Stage.View = (function(){
 		getInitialState: function(){
 			return {
 				title: this.props.stage.title,
-				owner: extractGroup(this.props.stage.link) || Global.Groups[0] || ""
+				owner: extractGroup(this.props.stage.link) || "",
+				groups: []
 			};
+		},
+
+		groupsReceived: function(ev){
+			var xhr = ev.target
+			if(xhr.status == 200){
+				var info = JSON.parse(ev.target.responseText);
+				this.setState({groups: info.groups});
+			}
+		},
+
+		componentDidMount: function(){
+			var xhr = new XMLHttpRequest();
+			xhr.withCredentials = true;
+			xhr.onload = this.groupsReceived;
+			xhr.open('RAW', "/user:editor-groups", true);
+			xhr.setRequestHeader('Accept', 'application/json');
+			xhr.send();
 		},
 
 		ownerChanged: function(ev){
@@ -153,8 +171,7 @@ KB.Stage.View = (function(){
 					React.DOM.label({}, "Owner"),
 					React.DOM.div(
 						{ className: "group" },
-						// TODO: don't use global here
-						Global.Groups.map(function(group, i){
+						this.state.groups.map(function(group, i){
 							var checked = owner == group;
 							return (
 								React.DOM.div(

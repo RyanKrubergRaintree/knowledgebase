@@ -2,27 +2,41 @@ package kb
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"time"
+)
+
+var (
+	ErrUnknownAction = errors.New("unknown action")
 )
 
 // Page represents a federated wiki page
 type Page struct {
-	Owner    Slug      `json:"owner"`
+	Version  int       `json:"version"`
 	Slug     Slug      `json:"slug"`
 	Title    string    `json:"title"`
 	Synopsis string    `json:"synopsis,omitempty"`
 	Modified time.Time `json:"modified,omitempty"`
 	Story    Story     `json:"story,omitempty"`
-	Journal  Journal   `json:"journal,omitempty"`
+}
+
+func (p *Page) Write(w io.Writer) error {
+	data, err := json.Marshal(p)
+	if err != nil {
+		panic("unable to marshal page " + err.Error())
+	}
+	n, err := w.Write(data)
+	if err == nil && n < len(data) {
+		return io.ErrShortWrite
+	}
+	return err
 }
 
 // Story is the viewable content of the page
 type Story []Item
-
-// Journal contains the history of the Page
-type Journal []Action
 
 // Apply modifies the page with an action
 func (page *Page) Apply(action Action) error {
@@ -35,18 +49,9 @@ func (page *Page) Apply(action Action) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
 
-// LastModified returns the date when the page was last modified
-// if there is no such date it will return a zero time
-func (page *Page) LastModified() time.Time {
-	for i := len(page.Journal) - 1; i >= 0; i-- {
-		if t, err := page.Journal[i].Time(); err == nil && !t.IsZero() {
-			return t
-		}
-	}
-	return time.Time{}
+	page.Version++
+	return nil
 }
 
 // IndexOf returns the index of an item with `id`
@@ -123,6 +128,8 @@ func (s *Story) RemoveByID(id string) (item Item, err error) {
 	return item, fmt.Errorf("missing item id '%v'", id)
 }
 
+func NewID() string { return fmt.Sprintf("%016x", rand.Int63()) }
+
 // Item represents a federated wiki Story item
 type Item map[string]interface{}
 
@@ -159,4 +166,93 @@ func ReadJSONAction(r io.Reader) (Action, error) {
 	}
 
 	return action, nil
+}
+
+// Action represents a operation that can be applied to a fedwiki.Page
+type Action map[string]interface{}
+
+// Str returns string value by the key
+// if that key doesn't exist, it will return an empty string
+func (action Action) Str(key string) string {
+	if s, ok := action[key].(string); ok {
+		return s
+	}
+	return ""
+}
+
+// Type returns the action type attribute
+func (action Action) Type() string {
+	return action.Str("type")
+}
+
+// Item returns the item attribute
+func (action Action) Item() (Item, bool) {
+	item, ok := action["item"]
+	if !ok {
+		return nil, false
+	}
+	m, isitem := (item).(Item)
+	if !isitem {
+		m, ismap := (item).(map[string]interface{})
+		if !ismap {
+			return nil, false
+		}
+		return (Item)(m), true
+	}
+	return m, true
+}
+
+// Time returns the time when the action occurred
+func (action Action) Time() (t time.Time, err error) {
+	val, ok := action["time"]
+	if !ok {
+		return time.Time{}, fmt.Errorf("time not found")
+	}
+	switch val := val.(type) {
+	case string:
+		return time.Parse(time.RFC3339, val)
+	case int: // assume unix timestamp
+		return time.Unix(int64(val), 0), nil
+	case int64: // assume unix timestamp
+		return time.Unix(val, 0), nil
+	}
+
+	return time.Time{}, fmt.Errorf("unknown date format")
+}
+
+// actionfns defines how each action type is applied
+var actionfns = map[string]func(p *Page, a Action) error{
+	"add": func(p *Page, action Action) error {
+		item, ok := action.Item()
+		if !ok {
+			return fmt.Errorf("no item in action")
+		}
+
+		after := action.Str("after")
+		if after == "" {
+			p.Story.Prepend(item)
+			return nil
+		}
+		return p.Story.InsertAfter(after, item)
+	},
+	"edit": func(p *Page, action Action) error {
+		item, ok := action.Item()
+		if !ok {
+			return fmt.Errorf("no item in action")
+		}
+		return p.Story.SetByID(action.Str("id"), item)
+	},
+	"remove": func(p *Page, action Action) error {
+		_, err := p.Story.RemoveByID(action.Str("id"))
+		return err
+	},
+	"move": func(p *Page, action Action) error {
+		return p.Story.Move(action.Str("id"), action.Str("after"))
+	},
+	"create": func(p *Page, action Action) error {
+		return nil
+	},
+	"fork": func(p *Page, action Action) error {
+		return nil
+	},
 }

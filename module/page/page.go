@@ -5,17 +5,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
-	server *kbserver.Server
+	server *kb.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *Module {
+func New(server *kb.Server) *Module {
 	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
@@ -24,8 +23,8 @@ func New(server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          "page",
 		Name:        "Page",
 		Public:      true,
@@ -34,20 +33,15 @@ func (mod *Module) Info() kbserver.Group {
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{
-		{
-			Owner:    "page",
-			Slug:     "page:pages",
-			Title:    "Pages",
-			Synopsis: "List of all pages.",
-		},
-		{
-			Owner:    "page",
-			Slug:     "page:recent-changes",
-			Title:    "Recent Changes",
-			Synopsis: "Shows recently changed pages.",
-		},
-	}
+	return []kb.PageEntry{{
+		Slug:     "page:pages",
+		Title:    "Pages",
+		Synopsis: "List of all pages.",
+	}, {
+		Slug:     "page:recent-changes",
+		Title:    "Recent Changes",
+		Synopsis: "Shows recently changed pages.",
+	}}
 }
 
 func (mod *Module) init() {
@@ -61,9 +55,14 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
-	index, ok := mod.server.AccessIndex(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
+	}
+
+	page := &kb.Page{
+		Slug:  "page:pages",
+		Title: "Pages",
 	}
 
 	entries, err := index.List()
@@ -71,16 +70,13 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "page",
-		Slug:  "page:pages",
-		Title: "Pages",
-		Story: kb.StoryFromEntries(entries),
-	})
+
+	page.Story = kb.StoryFromEntries(entries)
+	page.WriteResponse(w)
 }
 
 func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
-	index, ok := mod.server.AccessIndex(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
@@ -91,29 +87,31 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "page",
+
+	page := &kb.Page{
 		Slug:  "page:search",
 		Title: "Search \"" + q + "\"",
 		Story: kb.StoryFromEntries(entries),
-	})
+	}
+	page.WriteResponse(w)
 }
 
 func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
-	index, ok := mod.server.AccessIndex(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
 
-	entries, err := index.RecentChanges(30)
+	entries, err := index.RecentChanges()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "page",
+
+	page := &kb.Page{
 		Slug:  "page:recent-changes",
 		Title: "Recent Changes",
 		Story: kb.StoryFromEntries(entries),
-	})
+	}
+	page.WriteResponse(w)
 }

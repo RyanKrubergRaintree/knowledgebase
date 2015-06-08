@@ -1,0 +1,6 @@
+{
+	"admins": ["egon-elbre"],
+	"email" : {
+		".*@raintreeinc.com": ["raintree"]
+	}
+}

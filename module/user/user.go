@@ -1,23 +1,23 @@
 package user
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
-	server *kbserver.Server
+	server *kb.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *Module {
+func New(server *kb.Server) *Module {
 	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
@@ -26,8 +26,8 @@ func New(server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          "user",
 		Name:        "User",
 		Public:      true,
@@ -37,6 +37,7 @@ func (mod *Module) Info() kbserver.Group {
 
 func (mod *Module) init() {
 	mod.router.HandleFunc("/user:current", mod.current).Methods("GET")
+	mod.router.HandleFunc("/user:editor-groups", mod.groups).Methods("RAW")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -44,27 +45,34 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{
-		{
-			Owner:    "user",
-			Slug:     "user:current",
-			Title:    "Current",
-			Synopsis: "Information about the current user.",
-		},
-	}
+	return []kb.PageEntry{{
+		Slug:     "user:current",
+		Title:    "Current",
+		Synopsis: "Information about the current user.",
+	}}
 }
 
 var esc = html.EscapeString
 
 func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
-	auth, user, ok := mod.server.AccessUserInfo(w, r)
+	context, ok := mod.server.UserContext(w, r)
 	if !ok {
 		return
 	}
 
-	story := kb.Story{}
+	user, err := context.Users().ByID(context.ActiveUserID())
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
 
-	story.Append(kb.HTML(fmt.Sprintf(`
+	page := &kb.Page{
+		Slug:     "user:current",
+		Title:    "Current",
+		Synopsis: "Information about the current user.",
+	}
+
+	page.Story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Info:</b></p>
 		<table>
 			<tr><td>ID</td><td>%v</td></tr>
@@ -73,28 +81,35 @@ func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
 		</table>
 	`, user.ID, esc(user.Name), esc(user.Email))))
 
-	el := "<p><b>Member of:</b></p><ul>"
-	for _, group := range user.Groups {
-		el += "<li><a href='group:" + esc(group) + "'>" + esc(group) + "</a></li>"
+	page.WriteResponse(w)
+}
+
+func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
+	context, ok := mod.server.UserContext(w, r)
+	if !ok {
+		return
 	}
-	el += "</ul>"
 
-	story.Append(kb.HTML(el))
-	story.Append(kb.HTML(fmt.Sprintf(`
-		<p><b>Authentication:</b></p>
-		<table>
-			<tr><td>AuthID</td><td>%s</td></tr>
-			<tr><td>ID</td><td>%s</td></tr>
-			<tr><td>Email</td><td>%s</td></tr>
-			<tr><td>Provider</td><td>%s</td></tr>
-		</table>
-	`, esc(auth.AuthID), auth.ID, esc(auth.Email), esc(auth.Provider))))
+	groups, err := context.Index(context.ActiveUserID()).Groups(kb.Editor)
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner:    "user",
-		Slug:     "user:current",
-		Title:    "Current",
-		Synopsis: "Information about the current user.",
-		Story:    story,
-	})
+	var result struct {
+		Groups []string `json:"groups"`
+	}
+
+	for _, group := range groups {
+		result.Groups = append(result.Groups, group.Name)
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
 }

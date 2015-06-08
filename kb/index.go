@@ -8,7 +8,6 @@ import (
 )
 
 type PageEntry struct {
-	Owner    Slug      `json:"owner"`
 	Slug     Slug      `json:"slug"`
 	Title    string    `json:"title"`
 	Synopsis string    `json:"synopsis"`
@@ -27,12 +26,11 @@ func (page *PageEntry) HasTag(tag string) bool {
 
 func PageEntryFrom(page *Page) PageEntry {
 	return PageEntry{
-		Owner:    page.Owner,
 		Slug:     page.Slug,
 		Title:    page.Title,
 		Synopsis: page.Synopsis,
 		Tags:     ExtractTags(page),
-		Modified: page.LastModified(),
+		Modified: page.Modified,
 	}
 }
 

@@ -1,0 +1,51 @@
+{
+	"groups": [
+		{
+			"ID": "raintree",
+			"OwnerID": "raintree",
+			"Name": "Raintree",
+			"Public": false,
+			"Description": "Raintree Systems Inc."
+		},
+		{
+			"ID": "community",
+			"OwnerID": "raintree",
+			"Name": "Community",
+			"Public": true,
+			"Description": "Community"
+		},
+		{
+			"ID": "qa",
+			"OwnerID": "qa",
+			"Name": "QA",
+			"Public": false,
+			"Description": "Raintree Quality Assurance"
+		},
+		{
+			"ID": "engineering",
+			"OwnerID": "engineering",
+			"Name": "Engineering",
+			"Public": false,
+			"Description": "Raintree Engineering"
+		},
+		{
+			"ID": "help",
+			"OwnerID": "help",
+			"Name": "Help",
+			"Public": true,
+			"Description": "Raintree Official Help"
+		},
+		{
+			"ID": "knowledge-base",
+			"OwnerID": "knowledge-base",
+			"Name": "Knowledge Base",
+			"Public": true,
+			"Description": "Information about Knowledge Base"
+		}
+	],
+	"community": [
+		{"GroupID": "qa", "MemberID": "raintree", "Rights": "reader"},
+		{"GroupID": "engineering", "MemberID": "raintree", "Rights": "reader"},
+		{"GroupID": "knowledge-base", "MemberID": "raintree", "Rights": "editor"}
+	]
+}

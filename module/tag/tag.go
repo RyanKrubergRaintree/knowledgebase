@@ -7,17 +7,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
-	server *kbserver.Server
+	server *kb.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *Module {
+func New(server *kb.Server) *Module {
 	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
@@ -26,8 +25,8 @@ func New(server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          "tag",
 		Name:        "Tag",
 		Public:      true,
@@ -41,14 +40,11 @@ func (mod *Module) init() {
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{
-		{
-			Owner:    "tag",
-			Slug:     "tag:tags",
-			Title:    "Tags",
-			Synopsis: "Listing of all tags.",
-		},
-	}
+	return []kb.PageEntry{{
+		Slug:     "tag:tags",
+		Title:    "Tags",
+		Synopsis: "Listing of all tags.",
+	}}
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -56,38 +52,37 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
-	userID, ok := mod.server.AccessAuth(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
-	index := mod.server.IndexByUser(userID)
 
-	tag := kbserver.SlugParam(r, "tag-id")
+	tag := kb.SlugParam(r, "tag-id")
 	if tag == "" {
 		http.Error(w, "tag-id missing", http.StatusBadRequest)
 		return
 	}
 
-	entries, err := index.ByTag(string(tag))
+	entries, err := index.ByTag(tag)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "tag",
+	page := &kb.Page{
 		Slug:  "tag:" + tag,
 		Title: kb.SlugToTitle(tag),
 		Story: kb.StoryFromEntries(entries),
-	})
+	}
+
+	page.WriteResponse(w)
 }
 
 func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
-	userID, ok := mod.server.AccessAuth(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
-	index := mod.server.IndexByUser(userID)
 
 	entries, err := index.Tags()
 	if err != nil {
@@ -95,22 +90,21 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	story := kb.Story{}
+	page := &kb.Page{
+		Slug:  "tag:tags",
+		Title: "Tags",
+	}
+
 	if len(entries) == 0 {
-		story.Append(kb.Paragraph("No results."))
+		page.Story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
-			story.Append(kb.Entry(
+			page.Story.Append(kb.Entry(
 				html.EscapeString(entry.Name),
 				strconv.Itoa(entry.Count)+" pages",
 				kb.Slugify("tag:"+entry.Name)))
 		}
 	}
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "tag",
-		Slug:  "tag:tags",
-		Title: "Tags",
-		Story: story,
-	})
+	page.WriteResponse(w)
 }

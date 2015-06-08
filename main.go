@@ -1,17 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 
 	"github.com/raintreeinc/livebundle"
 
 	"github.com/raintreeinc/knowledgebase/auth"
-	"github.com/raintreeinc/knowledgebase/kbserver"
-	"github.com/raintreeinc/knowledgebase/kbserver/pgdb"
+	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 
 	"github.com/raintreeinc/knowledgebase/module/admin"
 	"github.com/raintreeinc/knowledgebase/module/dita"
@@ -19,8 +22,6 @@ import (
 	"github.com/raintreeinc/knowledgebase/module/page"
 	"github.com/raintreeinc/knowledgebase/module/tag"
 	"github.com/raintreeinc/knowledgebase/module/user"
-
-	"github.com/gorilla/sessions"
 
 	_ "github.com/lib/pq"
 )
@@ -36,6 +37,8 @@ var (
 
 	development = flag.Bool("development", true, "development mode")
 	ditamap     = flag.String("dita", "", "ditamap file for showing live dita")
+
+	rules = flag.String("rules", "rules.json", "different rules for server")
 
 	templatesdir = flag.String("templates", "templates", "templates `directory`")
 	assetsdir    = flag.String("assets", "assets", "assets `directory`")
@@ -65,6 +68,9 @@ func main() {
 	if os.Getenv("DITAMAP") != "" {
 		*ditamap = os.Getenv("DITAMAP")
 	}
+	if os.Getenv("RULES") != "" {
+		*rules = os.Getenv("RULES")
+	}
 
 	if os.Getenv("DEVELOPMENT") != "" {
 		v, err := strconv.ParseBool(os.Getenv("DEVELOPMENT"))
@@ -89,42 +95,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if err := db.Initialize(); err != nil {
+		log.Fatal(err)
+	}
 
-	// create default groups
-	db.Groups().Create(kbserver.Group{
-		ID:          "community",
-		Name:        "Community",
-		Public:      true,
-		Description: "All editing users",
-	})
+	// protect server with authentication
+	url := "http://" + *domain
+	auth.Register(os.Getenv("APPKEY"), url, "/system/auth", auth.ClientsFromEnv())
 
-	db.Groups().Create(kbserver.Group{
-		ID:          "engineering",
-		Name:        "Engineering",
-		Public:      true,
-		Description: "Raintree Engineering",
-	})
+	// create server
+	server := kb.NewServer(kb.ServerInfo{
+		Domain:     *domain,
+		ShortTitle: "KB",
+		Title:      "Knowledge Base",
+		Company:    "Raintree Systems Inc.",
+	}, auth.New(), client, db)
 
-	db.Groups().Create(kbserver.Group{
-		ID:          "help",
-		Name:        "Help",
-		Public:      true,
-		Description: "Raintree Help",
-	})
-
-	db.Groups().Create(kbserver.Group{
-		ID:          "admin",
-		Name:        "Admin",
-		Public:      false,
-		Description: "Administrators",
-	})
-
-	// context
-	store := sessions.NewFilesystemStore("", []byte("some secret"))
-	context := kbserver.NewContext(*domain, store)
-
-	// create KnowledgeBase server
-	server := kbserver.New(*domain, *templatesdir, db, client, context)
+	ruleset := MustLoadRules(*rules)
+	server.Rules = ruleset
 
 	// add systems
 	server.AddModule(admin.New(server))
@@ -137,11 +125,63 @@ func main() {
 		server.AddModule(dita.New("Dita", *ditamap, server))
 	}
 
-	// protect server with authentication
-	url := "http://" + *domain
-	auth.Register(os.Getenv("APPKEY"), url, auth.ClientsFromEnv())
-	front := auth.New(server)
-
-	http.Handle("/", front)
+	http.Handle("/", server)
 	log.Fatal(http.ListenAndServe(*addr, nil))
+}
+
+type RuleSet struct {
+	Admins []kb.Slug
+	Email  map[string][]kb.Slug `json:"email"`
+}
+
+func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
+	context := db.Context("admin")
+	_, err := context.Users().ByID(user.ID)
+	created := err == nil
+
+	createUserIfNeeded := func() {
+		if !created {
+			err := context.Users().Create(user)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			created = true
+		}
+	}
+
+	for _, admin := range rs.Admins {
+		if user.ID == admin {
+			createUserIfNeeded()
+			context.Access().SetAdmin(user.ID, true)
+		}
+	}
+
+	for rule, groups := range rs.Email {
+		matched, err := regexp.MatchString(rule, user.Email)
+		if err != nil {
+			log.Println(err)
+		}
+		if matched && err == nil {
+			createUserIfNeeded()
+			for _, group := range groups {
+				context.Access().AddUser(group, user.ID)
+			}
+		}
+	}
+	return nil
+}
+
+func MustLoadRules(filename string) *RuleSet {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rs := &RuleSet{}
+	if err := json.Unmarshal(data, rs); err != nil {
+		log.Fatal(err)
+	}
+
+	return rs
 }

@@ -7,17 +7,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
-	server *kbserver.Server
+	server *kb.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *Module {
+func New(server *kb.Server) *Module {
 	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
@@ -26,8 +25,8 @@ func New(server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          "group",
 		Name:        "Group",
 		Public:      true,
@@ -36,18 +35,17 @@ func (mod *Module) Info() kbserver.Group {
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{
-		{
-			Owner:    "group",
-			Slug:     "group:groups",
-			Title:    "Groups",
-			Synopsis: "List of all groups.",
-		},
-	}
+	return []kb.PageEntry{{
+		Slug:     "group:groups",
+		Title:    "Groups",
+		Synopsis: "List of all groups.",
+	}}
 }
 
 func (mod *Module) init() {
 	mod.router.HandleFunc("/group:groups", mod.groups).Methods("GET")
+	mod.router.HandleFunc("/group:modules", mod.modules).Methods("GET")
+	mod.router.HandleFunc("/group:module-{module-id}", mod.modulePages).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}-details", mod.details).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
@@ -60,19 +58,22 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 var esc = html.EscapeString
 
 func (mod *Module) details(w http.ResponseWriter, r *http.Request) {
-	_, groupID, ok := mod.server.AccessGroupRead(w, r)
+	context, groupID, ok := mod.server.GroupContext(w, r, kb.Reader)
 	if !ok {
 		return
 	}
 
-	group, err := mod.server.Groups().ByID(groupID)
+	group, err := context.Groups().ByID(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
-	story := kb.Story{}
 
-	story.Append(kb.HTML(fmt.Sprintf(`
+	page := &kb.Page{
+		Slug:  "group:" + groupID + "-details",
+		Title: esc(group.Name) + " Details",
+	}
+	page.Story.Append(kb.HTML(fmt.Sprintf(`
 		<p><b>Info:</b></p>
 		<table>
 			<tr><td>ID</td><td>%s</td></tr>
@@ -82,139 +83,164 @@ func (mod *Module) details(w http.ResponseWriter, r *http.Request) {
 		</table>
 	`, group.ID, esc(group.Name), group.Public, esc(group.Description))))
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "group",
-		Slug:  "group:" + groupID + "-details",
-		Title: esc(group.Name) + " Details",
-		Story: story,
-	})
+	page.WriteResponse(w)
 }
 
-func (mod *Module) modulePages(sysId kb.Slug, w http.ResponseWriter, r *http.Request) {
-	sysgroup := mod.server.Modules[sysId]
-	group := sysgroup.Info()
+func (mod *Module) modulePages(w http.ResponseWriter, r *http.Request) {
+	moduleID := kb.SlugParam(r, "module-id")
+	if moduleID == "" {
+		http.Error(w, "module-id missing", http.StatusBadRequest)
+		return
+	}
 
-	entries := sysgroup.Pages()
+	module, ok := mod.server.Modules[moduleID]
+	if !ok {
+		http.NotFound(w, r)
+		return
+	}
+
+	info := module.Info()
+	page := &kb.Page{
+		Slug:     "group:module-" + info.ID,
+		Title:    "Module " + info.Name,
+		Synopsis: info.Description,
+	}
+
+	entries := module.Pages()
 	kb.SortPageEntriesBySlug(entries)
-	story := kb.StoryFromEntries(entries)
-	story.Prepend(kb.Paragraph(group.Description))
+	page.Story = kb.StoryFromEntries(entries)
+	page.Story.Prepend(kb.Paragraph(info.Description))
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner:    "group",
-		Slug:     "group:" + sysId,
-		Title:    group.Name,
-		Synopsis: group.Description,
-		Story:    story,
-	})
+	page.WriteResponse(w)
 }
 
 func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
-	userID, groupID, ok := mod.server.AccessGroup(w, r)
+	context, groupID, ok := mod.server.GroupContext(w, r, kb.Reader)
 	if !ok {
 		return
 	}
-	if _, isSystem := mod.server.Modules[groupID]; isSystem {
-		mod.modulePages(groupID, w, r)
-		return
-	}
 
-	index := mod.server.IndexByUser(userID)
-	entries, err := index.ByGroup(groupID)
+	info, err := context.Groups().ByID(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
 
-	group, err := mod.server.Groups().ByID(groupID)
+	entries, err := context.Index(context.ActiveUserID()).ByGroup(info.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
 
-	story := kb.StoryFromEntries(entries)
-	story.Prepend(kb.Paragraph(group.Description))
+	page := &kb.Page{
+		Slug:     "group:" + info.ID,
+		Title:    info.Name,
+		Synopsis: info.Description,
+	}
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner:    "group",
-		Slug:     "group:" + groupID,
-		Title:    group.Name,
-		Synopsis: group.Description,
-		Story:    story,
-	})
+	page.Story = kb.StoryFromEntries(entries)
+	page.Story.Prepend(kb.Paragraph(info.Description))
+
+	page.WriteResponse(w)
 }
 
 func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
-	index, ok := mod.server.AccessIndex(w, r)
+	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
 
-	entries, err := index.Groups()
+	page := &kb.Page{
+		Slug:  "group:groups",
+		Title: "Groups",
+	}
+
+	entries, err := index.Groups(kb.Reader)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
 
-	story := kb.Story{}
 	if len(entries) == 0 {
-		story.Append(kb.Paragraph("No results."))
+		page.Story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
-			story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
+			page.Story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
 		}
 	}
 
-	if len(mod.server.Modules) > 0 {
-		story.Append(kb.HTML("<h2>Modules:</h2>"))
+	page.WriteResponse(w)
+}
+
+func (mod *Module) modules(w http.ResponseWriter, r *http.Request) {
+	_, ok := mod.server.UserContext(w, r)
+	if !ok {
+		return
+	}
+
+	page := &kb.Page{
+		Slug:  "group:modules",
+		Title: "Modules",
+	}
+
+	if len(mod.server.Modules) == 0 {
+		page.Story.Append(kb.Paragraph("No results."))
+	} else {
 		for _, Module := range mod.server.Modules {
 			entry := Module.Info()
-			story.Append(kb.Entry(
-				esc(entry.Name),
+			page.Story.Append(kb.Entry(
+				esc("Module "+entry.Name),
 				esc(entry.Description),
-				"group:"+entry.ID,
+				"group:module-"+entry.ID,
 			))
 		}
 	}
 
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "group",
-		Slug:  "group:groups",
-		Title: "Groups",
-		Story: story,
-	})
+	page.WriteResponse(w)
 }
 
 func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
-	_, groupID, ok := mod.server.AccessGroupWrite(w, r)
+	context, groupID, ok := mod.server.GroupContext(w, r, kb.Moderator)
 	if !ok {
 		return
 	}
 
-	group, err := mod.server.Groups().ByID(groupID)
+	group, err := context.Groups().ByID(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
 
-	members, err := mod.server.Groups().MembersOf(groupID)
+	members, err := context.Access().List(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		kb.WriteResult(w, err)
 		return
 	}
 
-	story := kb.Story{}
-
-	el := "<ul>"
-	for _, member := range members {
-		el += "<li>" + html.EscapeString(member.Name) + "</li>"
-	}
-	el += "</ul>"
-	story.Append(kb.HTML(el))
-
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "group",
+	page := &kb.Page{
 		Slug:  "group:" + groupID + "-members",
 		Title: group.Name + " Members",
-		Story: story,
-	})
+	}
+
+	page.Story.Append(kb.HTML("<h2>Moderators</h2>"))
+	el := "<ul>"
+	for _, member := range members {
+		if !member.IsGroup {
+			el += "<li>" + html.EscapeString(member.Name) + "</li>"
+		}
+	}
+	el += "</ul>"
+	page.Story.Append(kb.HTML(el))
+
+	page.Story.Append(kb.HTML("<h2>Community</h2>"))
+	el = "<ul>"
+	for _, member := range members {
+		if member.IsGroup {
+			el += "<li>" + html.EscapeString(member.Name) + " = " + string(member.Access) + "</li>"
+		}
+	}
+	el += "</ul>"
+	page.Story.Append(kb.HTML(el))
+
+	page.WriteResponse(w)
 }

@@ -17,24 +17,23 @@ import (
 	"github.com/bradfitz/slice"
 
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv"
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 var _ *kb.Page
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
 	name    string
 	ditamap string
-	server  *kbserver.Server
+	server  *kb.Server
 
 	store atomic.Value
 }
 
-func New(name, ditamap string, server *kbserver.Server) *Module {
+func New(name, ditamap string, server *kb.Server) *Module {
 	mod := &Module{
 		name:    name,
 		ditamap: ditamap,
@@ -44,8 +43,8 @@ func New(name, ditamap string, server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          kb.Slugify(mod.name),
 		Name:        mod.name,
 		Public:      true,
@@ -101,7 +100,11 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			page.Story.Append(kb.HTML(text))
 		}
-		kbserver.WriteJSON(w, r, page)
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := page.Write(w); err != nil {
+			log.Println(err)
+		}
 		return
 	case name + ":all-pages":
 		page := &kb.Page{
@@ -118,7 +121,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		content += "</ul>"
 
 		page.Story.Append(kb.HTML(content))
-		kbserver.WriteJSON(w, r, page)
+		page.WriteResponse(w)
 		return
 	}
 	http.NotFound(w, r)

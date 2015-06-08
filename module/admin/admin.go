@@ -5,17 +5,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kbserver"
 )
 
-var _ kbserver.Module = &Module{}
+var _ kb.Module = &Module{}
 
 type Module struct {
-	server *kbserver.Server
+	server *kb.Server
 	router *mux.Router
 }
 
-func New(server *kbserver.Server) *Module {
+func New(server *kb.Server) *Module {
 	mod := &Module{
 		server: server,
 		router: mux.NewRouter(),
@@ -24,8 +23,8 @@ func New(server *kbserver.Server) *Module {
 	return mod
 }
 
-func (mod *Module) Info() kbserver.Group {
-	return kbserver.Group{
+func (mod *Module) Info() kb.Group {
+	return kb.Group{
 		ID:          "admin",
 		Name:        "Admin",
 		Public:      false,
@@ -34,14 +33,11 @@ func (mod *Module) Info() kbserver.Group {
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{
-		{
-			Owner:    "admin",
-			Slug:     "admin:upload-help",
-			Title:    "Upload Help",
-			Synopsis: "Page for updating help.",
-		},
-	}
+	return []kb.PageEntry{{
+		Slug:     "admin:upload-help",
+		Title:    "Upload Help",
+		Synopsis: "Page for updating help.",
+	}}
 }
 
 func (mod *Module) init() {
@@ -54,24 +50,18 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) uploadhelp(w http.ResponseWriter, r *http.Request) {
-	_, ok := mod.server.AccessAdmin(w, r)
+	_, ok := mod.server.AdminContext(w, r)
 	if !ok {
 		return
 	}
 
-	story := kb.Story{}
-	story.Append(kb.HTML(`
-	<from>
-		<textarea></textarea>
-	</form>
-	`))
-
-	kbserver.WriteJSON(w, r, &kb.Page{
-		Owner: "admin",
+	page := &kb.Page{
 		Slug:  "admin:upload-help",
 		Title: "Upload Help",
-		Story: story,
-	})
+		Story: kb.Story{kb.HTML(`<from><textarea></textarea></form>`)},
+	}
+
+	page.WriteResponse(w)
 }
 
 func (mod *Module) loadhelp(w http.ResponseWriter, r *http.Request) {
