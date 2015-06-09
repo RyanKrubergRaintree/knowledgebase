@@ -121,6 +121,11 @@
 	min-height: 80px;
 }
 
+.item-content .error {
+	background: #faa;
+	padding: 4px;
+}
+
 .content-unknown {
 	border: 1px solid #f00;
 	padding: 8px;

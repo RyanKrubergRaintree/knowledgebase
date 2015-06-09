@@ -171,7 +171,9 @@ KB.Stage = (function(){
 			this.pull();
 		},
 
-
+		refresh: function(){
+			this.pull();
+		},
 		pull: function(){
 			if(this.url == null){ return; }
 

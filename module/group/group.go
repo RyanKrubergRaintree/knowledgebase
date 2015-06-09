@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"html"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/raintreeinc/knowledgebase/extra/simpleform"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
@@ -47,8 +49,10 @@ func (mod *Module) init() {
 	mod.router.HandleFunc("/group:modules", mod.modules).Methods("GET")
 	mod.router.HandleFunc("/group:module-{module-id}", mod.modulePages).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}-details", mod.details).Methods("GET")
-	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("GET")
-	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("PATCH")
+	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods(
+		"GET",
+		"ADD-USER", "REMOVE-USER",
+		"ADD-COMMUNITY", "REMOVE-COMMUNITY")
 	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
 }
 
@@ -213,7 +217,49 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == "PATCH" {
+	switch r.Method {
+	case "ADD-USER", "REMOVE-USER",
+		"ADD-COMMUNITY", "REMOVE-COMMUNITY":
+
+		name := strings.TrimSpace(r.FormValue("name"))
+		if name == "" {
+			http.Error(w, "Name not specified.", http.StatusBadRequest)
+			return
+		}
+
+		id := kb.Slugify(name)
+		var err error
+		switch r.Method {
+		case "ADD-USER":
+			err = context.Access().AddUser(groupID, id)
+		case "REMOVE-USER":
+			err = context.Access().RemoveUser(groupID, id)
+		case "ADD-COMMUNITY":
+			rights := strings.TrimSpace(r.FormValue("rights"))
+			if rights == "" {
+				http.Error(w, "Rights not specified.", http.StatusBadRequest)
+				return
+			}
+			err = context.Access().CommunityAdd(groupID, id, kb.Rights(rights))
+		case "REMOVE-COMMUNITY":
+			err = context.Access().CommunityRemove(groupID, id)
+		}
+		if err != nil {
+			kb.WriteResult(w, err)
+			return
+		}
+
+		switch r.Method {
+		case "ADD-USER":
+			w.Write([]byte("user added"))
+		case "REMOVE-USER":
+			w.Write([]byte("user removed"))
+		case "ADD-COMMUNITY":
+			w.Write([]byte("community added"))
+		case "REMOVE-COMMUNITY":
+			w.Write([]byte("community removed"))
+		}
+
 		return
 	}
 
@@ -229,7 +275,14 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.Story.Append(kb.HTML("<h2>Moderators</h2>"))
-	page.Story.Append(kb.HTML("<from><input><button>Add</button><button>Remove</button></form>"))
+
+	page.Story.Append(simpleform.New(
+		"/"+string(page.Slug), "",
+		simpleform.Field("name", "Name"),
+		simpleform.Button("ADD-USER", "Add"),
+		simpleform.Button("REMOVE-USER", "Remove"),
+	))
+
 	el := "<ul>"
 	for _, member := range members {
 		if !member.IsGroup {
@@ -240,7 +293,15 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 	page.Story.Append(kb.HTML(el))
 
 	page.Story.Append(kb.HTML("<h2>Community</h2>"))
-	page.Story.Append(kb.HTML("<from><input><button>Add</button><button>Remove</button></form>"))
+
+	page.Story.Append(simpleform.New(
+		"/"+string(page.Slug),
+		"",
+		simpleform.Field("name", "Name"),
+		simpleform.Option("rights", []string{string(kb.Reader), string(kb.Editor), string(kb.Moderator)}),
+		simpleform.Button("ADD-COMMUNITY", "Add"),
+		simpleform.Button("REMOVE-COMMUNITY", "Remove"),
+	))
 
 	el = "<ul>"
 	for _, member := range members {
