@@ -330,7 +330,7 @@ func (server *Server) GroupContext(w http.ResponseWriter, r *http.Request, min R
 	context := server.Context(user.ID)
 	rights := context.Access().Rights(groupID, user.ID)
 	if rights.Level() < min.Level() {
-		http.Error(w, "Not an enough rights.", http.StatusUnauthorized)
+		http.Error(w, "Not an enough rights. You are "+string(rights)+", but need to be "+string(min)+".", http.StatusUnauthorized)
 		return nil, groupID, false
 	}
 	return context, groupID, true

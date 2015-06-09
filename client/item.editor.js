@@ -78,9 +78,9 @@ KB.Item.Editor = React.createClass({
 			item = this.props.item,
 			node = this.refs.text.getDOMNode();
 
-		if(ev.keyCode == 13){
+		if((ev.ctrlKey) && (ev.keyCode == 13)){
 			switch(item.type){
-			case "paragraph":
+			case "paragraph", "html":
 				var pre = node.value.substr(0, node.selectionStart),
 					post = node.value.substr(node.selectionStart);
 

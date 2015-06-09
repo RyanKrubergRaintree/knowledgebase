@@ -48,6 +48,7 @@ func (mod *Module) init() {
 	mod.router.HandleFunc("/group:module-{module-id}", mod.modulePages).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}-details", mod.details).Methods("GET")
 	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("GET")
+	mod.router.HandleFunc("/group:{group-id}-members", mod.members).Methods("PATCH")
 	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
 }
 
@@ -77,11 +78,12 @@ func (mod *Module) details(w http.ResponseWriter, r *http.Request) {
 		<p><b>Info:</b></p>
 		<table>
 			<tr><td>ID</td><td>%s</td></tr>
+			<tr><td>Owner</td><td>%s</td></tr>
 			<tr><td>Name</td><td>%s</td></tr>
 			<tr><td>Public</td><td>%v</td></tr>
 			<tr><td>Description</td><td>%s</td></tr>
 		</table>
-	`, group.ID, esc(group.Name), group.Public, esc(group.Description))))
+	`, group.ID, group.OwnerID, esc(group.Name), group.Public, esc(group.Description))))
 
 	page.WriteResponse(w)
 }
@@ -211,6 +213,10 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == "PATCH" {
+		return
+	}
+
 	members, err := context.Access().List(groupID)
 	if err != nil {
 		kb.WriteResult(w, err)
@@ -223,6 +229,7 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.Story.Append(kb.HTML("<h2>Moderators</h2>"))
+	page.Story.Append(kb.HTML("<from><input><button>Add</button><button>Remove</button></form>"))
 	el := "<ul>"
 	for _, member := range members {
 		if !member.IsGroup {
@@ -233,6 +240,8 @@ func (mod *Module) members(w http.ResponseWriter, r *http.Request) {
 	page.Story.Append(kb.HTML(el))
 
 	page.Story.Append(kb.HTML("<h2>Community</h2>"))
+	page.Story.Append(kb.HTML("<from><input><button>Add</button><button>Remove</button></form>"))
+
 	el = "<ul>"
 	for _, member := range members {
 		if member.IsGroup {

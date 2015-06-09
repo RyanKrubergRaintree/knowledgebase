@@ -185,12 +185,22 @@ KB.Item.Content['paragraph'] = React.createClass({
 	displayName: 'Paragraph',
 	render: function(){
 		var stage = this.props.stage;
-		return React.DOM.p({
-			className: 'item-content content-paragraph',
-			dangerouslySetInnerHTML: {
-				__html: Resolve(stage, this.props.item.text)
-			}
-		});
+		var resolved = Resolve(stage, this.props.item.text);
+		var paragraphs = resolved.split("\n\n");
+		if(paragraphs.length > 1){
+			return React.DOM.div({
+				className: 'item-content content-paragraph',
+			}, paragraphs.map(function(p, i){
+				return React.DOM.p({key: i, dangerouslySetInnerHTML: {__html: p}});
+			}));
+		} else {
+			return React.DOM.p({
+				className: 'item-content content-paragraph',
+				dangerouslySetInnerHTML: {
+					__html: paragraphs[0]
+				}
+			});
+		}
 	}
 });
 
@@ -250,7 +260,12 @@ KB.Item.Content['entry'] = React.createClass({
 				href: url
 			}, item.title),
 			React.DOM.div({className: 'entry-owner'}, ref.owner),
-			React.DOM.p({className: 'entry-synopsis'}, this.props.item.text)
+			React.DOM.p({
+				className: 'entry-synopsis',
+				dangerouslySetInnerHTML: {
+					__html: this.props.item.text
+				}
+			})
 		);
 	}
 });
@@ -261,7 +276,13 @@ KB.Item.Content['tags'] = React.createClass({
 		var item = this.props.item,
 			stage = this.props.stage;
 
-		var tags = typeof item.text == "undefined" ? [] : item.text.split(",");
+		var text = typeof item.text == "undefined" ? "" : item.text.trim();
+		var tags = [];
+		if(text !== "") {
+			tags =  text.split(",");
+		}
+		tags = tags.map(function(tag){ return tag.trim(); })
+					.filter(function(tag){ return tag != ""; });
 		return React.DOM.div({className: 'item-contet content-tags'},
 			tags.length > 0 ?
 				tags.map(function(tag, i){
