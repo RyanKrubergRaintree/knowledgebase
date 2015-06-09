@@ -128,12 +128,27 @@ KB.Item.Editor = React.createClass({
 				onKeyDown: this.handleKey,
 				autoFocus: true
 			}),
-			React.DOM.div({
-				className: "item-delete mdi mdi-delete",
-				title: "Delete this item.",
-				tabIndex: '1',
-				onClick: this.remove
-			})
+			React.DOM.div(
+				{className:'editor-buttons'},
+				React.DOM.div({
+					className: "mdi mdi-content-save",
+					title: "Save changes. (Unfocus the editor will save.)",
+					tabIndex: '1',
+					onClick: this.commit
+				}),
+				React.DOM.div({
+					className: "mdi mdi-backup-restore",
+					title: "Cancel any modifications. (Pressing escape will cancel changes.)",
+					tabIndex: '2',
+					onClick: this.stopEditing
+				}),
+				React.DOM.div({
+					className: "item-delete mdi mdi-delete",
+					title: "Delete this item.",
+					tabIndex: '3',
+					onClick: this.remove
+				})
+			)
 		)
 	}
 });

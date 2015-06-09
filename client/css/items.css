@@ -46,49 +46,10 @@
 	background-position: center right;
 }
 
-.item-delete {
-	position: absolute;
-	right: 30px;
-	bottom: 10px;
-
-	text-decoration: none;
-	z-index: 10;
-	background: #FFF;
-
-	width: 30px;
-	height: 30px;
-	text-align: center;
-	line-height: 30px;
-
-	cursor: pointer;
-
-	color: #333;
-	font-size: 20px;
-	border-radius: 30px;
-
-	transition: background 0.2s ease-in-out,
-				box-shadow 0.1s ease-in-out;
-
-	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
-
-	box-shadow:
-		0 6px 10px 0 rgba(0, 0, 0, 0.3),
-		0 2px 2px 0 rgba(0, 0, 0, 0.2);
-}
-
-.item-delete:hover {
-	background: #f44;
-}
-
-.item-delete:active {
-	box-shadow:
-		0 13px 25px 0 rgba(0, 0, 0, 0.3),
-		0 11px 7px 0 rgba(0, 0, 0, 0.19);
-}
-
 .item-editing {
 	margin: 8px 16px;
 	padding: 8px;
+	padding-right: 45px;
 
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
@@ -102,6 +63,56 @@
 	width: 100%;
 	height: 100px;
 	border: 0;
+}
+
+.content-editor .editor-buttons {
+	position: absolute;
+	right:0; bottom: 0;
+	width: 45px;
+
+	z-index: 10;
+	padding: 8px;
+	text-align: center;
+}
+.content-editor .editor-buttons > * {
+	text-decoration: none;
+	background: #FFF;
+
+	width: 30px;
+	margin-bottom: 8px;
+	text-align: center;
+	line-height: 30px;
+
+	cursor: pointer;
+
+	color: #333;
+	font-size: 20px;
+	border-radius: 30px;
+	border: 1px solid #fff;
+
+	transition: background 0.2s ease-in-out,
+				box-shadow 0.1s ease-in-out;
+
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+
+	box-shadow:
+		0 6px 10px 0 rgba(0, 0, 0, 0.3),
+		0 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.content-editor .editor-buttons > *:hover {
+	border: 1px solid #7DC6FF;
+}
+
+.content-editor .editor-buttons > *:active {
+	box-shadow:
+		0 13px 25px 0 rgba(0, 0, 0, 0.3),
+		0 11px 7px 0 rgba(0, 0, 0, 0.19);
+}
+
+.item-delete:hover {
+	border: 1px solid #f88 !important;
+	background: #f88 !important;
 }
 
 .item-content textarea {
