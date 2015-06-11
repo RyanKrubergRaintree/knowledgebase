@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -67,7 +68,14 @@ func HelpUpgrade(DB kb.Database, fs *flag.FlagSet, args []string) {
 		pages[page.Slug] = page
 	}
 
-	err := DB.Context("admin").Pages("help").BatchReplace(pages)
+	complete := 0
+	total := len(pages)
+
+	err := DB.Context("admin").Pages("help").BatchReplace(pages, func(slug kb.Slug) {
+		complete++
+		fmt.Printf("%04d/%04d : %v\n", complete, total, slug)
+	})
+
 	if err != nil {
 		log.Println(err)
 	} else {

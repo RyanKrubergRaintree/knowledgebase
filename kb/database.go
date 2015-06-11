@@ -104,7 +104,7 @@ type Pages interface {
 	Edit(id Slug, version int, action Action) error
 	Delete(id Slug, version int) error
 
-	BatchReplace(pages map[Slug]*Page) error
+	BatchReplace(pages map[Slug]*Page, complete func(Slug)) error
 
 	List() ([]PageEntry, error)
 	Journal(id Slug) ([]Action, error)

@@ -8,7 +8,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-func (db Pages) BatchReplace(pages map[kb.Slug]*kb.Page) error {
+func (db Pages) BatchReplace(pages map[kb.Slug]*kb.Page, complete func(kb.Slug)) error {
 	for slug := range pages {
 		if owner, _ := kb.TokenizeLink(string(slug)); owner != db.GroupID {
 			return errors.New("Invalid group replacement.")
@@ -58,6 +58,8 @@ func (db Pages) BatchReplace(pages map[kb.Slug]*kb.Page) error {
 			insert.Close()
 			return fmt.Errorf("failed to insert: %v", err)
 		}
+
+		complete(page.Slug)
 	}
 
 	insert.Close()
