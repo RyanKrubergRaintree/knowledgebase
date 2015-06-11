@@ -28,13 +28,6 @@ this.Convert = {};
 			};
 		}
 
-		var query = "";
-		var q = link.indexOf("?");
-		if(q >= 0){
-			query = link.substr(q);
-			link = link.substr(0, q);
-		}
-
 		// remove prefix "/"
 		if(link[0] == "/") {
 			link = link.substr(1);
@@ -46,7 +39,7 @@ this.Convert = {};
 		return {
 			link: Convert.URLToReadable(link),
 			owner: owner,
-			url: "/" + Slugify(link) + query,
+			url: "/" + Slugify(link),
 			title: Convert.LinkToTitle(link),
 		};
 	}

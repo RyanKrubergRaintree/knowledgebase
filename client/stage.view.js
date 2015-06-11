@@ -56,6 +56,24 @@ KB.Stage.View = (function(){
 
 	var StageInfo = React.createClass({
 		displayName: "StageInfo",
+		createReference: function(ev){
+			var stage = this.props.stage,
+				page = stage.page;
+			var item = {
+				id: GenerateID(),
+				type: "reference",
+				url: stage.url,
+				title: page.title,
+				text: page.synopsis
+			};
+
+			ev.dataTransfer.effectAllowed = 'copy';
+			var data = {
+				item: item
+			};
+
+			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+		},
 		render: function(){
 			var table = React.DOM.table,
 			 	tr = React.DOM.tr,
@@ -74,7 +92,11 @@ KB.Stage.View = (function(){
 			return React.DOM.div(
 				null,
 				table({className:"stage-info"},
-					tr(null, td(null, "Link"),  td(null, stage.link)),
+					tr({
+						onDragStart: this.createReference,
+						draggable: true,
+						style: { cursor: "move" }
+					}, td(null, "Link"),  td(null, stage.link)),
 					tr(null, td(null, "State"), td(null, stage.state))
 				),
 				error
