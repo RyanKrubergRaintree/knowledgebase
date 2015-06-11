@@ -35,11 +35,6 @@ func (db Access) Rights(group, user kb.Slug) kb.Rights {
 		return kb.Moderator
 	}
 
-	// is it a public group?
-	if db.BoolQuery(`SELECT FROM Groups WHERE ID = $1 AND Public`, group) {
-		return kb.Reader
-	}
-
 	row := db.QueryRow(`
 		SELECT Access FROM Community
 		JOIN Membership on Community.MemberID = Membership.GroupID
@@ -55,6 +50,12 @@ func (db Access) Rights(group, user kb.Slug) kb.Rights {
 	if err != sql.ErrNoRows {
 		log.Println(err)
 	}
+
+	// is it a public group?
+	if db.BoolQuery(`SELECT FROM Groups WHERE ID = $1 AND Public`, group) {
+		return kb.Reader
+	}
+
 	return kb.Blocked
 }
 

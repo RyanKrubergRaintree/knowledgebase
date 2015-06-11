@@ -247,15 +247,8 @@ KB.Stage = (function(){
 				return;
 			}
 			this.creating = false;
-
-			var data = ParseJSON(xhr.responseText),
-			page = new KB.Page(data);
-			if(xhr.responseURL){
-				this.url = xhr.responseURL;
-			}
-			this.page = page;
-			this.state = "loaded";
-			this.changed();
+			this.state = "created";
+			this.refresh();
 		},
 		createError_: function(ev){
 			this.state = "failed";

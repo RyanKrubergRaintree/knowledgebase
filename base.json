@@ -36,9 +36,9 @@
 			"Description": "Raintree Official Help"
 		},
 		{
-			"ID": "knowledge-base",
-			"OwnerID": "knowledge-base",
-			"Name": "Knowledge Base",
+			"ID": "kb",
+			"OwnerID": "kb",
+			"Name": "KB",
 			"Public": true,
 			"Description": "Information about Knowledge Base"
 		}
@@ -46,6 +46,6 @@
 	"community": [
 		{"GroupID": "qa", "MemberID": "raintree", "Rights": "reader"},
 		{"GroupID": "engineering", "MemberID": "raintree", "Rights": "reader"},
-		{"GroupID": "knowledge-base", "MemberID": "raintree", "Rights": "editor"}
+		{"GroupID": "kb", "MemberID": "raintree", "Rights": "editor"}
 	]
 }

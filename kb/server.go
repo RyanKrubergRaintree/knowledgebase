@@ -144,8 +144,8 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ownerID, pageID := TokenizeLink(r.URL.Path)
-	if ownerID == "" {
+	groupID, pageID := TokenizeLink(r.URL.Path)
+	if groupID == "" {
 		http.Error(w, "No page owner specified:\n"+
 			"page links should have format owner:page-name.",
 			http.StatusBadRequest)
@@ -153,13 +153,13 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// modules must handle everything by themselves
-	if module, ok := server.Modules[ownerID]; ok {
+	if module, ok := server.Modules[groupID]; ok {
 		module.ServeHTTP(w, r)
 		return
 	}
 
 	context := server.Context(user.ID)
-	rights := context.Access().Rights(ownerID, user.ID)
+	rights := context.Access().Rights(groupID, user.ID)
 	var allowedMethods []string
 
 	switch rights {
@@ -184,7 +184,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pages := context.Pages(ownerID)
+	pages := context.Pages(groupID)
 	switch r.Method {
 
 	// reading a page
@@ -214,7 +214,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		pageOwner, _ := TokenizeLink(string(page.Slug))
-		if pageOwner != ownerID {
+		if pageOwner != groupID {
 			http.Error(w, "Invalid parameters specified.", http.StatusBadRequest)
 			return
 		}

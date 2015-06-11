@@ -13,8 +13,27 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func RDS() string {
+	user := os.Getenv("RDS_USERNAME")
+	pass := os.Getenv("RDS_PASSWORD")
+
+	dbname := os.Getenv("RDS_DB_NAME")
+	host := os.Getenv("RDS_HOSTNAME")
+	port := os.Getenv("RDS_PORT")
+
+	if user == "" || pass == "" || dbname == "" || host == "" || port == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s'", user, pass, dbname, host, port)
+}
+
 func OpenDB() kb.Database {
-	db, err := pgdb.New(os.Getenv("DATABASE"), os.Getenv("DOMAIN"))
+	params := RDS()
+	if params == "" {
+		params = os.Getenv("DATABASE")
+	}
+	db, err := pgdb.New(params)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -58,6 +59,9 @@ func main() {
 	}
 	if os.Getenv("CLIENTDIR") != "" {
 		*clientdir = os.Getenv("CLIENTDIR")
+	}
+	if rds := RDS(); rds != "" {
+		*database = rds
 	}
 	if os.Getenv("DATABASE") != "" {
 		*database = os.Getenv("DATABASE")
@@ -184,4 +188,19 @@ func MustLoadRules(filename string) *RuleSet {
 	}
 
 	return rs
+}
+
+func RDS() string {
+	user := os.Getenv("RDS_USERNAME")
+	pass := os.Getenv("RDS_PASSWORD")
+
+	dbname := os.Getenv("RDS_DB_NAME")
+	host := os.Getenv("RDS_HOSTNAME")
+	port := os.Getenv("RDS_PORT")
+
+	if user == "" || pass == "" || dbname == "" || host == "" || port == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s'", user, pass, dbname, host, port)
 }

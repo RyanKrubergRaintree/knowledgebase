@@ -31,12 +31,14 @@ func build() {
 
 	AddDir(".bin")
 
+	AddGlob("*.json")
 	AddGlob("Docker*")
 	AddGlob("LICENSE-*")
 
 	AddDir("assets")
 	AddDir("client")
 	AddDir("templates")
+
 }
 
 func main() {
