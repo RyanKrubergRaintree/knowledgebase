@@ -169,10 +169,6 @@ func (db Pages) Delete(id kb.Slug, version int) (err error) {
 	return err
 }
 
-func (db Pages) BatchReplace(pages map[kb.Slug]*kb.Page) error {
-	return ErrNotImplemented
-}
-
 func (db Pages) List() ([]kb.PageEntry, error) {
 	return db.pageEntries(`
 		WHERE OwnerID = $1

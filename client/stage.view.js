@@ -53,7 +53,6 @@ KB.Stage.View = (function(){
 				stage.canDestroy() ? a({
 					className:"mdi mdi-delete",
 					title:"Delete this page.",
-					style: { color: "#f88" },
 					onClick: this.deletePage
 				}) : null,
 				a({
