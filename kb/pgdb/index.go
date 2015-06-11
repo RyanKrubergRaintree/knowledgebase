@@ -41,7 +41,7 @@ func (db Index) Search(text string) ([]kb.PageEntry, error) {
 		AND	to_tsvector('english',
 				coalesce(cast(Data->'title' AS TEXT),'') || ' ' ||
 				coalesce(cast(Data->'story' AS TEXT), '')
-			) @@ to_tsquery('english', $2);
+			) @@ plainto_tsquery('english', $2);
 		`, db.UserID, text)
 }
 
