@@ -39,6 +39,10 @@ html, body {
 
 h1, h2, h3, h4 { font-weight: 400; }
 
+h2 { font-size: 1.2em; font-weight: 500; }
+h3 { font-size: 1.1em; font-weight: 500; }
+h4 { font-size: 1.1em; }
+
 #header {
 	position: fixed;
 	top: 0; left: 0; right: 0;
