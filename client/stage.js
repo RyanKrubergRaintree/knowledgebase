@@ -263,7 +263,7 @@ KB.Stage = (function(){
 
 			var xhr = new XMLHttpRequest();
 			xhr.withCredentials = true;
-			xhr.open('DELETE', jsonurl(this.url), true);
+			xhr.open('DELETE', this.url, true);
 
 			xhr.onload = this.destroyDone_.bind(this);
 			xhr.onerror = this.destroyError_.bind(this);

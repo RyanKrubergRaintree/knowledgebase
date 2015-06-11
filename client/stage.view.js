@@ -28,6 +28,16 @@ KB.Stage.View = (function(){
 			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
 		},
 
+		deletePage: function(){
+			var stage = this.props.stage;
+			var check = window.prompt("Delete this page?\nType the page link \""+ stage.link + "\" to confirm:");
+			if(check.trim() !== stage.link.trim()){
+				return;
+			}
+
+			stage.destroy();
+		},
+
 		render: function(){
 			var stage = this.props.stage;
 			var a = React.DOM.a;
@@ -39,6 +49,12 @@ KB.Stage.View = (function(){
 					style: { cursor: "move" },
 					draggable: true,
 					onDragStart: this.createFactory
+				}) : null,
+				stage.canDestroy() ? a({
+					className:"mdi mdi-delete",
+					title:"Delete this page.",
+					style: { color: "#f88" },
+					onClick: this.deletePage
 				}) : null,
 				a({
 					className:"mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),

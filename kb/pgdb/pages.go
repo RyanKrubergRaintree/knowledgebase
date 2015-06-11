@@ -145,11 +145,20 @@ func (db Pages) Edit(id kb.Slug, version int, action kb.Action) error {
 	return db.Overwrite(id, version, page)
 }
 
-func (db Pages) Delete(id kb.Slug, version int) error {
-	r, err := db.Exec(`
-		DELETE FROM Pages
-		WHERE Slug = $1 AND Version = $2
-	`, id, version)
+func (db Pages) Delete(id kb.Slug, version int) (err error) {
+	var r sql.Result
+	if version > 0 {
+		r, err = db.Exec(`
+			DELETE FROM Pages
+			WHERE Slug = $1 AND Version = $2
+		`, id, version)
+	} else {
+		r, err = db.Exec(`
+			DELETE FROM Pages
+			WHERE Slug = $1
+		`, id)
+	}
+
 	affected, _ := r.RowsAffected()
 	if err == sql.ErrNoRows || affected == 0 {
 		return kb.ErrConcurrentEdit
