@@ -99,9 +99,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Initializing DB")
 	if err := db.Initialize(); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("DB Initialization complete.")
 
 	// protect server with authentication
 	url := "http://" + *domain

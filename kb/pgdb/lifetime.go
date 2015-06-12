@@ -75,12 +75,48 @@ var setup = []string{`
 		Data     JSONB  NOT NULL,
 		Date     TIMESTAMP NOT NULL DEFAULT current_timestamp
 	)
+`, `
+-- this function updates Pages.Content Vector
+CREATE OR REPLACE FUNCTION Pages_Update() RETURNS trigger AS
+$$
+	DECLARE
+		Story TEXT;
+	BEGIN
+		SELECT INTO Story string_agg(Item.Content, ' ')
+			FROM (SELECT CAST(jsonb_array_elements(new.Data->'story')->'text' AS TEXT) AS Content) Item;
+		new.Content :=
+			setweight(to_tsvector('english', coalesce(CAST(new.Data->'title' AS TEXT),'')), 'A') ||
+			setweight(to_tsvector('english', coalesce(CAST(new.Data->'synopsis' AS TEXT),'')), 'B') ||
+			setweight(to_tsvector('english', story), 'C');
+		RETURN new;
+	END
+$$ LANGUAGE plpgsql VOLATILE
+COST 100;
+`, `
+DO $$
+BEGIN
+	BEGIN
+		ALTER TABLE Pages ADD COLUMN Content TSVECTOR;
+
+		CREATE TRIGGER Pages_UpdateTrigger
+		BEFORE INSERT OR UPDATE
+		ON Pages FOR EACH ROW EXECUTE PROCEDURE Pages_Update();
+
+		-- do a nop instruction to add all items
+		UPDATE Pages SET OwnerID = OwnerID;
+
+		CREATE INDEX PagesContentGIN ON Pages USING gin(Content);
+	EXCEPTION
+		WHEN duplicate_column THEN RAISE NOTICE 'Content column already exists.';
+	END;
+END;
+$$
 `}
 
 func (db *Database) Initialize() error {
 	for i, q := range setup {
 		if _, err := db.Exec(q); err != nil {
-			return fmt.Errorf("%d: %v", i, err)
+			return fmt.Errorf("%d: %v\n-QUERY-\n%v\n--\n", i, err, q)
 		}
 	}
 	return nil

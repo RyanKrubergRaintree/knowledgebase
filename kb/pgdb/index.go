@@ -38,10 +38,8 @@ func (db Index) List() ([]kb.PageEntry, error) {
 func (db Index) Search(text string) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
 		WHERE `+pageVisibleToUser+`
-		AND	to_tsvector('english',
-				coalesce(cast(Data->'title' AS TEXT),'') || ' ' ||
-				coalesce(cast(Data->'story' AS TEXT), '')
-			) @@ plainto_tsquery('english', $2);
+			AND	Content @@ plainto_tsquery('english', $2)
+		ORDER BY ts_rank(Content, plainto_tsquery('english', $2)) DESC
 		`, db.UserID, text)
 }
 
