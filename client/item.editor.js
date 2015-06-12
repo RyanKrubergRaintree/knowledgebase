@@ -79,38 +79,41 @@ KB.Item.Editor = React.createClass({
 			node = this.refs.text.getDOMNode();
 
 		if((ev.ctrlKey) && (ev.keyCode == 13)){
-			switch(item.type){
-			case "paragraph", "html":
-				var pre = node.value.substr(0, node.selectionStart),
-					post = node.value.substr(node.selectionStart);
 
-				if(pre == ""){
-					ev.preventDefault();
-					return;
-				}
+			var pre = node.value.substr(0, node.selectionStart),
+				post = node.value.substr(node.selectionStart);
 
-				if(pre != node.value){
-					node.value = pre;
-					this.commit();
-					this.stopEditing();
-				}
-
-				var adding = {
-					type: "paragraph",
-					id: GenerateID(),
-					text: post
-				};
-
-				stage.patch({
-					type: 'add',
-					id: adding.id,
-					after: item.id,
-					item: adding
-				});
-
-				stage.editing.start(adding.id);
+			if(pre == ""){
 				ev.preventDefault();
+				return;
 			}
+
+			if(pre != node.value){
+				node.value = pre;
+				this.commit();
+				this.stopEditing();
+			}
+
+			var continueWith = {
+				"paragraph": "paragraph",
+				"html": "html"
+			};
+
+			var adding = {
+				type: continueWith[item.type] || "paragraph",
+				id: GenerateID(),
+				text: post
+			};
+
+			stage.patch({
+				type: 'add',
+				id: adding.id,
+				after: item.id,
+				item: adding
+			});
+
+			stage.editing.start(adding.id);
+			ev.preventDefault();
 		}
 	},
 	render: function(){
