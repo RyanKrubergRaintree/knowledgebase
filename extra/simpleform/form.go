@@ -18,10 +18,10 @@ func Option(id string, values []string) Item {
 	}
 }
 
-func Button(method, caption string) Item {
+func Button(action, caption string) Item {
 	return Item{
 		"type":    "button",
-		"method":  method,
+		"action":  action,
 		"caption": caption,
 	}
 }

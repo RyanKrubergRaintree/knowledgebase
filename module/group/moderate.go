@@ -24,50 +24,55 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch r.Method {
-	case "ADD-USER", "REMOVE-USER",
-		"ADD-COMMUNITY", "REMOVE-COMMUNITY":
-
-		name := strings.TrimSpace(r.FormValue("name"))
-		if name == "" {
-			http.Error(w, "Name not specified.", http.StatusBadRequest)
-			return
-		}
-
-		id := kb.Slugify(name)
-		var err error
-		switch r.Method {
-		case "ADD-USER":
-			err = context.Access().AddUser(groupID, id)
-		case "REMOVE-USER":
-			err = context.Access().RemoveUser(groupID, id)
-		case "ADD-COMMUNITY":
-			rights := strings.TrimSpace(r.FormValue("rights"))
-			if rights == "" {
-				http.Error(w, "Rights not specified.", http.StatusBadRequest)
+	if r.Method == "PATCH" {
+		action := r.Header.Get("action")
+		switch action {
+		case "add-user", "remove-user",
+			"add-community", "remove-community":
+			name := strings.TrimSpace(r.FormValue("name"))
+			if name == "" {
+				http.Error(w, "Name not specified.", http.StatusBadRequest)
 				return
 			}
-			err = context.Access().CommunityAdd(groupID, id, kb.Rights(rights))
-		case "REMOVE-COMMUNITY":
-			err = context.Access().CommunityRemove(groupID, id)
-		}
-		if err != nil {
-			kb.WriteResult(w, err)
+
+			id := kb.Slugify(name)
+			var err error
+			switch action {
+			case "add-user":
+				err = context.Access().AddUser(groupID, id)
+			case "remove-user":
+				err = context.Access().RemoveUser(groupID, id)
+			case "add-community":
+				rights := strings.TrimSpace(r.FormValue("rights"))
+				if rights == "" {
+					http.Error(w, "Rights not specified.", http.StatusBadRequest)
+					return
+				}
+				err = context.Access().CommunityAdd(groupID, id, kb.Rights(rights))
+			case "remove-community":
+				err = context.Access().CommunityRemove(groupID, id)
+			}
+			if err != nil {
+				kb.WriteResult(w, err)
+				return
+			}
+
+			switch r.Method {
+			case "add-user":
+				w.Write([]byte("user added"))
+			case "remove-user":
+				w.Write([]byte("user removed"))
+			case "add-community":
+				w.Write([]byte("community added"))
+			case "remove-community":
+				w.Write([]byte("community removed"))
+			}
+
+			return
+		default:
+			http.Error(w, "Invalid action "+action+" specified", http.StatusBadRequest)
 			return
 		}
-
-		switch r.Method {
-		case "ADD-USER":
-			w.Write([]byte("user added"))
-		case "REMOVE-USER":
-			w.Write([]byte("user removed"))
-		case "ADD-COMMUNITY":
-			w.Write([]byte("community added"))
-		case "REMOVE-COMMUNITY":
-			w.Write([]byte("community removed"))
-		}
-
-		return
 	}
 
 	members, err := context.Access().List(groupID)
@@ -97,8 +102,8 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 	page.Story.Append(simpleform.New(
 		"/"+string(page.Slug), "",
 		simpleform.Field("name", "Name"),
-		simpleform.Button("ADD-USER", "Add"),
-		simpleform.Button("REMOVE-USER", "Remove"),
+		simpleform.Button("add-user", "Add"),
+		simpleform.Button("remove-user", "Remove"),
 	))
 
 	el := `<ul class="tight">`
@@ -117,8 +122,8 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 		"",
 		simpleform.Field("name", "Name"),
 		simpleform.Option("rights", []string{string(kb.Reader), string(kb.Editor), string(kb.Moderator)}),
-		simpleform.Button("ADD-COMMUNITY", "Add"),
-		simpleform.Button("REMOVE-COMMUNITY", "Remove"),
+		simpleform.Button("add-community", "Add"),
+		simpleform.Button("remove-community", "Remove"),
 	))
 
 	el = `<ul class="tight">`

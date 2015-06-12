@@ -35,14 +35,14 @@ KB.Item.Content['simple-form'] = React.createClass({
 
 		var url = this.props.item.url;
 
-		var method = GetDataAttribute(ev.currentTarget, "method") || "PUT";
-
 		var xhr = new XMLHttpRequest();
 		xhr.withCredentials = true;
 		xhr.onload = this.done;
 		xhr.onerror = this.errored;
 
-		xhr.open(method, url, true);
+		xhr.open("PATCH", url, true);
+
+		xhr.setRequestHeader("action", GetDataAttribute(ev.currentTarget, "action"));
 
 		var data = new FormData();
 		var items = this.props.item.items || [];
@@ -88,7 +88,7 @@ KB.Item.Content['simple-form'] = React.createClass({
 				case "button":
 					return React.DOM.button({
 						key: i,
-						"data-method": item.method,
+						"data-action": item.action,
 						onClick: self.click
 					}, item.caption);
 				case "option":
