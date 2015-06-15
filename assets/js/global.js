@@ -1,11 +1,7 @@
 'use strict';
 
 this.DeepClone = function DeepClone(obj){
-	var copy = JSON.parse(JSON.stringify(obj));
-	copy.constructor = obj.constructor;
-	copy.prototype = obj.prototype;
-	copy.__proto__ = obj.__proto__;
-	return copy;
+	return JSON.parse(JSON.stringify(obj));
 };
 
 this.ParseJSON = function ParseJSON(data){

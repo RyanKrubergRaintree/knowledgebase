@@ -49,7 +49,6 @@ KB.Item.Content['simple-form'] = React.createClass({
 		var self = this;
 		items.map(function(item){
 			var id = item.id || item.label;
-			console.log(self, id);
 			var node = self.refs[id];
 			if(typeof node !== "undefined"){
 				var value = node.getDOMNode().value;

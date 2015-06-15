@@ -1,5 +1,6 @@
 import "convert.js";
 import "resolve.js";
+import "util/Sanitize.js";
 import "item.js";
 import "item.editor.js";
 
@@ -191,13 +192,13 @@ KB.Item.Content['paragraph'] = React.createClass({
 			return React.DOM.div({
 				className: 'item-content content-paragraph',
 			}, paragraphs.map(function(p, i){
-				return React.DOM.p({key: i, dangerouslySetInnerHTML: {__html: p}});
+				return React.DOM.p({key: i, dangerouslySetInnerHTML: {__html: Sanitize(p)}});
 			}));
 		} else {
 			return React.DOM.p({
 				className: 'item-content content-paragraph',
 				dangerouslySetInnerHTML: {
-					__html: paragraphs[0]
+					__html: Sanitize(paragraphs[0])
 				}
 			});
 		}
@@ -211,7 +212,7 @@ KB.Item.Content['html'] = React.createClass({
 		return React.DOM.div({
 			className: 'item-content content-html',
 			dangerouslySetInnerHTML: {
-				__html: ResolveHTML(stage, this.props.item.text)
+				__html: Sanitize(ResolveHTML(stage, this.props.item.text))
 			}
 		});
 	}
