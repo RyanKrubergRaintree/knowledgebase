@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -132,6 +133,9 @@ func main() {
 		server.AddModule(dita.New("Dita", *ditamap, server))
 	}
 
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(*assetsdir, "ico", "favicon.ico"))
+	})
 	http.Handle("/", server)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
