@@ -35,6 +35,7 @@ func (db Pages) Create(page *kb.Page) error {
 		return kb.ErrInvalidSlug
 	}
 
+	page.Synopsis = kb.ExtractSynopsis(page)
 	tags := kb.ExtractTags(page)
 	tagSlugs := kb.SlugifyTags(tags)
 
@@ -94,6 +95,7 @@ func (db Pages) Overwrite(id kb.Slug, version int, page *kb.Page) error {
 		return fmt.Errorf("mismatching page.Slug (%s) and group (%s)", page.Slug, db.GroupID)
 	}
 
+	page.Synopsis = kb.ExtractSynopsis(page)
 	tags := kb.ExtractTags(page)
 	tagSlugs := kb.SlugifyTags(tags)
 	//TODO: extract/update synopsis here
