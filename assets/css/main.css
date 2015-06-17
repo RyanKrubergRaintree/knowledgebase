@@ -188,4 +188,6 @@ h4 { font-size: 1.1em; }
 	left: 0; right: 0; bottom: 0;
 	background: #fff;
 	transition: top 0.5s ease-in-out;
+
+	background: url("/assets/img/background.png") center bottom no-repeat;
 }
