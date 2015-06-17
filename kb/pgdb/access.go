@@ -2,12 +2,26 @@ package pgdb
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 type Access struct{ Context }
+
+func (db Access) VerifyUser(user kb.User) error {
+	if !db.BoolQuery(`
+		SELECT FROM Users
+		WHERE ID = $1
+		  AND AuthID = $2
+		  AND AuthProvider = $3
+		  AND Email = $4`,
+		user.ID, user.AuthID, user.AuthProvider, user.Email) {
+		return errors.New("Invalid user.")
+	}
+	return nil
+}
 
 func (db Access) IsAdmin(user kb.Slug) bool {
 	return db.BoolQuery(`SELECT FROM Users WHERE ID = $1 AND Admin`, user)

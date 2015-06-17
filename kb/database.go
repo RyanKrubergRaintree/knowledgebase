@@ -65,6 +65,8 @@ func (r Rights) Level() int {
 }
 
 type Access interface {
+	VerifyUser(user User) error
+
 	IsAdmin(user Slug) bool
 	SetAdmin(user Slug, isAdmin bool) error
 

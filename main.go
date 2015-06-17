@@ -161,13 +161,6 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		}
 	}
 
-	for _, admin := range rs.Admins {
-		if user.ID == admin {
-			createUserIfNeeded()
-			context.Access().SetAdmin(user.ID, true)
-		}
-	}
-
 	for rule, groups := range rs.Email {
 		matched, err := regexp.MatchString(rule, user.Email)
 		if err != nil {
@@ -180,7 +173,14 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 			}
 		}
 	}
-	return nil
+
+	for _, admin := range rs.Admins {
+		if user.ID == admin {
+			context.Access().SetAdmin(user.ID, true)
+		}
+	}
+
+	return context.Access().VerifyUser(user)
 }
 
 func MustLoadRules(filename string) *RuleSet {
