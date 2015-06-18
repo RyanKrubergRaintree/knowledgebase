@@ -59,6 +59,25 @@ KB.Page.View = (function(){
 	var Page = React.createClass({
 		displayName: "Page",
 
+		createReference: function(ev){
+			var stage = this.props.stage,
+				page = stage.page;
+			var item = {
+				id: GenerateID(),
+				type: "reference",
+				url: stage.url,
+				title: page.title,
+				text: page.synopsis
+			};
+
+			ev.dataTransfer.effectAllowed = 'copy';
+			var data = {
+				item: item
+			};
+
+			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+		},
+
 		dropEffectFor: function(ev){
 			if(ev.dataTransfer.effectAllowed === 'copy'){
 				return 'copy';
@@ -164,7 +183,19 @@ KB.Page.View = (function(){
 		},
 		render: function(){
 			var stage = this.props.stage,
+				owner = Convert.LinkToOwner(stage.link || stage.slug || stage.url || ""),
 				page = this.props.page;
+
+			var status = undefined;
+			if (stage.state === "loading"){
+				status = React.DOM.div({className: "page-loading"});
+			} else if (stage.state !== "loaded") {
+				console.log(stage.state)
+				status = React.DOM.div({className: "page-error"},
+					React.DOM.h2(null, stage.lastStatusText),
+					React.DOM.p(null, stage.lastError)
+				)
+			}
 
 			return React.DOM.div(
 				{
@@ -175,7 +206,14 @@ KB.Page.View = (function(){
 					onDrop: this.dragDrop,
 					onDragLeave: this.dragLeave
 				},
-				React.DOM.h1(null, page.title),
+				React.DOM.h2({ className: "page-owner" }, owner),
+				React.DOM.h1({
+					title: "Drag to create a page reference.",
+					draggable: true,
+					onDragStart: this.createReference,
+					style: {cursor: "move"}
+				}, page.title),
+				status,
 				React.createElement(Story, {
 					ref: "story",
 

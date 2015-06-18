@@ -4,6 +4,23 @@ this.Convert = {};
 (function(Convert){
 	"use strict";
 
+	function trimProtocol(link){
+		if(link.indexOf("https://", link) === 0){
+			return link.substr(6).trim();
+		} else if(link.indexOf("http://", link) === 0){
+			return link.substr(5).trim();
+		}
+		return link.trim();
+	}
+
+	function trimLeadingSlashes(link){
+		// remove prefix "/"
+		while(link[0] == "/") {
+			link = link.substr(1);
+		}
+		return link;
+	}
+
 	// There are several possible links
 	// "http://kb.example.com/example"
 	// "https://kb.example.com/example"
@@ -11,13 +28,7 @@ this.Convert = {};
 	// "/kb:example" - rooted local URL
 	// "kb:Example" - local URL
 	Convert.LinkToReference = function(link){
-		if(link.indexOf("https://", link) === 0){
-			link = link.substr(6);
-		} else if(link.indexOf("http://", link) === 0){
-			link = link.substr(5);
-		}
-
-		link = link.trim();
+		link = trimProtocol(link);
 		// External site:
 		// "//kb.example.com/example"
 		if((link[0] == "/") && (link[1] == "/") ) {
@@ -28,12 +39,8 @@ this.Convert = {};
 			};
 		}
 
-		// remove prefix "/"
-		if(link[0] == "/") {
-			link = link.substr(1);
-		}
-
-		var i = link.lastIndexOf(":")
+		link = trimLeadingSlashes(link);
+		var i = link.indexOf(":")
 		var owner = i >= 0 ? link.substr(0,i): "";
 
 		return {
@@ -49,10 +56,21 @@ this.Convert = {};
 	};
 
 	Convert.LinkToTitle = function(link){
-		var i = Math.max(link.lastIndexOf("/"), link.lastIndexOf(":"));
+		link = trimProtocol(link);
+		link = trimLeadingSlashes(link);
+		var i = Math.max(link.lastIndexOf("/"), link.indexOf(":"));
 		link = link.substr(i + 1);
 		return link;
 	};
+
+	Convert.LinkToOwner = function(link){
+		link = Convert.URLToReadable(link);
+		link = trimProtocol(link);
+		link = trimLeadingSlashes(link);
+		var i = link.indexOf(":");
+		link = link.substr(0, i);
+		return link.trim().toLowerCase();
+	}
 
 	Convert.URLToReadable = function(url){
 		var loc = Convert.URLToLocation(url);

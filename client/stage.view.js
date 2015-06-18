@@ -69,67 +69,6 @@ KB.Stage.View = (function(){
 		}
 	});
 
-	var StageInfo = React.createClass({
-		displayName: "StageInfo",
-		createReference: function(ev){
-			var stage = this.props.stage,
-				page = stage.page;
-			var item = {
-				id: GenerateID(),
-				type: "reference",
-				url: stage.url,
-				title: page.title,
-				text: page.synopsis
-			};
-
-			ev.dataTransfer.effectAllowed = 'copy';
-			var data = {
-				item: item
-			};
-
-			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
-		},
-		render: function(){
-			var table = React.DOM.table,
-			 	tr = React.DOM.tr,
-			 	td = React.DOM.td,
-			 	stage = this.props.stage;
-
-			var error = null;
-			if(stage.state == "error" && (stage.lastError != "")){
-				error = table(
-					{className: "stage-error"},
-					tr(null, td(null, stage.lastStatusText)),
-					tr(null, td(null, stage.lastError))
-				);
-			}
-
-			return React.DOM.div(
-				null,
-				table({className:"stage-info"},
-					tr({
-						onDragStart: this.createReference,
-						draggable: true,
-						style: { cursor: "move" }
-					}, td(null, "Link"),  td(null, stage.link)),
-					tr(null, td(null, "State"), td(null, stage.state))
-				),
-				error
-			);
-		}
-	});
-
-	function extractGroup(link) {
-		if(link == null){
-			return "";
-		}
-		var i = link.indexOf(":")
-		if(i >= 0) {
-			return link.substr(0, i);
-		}
-		return "";
-	}
-
 	var NewPage = React.createClass({
 		displayName: "NewPage",
 		tryCreate: function(ev){
@@ -146,7 +85,7 @@ KB.Stage.View = (function(){
 		getInitialState: function(){
 			return {
 				title: this.props.stage.title,
-				owner: extractGroup(this.props.stage.link) || "",
+				owner: Convert.LinkToOwner(this.props.stage.link) || "",
 				groups: []
 			};
 		},
@@ -278,7 +217,6 @@ KB.Stage.View = (function(){
 					}),
 					React.DOM.div(
 						{ className:"stage-scroll round-scrollbar"},
-						React.createElement(StageInfo, this.props),
 						React.createElement(NewPage, {
 							stage: this.props.stage
 						})
@@ -299,7 +237,6 @@ KB.Stage.View = (function(){
 				}),
 				React.DOM.div(
 					{ className:"stage-scroll round-scrollbar"},
-					React.createElement(StageInfo, this.props),
 					React.createElement(KB.Page.View, {
 						stage: this.props.stage,
 						page: this.props.stage.page,
