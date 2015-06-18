@@ -26,8 +26,8 @@ KB.Site = (function(){
 				this.lastStageId = undefined;
 			}
 			this.lastStageId = Lineup.open({
-				url: "/page:search?q="+query,
-				title: 'Search "' + query + '"',
+				url: "/search:search?q="+query,
+				title: '"' + query + '"',
 				insteadOf: this.lastStageId
 			});
 			ev.preventDefault();

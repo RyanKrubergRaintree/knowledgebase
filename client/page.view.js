@@ -190,7 +190,6 @@ KB.Page.View = (function(){
 			if (stage.state === "loading"){
 				status = React.DOM.div({className: "page-loading"});
 			} else if (stage.state !== "loaded") {
-				console.log(stage.state)
 				status = React.DOM.div({className: "page-error"},
 					React.DOM.h2(null, stage.lastStatusText),
 					React.DOM.p(null, stage.lastError)

@@ -1,4 +1,4 @@
-package page
+package search
 
 import (
 	"net/http"
@@ -25,28 +25,19 @@ func New(server *kb.Server) *Module {
 
 func (mod *Module) Info() kb.Group {
 	return kb.Group{
-		ID:          "page",
-		Name:        "Page",
+		ID:          "search",
+		Name:        "Search",
 		Public:      true,
-		Description: "Displays page listing and information.",
+		Description: "For searching pages.",
 	}
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
-	return []kb.PageEntry{{
-		Slug:     "page:pages",
-		Title:    "Pages",
-		Synopsis: "List of all pages.",
-	}, {
-		Slug:     "page:recent-changes",
-		Title:    "Recent Changes",
-		Synopsis: "Shows recently changed pages.",
-	}}
+	return []kb.PageEntry{}
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/page:pages", mod.pages).Methods("GET")
-	mod.router.HandleFunc("/page:recent-changes", mod.recentChanges).Methods("GET")
+	mod.router.HandleFunc("/search:search", mod.search).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -74,21 +65,22 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	page.WriteResponse(w)
 }
 
-func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
+func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
 
-	entries, err := index.RecentChanges()
+	q := r.URL.Query().Get("q")
+	entries, err := index.Search(q)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	page := &kb.Page{
-		Slug:  "page:recent-changes",
-		Title: "Recent Changes",
+		Slug:  "search:search",
+		Title: "Search \"" + q + "\"",
 		Story: kb.StoryFromEntries(entries),
 	}
 	page.WriteResponse(w)

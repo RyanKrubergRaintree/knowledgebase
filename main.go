@@ -22,6 +22,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/module/dita"
 	"github.com/raintreeinc/knowledgebase/module/group"
 	"github.com/raintreeinc/knowledgebase/module/page"
+	"github.com/raintreeinc/knowledgebase/module/search"
 	"github.com/raintreeinc/knowledgebase/module/tag"
 	"github.com/raintreeinc/knowledgebase/module/user"
 
@@ -126,6 +127,7 @@ func main() {
 	server.AddModule(admin.New(server))
 	server.AddModule(group.New(server))
 	server.AddModule(page.New(server))
+	server.AddModule(search.New(server))
 	server.AddModule(tag.New(server))
 	server.AddModule(user.New(server))
 

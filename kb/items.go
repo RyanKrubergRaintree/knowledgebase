@@ -1,10 +1,7 @@
 // This package implements common federated wiki types
 package kb
 
-import (
-	"strings"
-	"unicode"
-)
+import "strings"
 
 func Paragraph(text string) Item {
 	return Item{
@@ -93,8 +90,12 @@ func limitWords(text string, limit int) string {
 		words = words[:limit]
 	}
 	r := strings.Join(words, " ")
-	if len(r) > 0 && unicode.IsLetter(rune(r[len(r)-1])) {
-		r += "..."
+
+	if len(r) > 0 {
+		ch := r[len(r)-1]
+		if ch != '.' && ch != '?' && ch != '!' {
+			r += "..."
+		}
 	}
 	return r
 }
@@ -104,7 +105,7 @@ func ExtractSynopsis(page *Page) string {
 		if item.Type() == "paragraph" {
 			text := item.Val("text")
 			if text != "" {
-				return limitWords(text, 30)
+				return limitWords(text, 50)
 			}
 		}
 	}
