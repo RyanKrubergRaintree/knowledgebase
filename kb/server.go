@@ -103,10 +103,12 @@ func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool)
 	if strings.HasPrefix(r.URL.Path, "/system/auth/") {
 		switch r.URL.Path {
 		case "/system/auth/login":
+			server.Sessions().ClearUser(w, r)
 			server.Present(w, r, "login.html", map[string]interface{}{
 				"Logins": server.Auth.Logins(),
 			})
 		case "/system/auth/forbidden":
+			server.Sessions().ClearUser(w, r)
 			server.Present(w, r, "forbidden.html", nil)
 		case "/system/auth/logout":
 			server.Sessions().ClearUser(w, r)

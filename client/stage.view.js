@@ -94,7 +94,7 @@ KB.Stage.View = (function(){
 			var xhr = ev.target
 			if(xhr.status == 200){
 				var info = JSON.parse(ev.target.responseText);
-				this.setState({groups: info.groups});
+				this.setState({groups: info.groups || []});
 			}
 		},
 

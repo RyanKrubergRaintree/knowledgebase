@@ -58,6 +58,8 @@ func (ctx Context) Access() kb.Access     { return Access{ctx} }
 func (ctx Context) Users() kb.Users       { return Users{ctx} }
 func (ctx Context) Groups() kb.Groups     { return Groups{ctx} }
 
+func (ctx Context) GuestLogin() kb.GuestLogin { return GuestLogin{ctx} }
+
 func (ctx Context) Index(user kb.Slug) kb.Index  { return Index{ctx, user} }
 func (ctx Context) Pages(group kb.Slug) kb.Pages { return Pages{ctx, group} }
 

@@ -111,6 +111,27 @@ BEGIN
 	END;
 END;
 $$
+`, `
+	CREATE TABLE IF NOT EXISTS
+	GuestLogin (
+		AuthID TEXT NOT NULL,
+		Name   TEXT NOT NULL,
+		Email  TEXT NOT NULL,
+		Salt   BYTEA NOT NULL,
+		DK     BYTEA NOT NULL,
+
+		CONSTRAINT GuestLogin_PKEY PRIMARY KEY (Name)
+	)
+`, `
+DO $$
+BEGIN
+	BEGIN
+		ALTER TABLE Users ADD COLUMN MaxAccess Rights NOT NULL DEFAULT 'moderator';
+	EXCEPTION
+		WHEN duplicate_column THEN RAISE NOTICE 'MaxAccess column already exists.';
+	END;
+END;
+$$
 `}
 
 func (db *Database) Initialize() error {

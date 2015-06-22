@@ -112,13 +112,16 @@ func main() {
 	url := "http://" + *domain
 	auth.Register(os.Getenv("APPKEY"), url, "/system/auth", auth.ClientsFromEnv())
 
+	sec := auth.New()
+	sec.Alternate["guest"] = auth.NewDB(db)
+
 	// create server
 	server := kb.NewServer(kb.ServerInfo{
 		Domain:     *domain,
 		ShortTitle: "KB",
 		Title:      "Knowledge Base",
 		Company:    "Raintree Systems Inc.",
-	}, auth.New(), client, db)
+	}, sec, client, db)
 
 	ruleset := MustLoadRules(*rules)
 	server.Rules = ruleset
@@ -143,8 +146,9 @@ func main() {
 }
 
 type RuleSet struct {
-	Admins []kb.Slug
-	Email  map[string][]kb.Slug `json:"email"`
+	Admins         []kb.Slug
+	ByEmail        map[string][]kb.Slug `json:"byEmail"`
+	ByAuthProvider map[string][]kb.Slug `json:"byAuthProvider"`
 }
 
 func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
@@ -163,12 +167,21 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		}
 	}
 
-	for rule, groups := range rs.Email {
+	for rule, groups := range rs.ByEmail {
 		matched, err := regexp.MatchString(rule, user.Email)
 		if err != nil {
 			log.Println(err)
 		}
 		if matched && err == nil {
+			createUserIfNeeded()
+			for _, group := range groups {
+				context.Access().AddUser(group, user.ID)
+			}
+		}
+	}
+
+	for prov, groups := range rs.ByAuthProvider {
+		if prov == user.AuthProvider {
 			createUserIfNeeded()
 			for _, group := range groups {
 				context.Access().AddUser(group, user.ID)

@@ -80,12 +80,47 @@ func (db Index) ByTag(tag kb.Slug) ([]kb.PageEntry, error) {
 	`, db.UserID, tagSlugs)
 }
 
-func (db Index) Groups(min kb.Rights) (groups []kb.Group, err error) {
+func (db Index) readable() (groups []kb.Group, err error) {
 	rows, err := db.Query(`
 		SELECT  ID, OwnerID, Name, Public, Description
 		FROM    Groups
 		WHERE Public
 		   OR ID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
+		   OR OwnerID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
+		   OR ID IN (
+				SELECT Community.GroupID FROM Community
+				JOIN  Membership ON Community.MemberID = Membership.GroupID
+				WHERE Membership.UserID = $1
+				  AND Community.Access >= 'reader'
+			)
+	`, db.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var group kb.Group
+		rows.Scan(&group.ID, &group.OwnerID, &group.Name, &group.Public, &group.Description)
+		groups = append(groups, group)
+	}
+	return groups, nil
+}
+
+func (db Index) Groups(min kb.Rights) (groups []kb.Group, err error) {
+	if min == kb.Reader {
+		return db.readable()
+	}
+
+	user, err := db.Users().ByID(db.UserID)
+	if err != nil || user.MaxAccess.Level() < min.Level() {
+		return []kb.Group{}, err
+	}
+
+	rows, err := db.Query(`
+		SELECT  ID, OwnerID, Name, Public, Description
+		FROM    Groups
+		WHERE ID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
 		   OR OwnerID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
 		   OR ID IN (
 				SELECT Community.GroupID FROM Community

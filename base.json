@@ -41,11 +41,18 @@
 			"Name": "KB",
 			"Public": true,
 			"Description": "Information about Knowledge Base"
+		},
+		{
+			"ID": "guests",
+			"OwnerID": "raintree",
+			"Name": "Guests",
+			"Public": false,
+			"Description": "Guest login accounts"
 		}
 	],
 	"community": [
 		{"GroupID": "qa", "MemberID": "raintree", "Rights": "reader"},
 		{"GroupID": "engineering", "MemberID": "raintree", "Rights": "reader"},
-		{"GroupID": "kb", "MemberID": "raintree", "Rights": "editor"}
+		{"GroupID": "kb", "MemberID": "raintree", "Rights": "editor"},
 	]
 }

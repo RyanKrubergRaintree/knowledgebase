@@ -20,5 +20,21 @@
 			<a href="{{.URL}}" class='button'><span class="login-icon {{.Icon}}"></span>{{.Name}}</a>
 			{{ end }}
 		</div>
+
+		<form id="logins" action="/system/auth/callback/guest" method="POST">
+			<h2>Guest:</h2>
+			<table>
+				<tr>
+					<td><label for="username">Username:</label></td>
+					<td><input type="text" name="username"></td>
+				</tr>
+				<tr>
+					<td><label for="password">Password:</label></td>
+					<td><input type="password" name="password"></td>
+				</tr>
+			</table>
+			<br>
+			<input type="submit" value="Login">
+		</form>
 	</div>
 </body>

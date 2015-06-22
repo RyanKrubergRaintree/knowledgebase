@@ -40,24 +40,27 @@ func (db Access) SetAdmin(user kb.Slug, isAdmin bool) error {
 }
 
 func (db Access) Rights(group, user kb.Slug) kb.Rights {
-	// If a person is a direct member of the owner group, then he is a moderator
-	if db.BoolQuery(`
-		SELECT FROM Membership
+	var rights string
+
+	// If a person is a direct member of the owner group,
+	// then he has MaxAccess possible
+	err := db.QueryRow(`
+		SELECT Users.MaxAccess FROM Membership
 		JOIN Groups ON Membership.GroupID = Groups.OwnerID
+		JOIN Users ON Membership.UserID = Users.ID
 		WHERE Groups.ID = $1 AND UserID = $2
-	`, group, user) {
-		return kb.Moderator
+	`, group, user).Scan(&rights)
+	if err == nil {
+		return kb.Rights(rights)
 	}
 
-	row := db.QueryRow(`
-		SELECT Access FROM Community
-		JOIN Membership on Community.MemberID = Membership.GroupID
+	err = db.QueryRow(`
+		SELECT LEAST(Access, Users.MaxAccess) FROM Community
+		JOIN Membership ON Community.MemberID = Membership.GroupID
+		JOIN Users ON Users.ID = Membership.UserID
 		WHERE Community.GroupID = $1 AND Membership.UserID = $2
 		ORDER BY ACCESS DESC
-	`, group, user)
-
-	var rights string
-	err := row.Scan(&rights)
+	`, group, user).Scan(&rights)
 	if err == nil {
 		return kb.Rights(rights)
 	}
@@ -118,7 +121,7 @@ func (db Access) CommunityRemove(group, member kb.Slug) error {
 //TODO: fix this for OwnerID, GroupID
 func (db Access) List(group kb.Slug) (members []kb.Member, err error) {
 	rows, err := db.Query(`
-	SELECT Membership.UserID, Users.Name, False, 'moderator'
+	SELECT Membership.UserID, Users.Name, False, Min('moderator', Users.Restricted)
 		FROM Membership
 		JOIN Users ON Membership.UserID = Users.ID
 		WHERE Membership.GroupID = $1

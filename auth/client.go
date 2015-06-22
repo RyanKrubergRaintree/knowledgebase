@@ -23,9 +23,9 @@ var authPath = ""
 
 var _ kb.Auth = &Auth{}
 
-type Auth struct{}
+type Auth struct{ Alternate map[string]kb.Auth }
 
-func New() *Auth { return &Auth{} }
+func New() *Auth { return &Auth{make(map[string]kb.Auth)} }
 
 func setProvider(r *http.Request, provider string) {
 	q := r.URL.Query()
@@ -34,12 +34,22 @@ func setProvider(r *http.Request, provider string) {
 }
 
 func (auth *Auth) Start(w http.ResponseWriter, r *http.Request) {
-	setProvider(r, path.Base(r.URL.Path))
+	provider := path.Base(r.URL.Path)
+	if alt, ok := auth.Alternate[provider]; ok {
+		alt.Start(w, r)
+		return
+	}
+
+	setProvider(r, provider)
 	gothic.BeginAuthHandler(w, r)
 }
 
 func (auth *Auth) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) {
 	provider := path.Base(r.URL.Path)
+	if alt, ok := auth.Alternate[provider]; ok {
+		return alt.Finish(w, r)
+	}
+
 	setProvider(r, provider)
 
 	user, err := gothic.CompleteUserAuth(w, r)

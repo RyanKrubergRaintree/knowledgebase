@@ -33,6 +33,8 @@ type Context interface {
 	Groups() Groups
 	Index(user Slug) Index
 	Pages(group Slug) Pages
+
+	GuestLogin() GuestLogin
 }
 
 type Sessions interface {
@@ -82,6 +84,11 @@ type Access interface {
 	List(group Slug) ([]Member, error)
 }
 
+type GuestLogin interface {
+	Add(name, email, password string) error
+	Verify(name, password string) (User, error)
+}
+
 type Users interface {
 	ByID(id Slug) (User, error)
 	Create(user User) error
@@ -128,11 +135,12 @@ type Index interface {
 func init() { gob.Register(User{}) }
 
 type User struct {
-	ID      Slug
-	Email   string
-	Name    string
-	Company string
-	Admin   bool
+	ID        Slug
+	Email     string
+	Name      string
+	Company   string
+	Admin     bool
+	MaxAccess Rights
 
 	AuthID       string
 	AuthProvider string

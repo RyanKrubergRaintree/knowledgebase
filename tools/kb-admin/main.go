@@ -54,6 +54,7 @@ func main() {
 	for _, cmd := range cmds.List {
 		if cmd.Name == cmdname {
 			fs := flag.NewFlagSet(cmdname, flag.ExitOnError)
+			fs.Usage = fs.PrintDefaults
 			cmd.Run(OpenDB(), fs, args[1:])
 			return
 		}
