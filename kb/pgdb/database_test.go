@@ -93,36 +93,42 @@ func TestIntegration(t *testing.T) {
 
 	// Managing users:
 	log("Creating a reader user", context.Users().Create(kb.User{
-		ID:   "reader",
-		Name: "Reader",
+		ID:        "reader",
+		Name:      "Reader",
+		MaxAccess: kb.Moderator,
 	}))
 
 	log("Creating an editor user", context.Users().Create(kb.User{
-		ID:    "editor",
-		Name:  "Editor",
-		Email: "editor@example.com",
+		ID:        "editor",
+		Name:      "Editor",
+		Email:     "editor@example.com",
+		MaxAccess: kb.Moderator,
 	}))
-	assert("Duplicate user", context.Users().Create(kb.User{ID: "editor"}) == kb.ErrUserExists)
+	assert("Duplicate user", context.Users().Create(kb.User{ID: "editor", MaxAccess: kb.Moderator}) == kb.ErrUserExists)
 
 	log("Creating an moderator user", context.Users().Create(kb.User{
-		ID:   "moderator",
-		Name: "Moderator",
+		ID:        "moderator",
+		Name:      "Moderator",
+		MaxAccess: kb.Moderator,
 	}))
 
 	log("Creating an admin user", context.Users().Create(kb.User{
-		ID:    "admin",
-		Name:  "Admin",
-		Admin: true,
+		ID:        "admin",
+		Name:      "Admin",
+		Admin:     true,
+		MaxAccess: kb.Moderator,
 	}))
 
 	log("Creating a dynamic user", context.Users().Create(kb.User{
-		ID:   "dynamic",
-		Name: "Dynamic",
+		ID:        "dynamic",
+		Name:      "Dynamic",
+		MaxAccess: kb.Moderator,
 	}))
 
 	log("Creating a delete user", context.Users().Create(kb.User{
-		ID:   "delete",
-		Name: "Delete",
+		ID:        "delete",
+		Name:      "Delete",
+		MaxAccess: kb.Moderator,
 	}))
 
 	log("Deleting an user", context.Users().Delete("delete"))

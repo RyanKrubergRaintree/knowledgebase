@@ -64,6 +64,8 @@ func (auth *Auth) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error
 		ID:    kb.Slugify(user.Name),
 		Email: user.Email,
 		Name:  user.Name,
+
+		MaxAccess: kb.Moderator,
 	}, nil
 }
 

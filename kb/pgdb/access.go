@@ -121,7 +121,7 @@ func (db Access) CommunityRemove(group, member kb.Slug) error {
 //TODO: fix this for OwnerID, GroupID
 func (db Access) List(group kb.Slug) (members []kb.Member, err error) {
 	rows, err := db.Query(`
-	SELECT Membership.UserID, Users.Name, False, Min('moderator', Users.Restricted)
+	SELECT Membership.UserID, Users.Name, False, Users.MaxAccess
 		FROM Membership
 		JOIN Users ON Membership.UserID = Users.ID
 		WHERE Membership.GroupID = $1
