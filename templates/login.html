@@ -14,27 +14,32 @@
 	</div>
 
 	<div id="content">
+		<div id="browser-notice">
+			<p>Knowledge Base works best with <a href="http://www.google.com/chrome/">Google Chrome</a>. Other browsers still have some known issues.</p>
+		</div>
+
+		<form id="logins" action="/system/auth/callback/guest" method="POST">
+			<h2>Customer login:</h2>
+			<table>
+				<tr>
+					<td><label for="username">Username:</label></td>
+					<td><input type="text" name="username" tabindex=1></td>
+					<td rowspan=2>
+						<input class="button" type="submit" value="Login" tabindex=3>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="password">Password:</label></td>
+					<td><input type="password" name="password" tabindex=2></td>
+				</tr>
+			</table>
+		</form>
+
 		<div id="logins">
-			<h2 class="title">Login with:</h2>
+			<h2 class="title">Raintree employee login:</h2>
 			{{ range .Logins }}
 			<a href="{{.URL}}" class='button'><span class="login-icon {{.Icon}}"></span>{{.Name}}</a>
 			{{ end }}
 		</div>
-
-		<form id="logins" action="/system/auth/callback/guest" method="POST">
-			<h2>Guest:</h2>
-			<table>
-				<tr>
-					<td><label for="username">Username:</label></td>
-					<td><input type="text" name="username"></td>
-				</tr>
-				<tr>
-					<td><label for="password">Password:</label></td>
-					<td><input type="password" name="password"></td>
-				</tr>
-			</table>
-			<br>
-			<input type="submit" value="Login">
-		</form>
 	</div>
 </body>
