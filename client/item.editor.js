@@ -5,7 +5,15 @@ import "item.js";
 
 KB.Item.Editor = React.createClass({
 	blur: function(ev){
+		var self = this;
 		var container = this.getDOMNode();
+		if(ev.relatedTarget === null){
+			// HACK-FIX: Firefox doesn't have relatedTarget
+			// use a delayed commit if we don't know the related target
+			// that way any menu action can complete, before the commit
+			window.setTimeout(function(){ self.commit(); }, 300);
+			return;
+		}
 		if(!container.contains(ev.relatedTarget)){
 			this.commit();
 		}
@@ -13,6 +21,9 @@ KB.Item.Editor = React.createClass({
 	commit: function(ev){
 		var stage = this.props.stage,
 			item = this.props.item;
+
+		// in case the delay
+		if(this.refs.text === undefined) { return; }
 
 		var text = this.refs.text.getDOMNode().value;
 		if((text === '') &&
