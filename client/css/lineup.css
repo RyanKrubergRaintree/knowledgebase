@@ -9,12 +9,18 @@
 	display: -webkit-flex;
 	display: flex;
 
+	-webkit-flex-flow: row;
+	-ms-flex-flow: row;
 	flex-flow: row;
 }
 
 .stage {
 	position: relative;
+
+	-webkit-flex: none;
+	-ms-flex: none;
 	flex: none;
+
 	width: 100%;
 	max-width: 500px;
 
@@ -115,13 +121,13 @@
 	background: #FFF;
 	padding: 0.1px 0 10px 0;
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+
+	overflow: auto;
 }
 
 .page h1 {
 	position: relative;
-	margin-top: 34px;
-	margin-bottom: 16px;
-	margin-left: 10px;
+	margin: 34px 10px 16px 10px;
 	z-index: 10;
 }
 
