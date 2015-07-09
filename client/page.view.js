@@ -75,11 +75,18 @@ KB.Page.View = (function(){
 				item: item
 			};
 
-			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+			ev.dataTransfer.setData("Text", JSON.stringify(data));
 		},
 
 		dropEffectFor: function(ev){
-			if(ev.dataTransfer.effectAllowed === 'copy'){
+			var effect = "copy";
+			try {
+				effect = ev.dataTransfer.effectAllowed;
+			} catch (ex){
+				// HACK-FIX, this is required for IE11
+				// otherwise getting effectAllowed fails
+			}
+			if(effect === 'copy'){
 				return 'copy';
 			}
 			if(ev.shiftKey){
@@ -135,7 +142,8 @@ KB.Page.View = (function(){
 
 			var dropEffect = this.dropEffectFor(ev);
 
-			var data = ev.dataTransfer.getData("kb/item");
+			var data = ev.dataTransfer.getData("Text");
+			try { JSON.parse(data); } catch (ex) { data = null; }
 			if(data){
 				var data = ParseJSON(data);
 				var item = data.item;

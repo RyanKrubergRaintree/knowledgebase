@@ -24,8 +24,10 @@ KB.Item.View = React.createClass({
 			ev.dataTransfer.effectAllowed = 'copy';
 		}
 
-		var off = mouseOffset(ev);
-		ev.dataTransfer.setDragImage(this.getDOMNode(), off.x, off.y);
+		if(ev.dataTransfer.setDragImage){
+			var off = mouseOffset(ev);
+			ev.dataTransfer.setDragImage(this.getDOMNode(), off.x, off.y);
+		}
 
 		var data = {
 			item: item,
@@ -33,8 +35,7 @@ KB.Item.View = React.createClass({
 			url: stage.url,
 			text: stage.page.synopsis
 		};
-		ev.dataTransfer.setData("kb/item", JSON.stringify(data));
-		ev.dataTransfer.setData("kb/url", stage.url);
+		ev.dataTransfer.setData("Text", JSON.stringify(data));
 
 		function mouseOffset(ev){
 			ev = ev.nativeEvent || ev;
@@ -96,7 +97,7 @@ KB.Item.View = React.createClass({
 			!isEditing ? React.DOM.div({
 				className:"item-drag",
 				title: "Move or copy item.",
-				draggable: true,
+				draggable: "true",
 
 				onDragStart: this.dragStart,
 				onDrag: this.drag,

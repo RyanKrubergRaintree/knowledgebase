@@ -3,8 +3,9 @@ this.Sanitize = (function(){
 
 	var iframe = document.createElement('iframe');
 	if (iframe['sandbox'] === undefined) {
-		alert('Your browser does not support sandboxed iframes. Please upgrade to a modern browser.');
-		return '';
+		return function(input){
+			return input
+		};
 	}
 
 	iframe.sandbox = 'allow-same-origin';
@@ -17,9 +18,13 @@ this.Sanitize = (function(){
 
 	var body = iframe.contentDocument.body;
 	return function(input){
-		body.innerHTML = input;
-		var result = clone(body);
-		body.innerHTML = "";
-		return result.innerHTML;
+		try {
+			body.innerHTML = input;
+			var result = clone(body);
+			body.innerHTML = "";
+			return result.innerHTML;
+		} catch (ex) {
+			return input;
+		}
 	};
 })();

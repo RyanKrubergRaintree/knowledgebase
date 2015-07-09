@@ -25,7 +25,7 @@ KB.Stage.View = (function(){
 				item: item
 			};
 
-			ev.dataTransfer.setData("kb/item", JSON.stringify(data));
+			ev.dataTransfer.setData("Text", JSON.stringify(data));
 		},
 
 		deletePage: function(){
@@ -43,11 +43,11 @@ KB.Stage.View = (function(){
 			var a = React.DOM.a;
 			return React.DOM.div(
 				{className: "stage-buttons"},
-				stage.canModify() ? a({
+				stage.canModify() ? React.DOM.div({
 					className:"mdi mdi-playlist-plus",
 					title:"Drag to page to add an item.",
 					style: { cursor: "move" },
-					draggable: true,
+					draggable: "true",
 					onDragStart: this.createFactory
 				}) : null,
 				stage.canDestroy() ? a({

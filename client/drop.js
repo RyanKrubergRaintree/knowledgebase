@@ -76,26 +76,36 @@ this.DropData = (function(){
 			return item;
 		}
 
-		var html = dataTransfer.getData("text/html");
-		var href = dataTransfer.getData("text/uri-list");
+		try {
+			var html = dataTransfer.getData("text/html");
+			var href = dataTransfer.getData("text/uri-list");
 
-		if(href){
-			if(html){
-				var rxTags = /<[^>]+>/g;
-				html = html.replace(rxTags, "");
-			} else {
-				html = Convert.URLToReadable(href);
+			if(href){
+				if(html){
+					var rxTags = /<[^>]+>/g;
+					html = html.replace(rxTags, "");
+				} else {
+					html = Convert.URLToReadable(href);
+				}
+
+				return {
+					id: GenerateID(),
+					type: "reference",
+					title: html,
+					url: href
+				};
 			}
-
-			return {
-				id: GenerateID(),
-				type: "reference",
-				title: html,
-				url: href
-			};
+		} catch (ex) {
+			// this getData may fail in IE
 		}
-
-		var text = dataTransfer.getData("text/plain");
+		try {
+			var text = dataTransfer.getData("text/plain");
+			if(text === ""){
+				text = dataTransfer.getData("Text");
+			}
+		} catch (ex) {
+			text = dataTransfer.getData("Text");
+		}
 		if(text){
 			if(text.match(rxCode)){
 				return {
