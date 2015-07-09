@@ -141,7 +141,6 @@ KB.Stage = (function(){
 				this.patching_ = true;
 
 				var xhr = new XMLHttpRequest();
-				xhr.withCredentials = true;
 				xhr.onload = this.patchDone_.bind(this);
 				xhr.onerror = this.patchError_.bind(this);
 
@@ -181,7 +180,6 @@ KB.Stage = (function(){
 			this.changed();
 
 			var xhr = new XMLHttpRequest();
-			xhr.withCredentials = true;
 			xhr.onload = this.pullDone_.bind(this);
 			xhr.onerror = this.pullError_.bind(this);
 
@@ -222,7 +220,6 @@ KB.Stage = (function(){
 			this.urlChanged();
 
 			var xhr = new XMLHttpRequest();
-			xhr.withCredentials = true;
 			xhr.onload = this.createDone_.bind(this);
 			xhr.onerror = this.createError_.bind(this);
 
@@ -262,7 +259,6 @@ KB.Stage = (function(){
 			if(this.url == null){ return; }
 
 			var xhr = new XMLHttpRequest();
-			xhr.withCredentials = true;
 			xhr.open('DELETE', this.url, true);
 
 			xhr.onload = this.destroyDone_.bind(this);

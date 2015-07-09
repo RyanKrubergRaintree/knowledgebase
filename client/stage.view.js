@@ -100,7 +100,6 @@ KB.Stage.View = (function(){
 
 		componentDidMount: function(){
 			var xhr = new XMLHttpRequest();
-			xhr.withCredentials = true;
 			xhr.onload = this.groupsReceived;
 			xhr.open('RAW', "/user:editor-groups", true);
 			xhr.setRequestHeader('Accept', 'application/json');

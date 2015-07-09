@@ -36,7 +36,6 @@ KB.Item.Content['simple-form'] = React.createClass({
 		var url = this.props.item.url;
 
 		var xhr = new XMLHttpRequest();
-		xhr.withCredentials = true;
 		xhr.onload = this.done;
 		xhr.onerror = this.errored;
 
