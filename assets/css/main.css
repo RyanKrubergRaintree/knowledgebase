@@ -23,8 +23,6 @@ x=5
 		0 17px 17px 0 rgba(0, 0, 0, 0.15);
 */
 
-@import url(https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700);
-
 html, body {
 	margin: 0;
 	padding: 0;
@@ -54,8 +52,7 @@ h4 { font-size: 1.1em; }
 	height: 46px;
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 
-	z-index: 2;
-
+	z-index: 10;
 	transition: box-shadow 0.2s ease-in-out;
 }
 
@@ -190,6 +187,8 @@ h4 { font-size: 1.1em; }
 	left: 0; right: 0; bottom: 0;
 	background: #fff;
 	transition: top 0.5s ease-in-out;
+
+	z-index: -1;
 
 	background: url("/assets/img/background.png") center bottom no-repeat;
 }

@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/raintreeinc/livebundle"
 
@@ -28,6 +29,8 @@ import (
 
 	_ "github.com/lib/pq"
 )
+
+var Etag = time.Now().Format(http.TimeFormat)
 
 // TODO: add
 //  https://github.com/unrolled/secure
@@ -90,7 +93,9 @@ func main() {
 	log.Printf("Starting %s on %s\n", *domain, *addr)
 
 	// Serve static files
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(*assetsdir))))
+	http.Handle("/assets/", WithStaticEtag(
+		http.StripPrefix("/assets/",
+			http.FileServer(http.Dir(*assetsdir)))))
 
 	// Serve client
 	client := livebundle.New(*clientdir, "/client/", *development)
@@ -139,10 +144,18 @@ func main() {
 	}
 
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Etag", Etag)
 		http.ServeFile(w, r, filepath.Join(*assetsdir, "ico", "favicon.ico"))
 	})
 	http.Handle("/", server)
 	log.Fatal(http.ListenAndServe(*addr, nil))
+}
+
+func WithStaticEtag(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Etag", Etag)
+		h.ServeHTTP(w, r)
+	})
 }
 
 type RuleSet struct {
