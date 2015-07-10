@@ -3,7 +3,7 @@
 	{{ template "head.html" . }}
 
 	<script src="/assets/js/react.js"></script>
-	<script src="/client/global.js"></script>
+	<script src="/client/global.js?{{Site.Version}}"></script>
 
 	<script>
 	Global.User = "{{User.Name}}";

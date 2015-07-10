@@ -14,7 +14,7 @@ import (
 )
 
 type Client interface {
-	Include() string
+	Include(version string) string
 }
 
 type Module interface {
@@ -33,6 +33,8 @@ type ServerInfo struct {
 	ShortTitle string
 	Title      string
 	Company    string
+
+	Version string
 }
 
 type AuthLogin struct{ URL, Name, Icon string }
@@ -356,7 +358,7 @@ func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname stri
 				return user
 			},
 			"Client": func() template.HTML {
-				return template.HTML(server.Client.Include())
+				return template.HTML(server.Client.Include(server.Version))
 			},
 		},
 	).ParseGlob(filepath.Join(server.Templates, "*.html"))
