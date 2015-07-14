@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -21,14 +22,22 @@ func check(err error) {
 	}
 }
 
-func build() {
-	cmd := exec.Command("go", "build", "-o", filepath.Join(".bin", "run"), ".")
+func run(name string, args ...string) error {
+	fmt.Println("> ", name, strings.Join(args, " "))
+
+	cmd := exec.Command(name, args...)
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	cmd.Env = append([]string{
+		"GOOS=linux",
+		"GOARCH=amd64",
+		"CGO_ENABLED=0",
+	}, os.Environ()...)
 
-	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "GOOS=linux", "GOARCH=amd64")
-	check(cmd.Run())
+	return cmd.Run()
+}
 
+func build() {
+	check(run("go", "build", "-v", "-o", filepath.Join(".bin", "run"), "."))
 	AddDir(".bin")
 
 	AddGlob("*.json")
@@ -54,9 +63,8 @@ func main() {
 	fmt.Println("Creating:", filename)
 
 	ZIP = zip.NewWriter(file)
-	defer ZIP.Close()
-
 	build()
+	ZIP.Close()
 }
 
 // filename with forward slashes
