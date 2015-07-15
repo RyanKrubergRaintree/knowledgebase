@@ -12,7 +12,7 @@ function Resolve(stage, text){
 	});
 	return text;
 }
-Resolve.rxExternalLink = /\[\[\s*(http[a-zA-Z0-9:\.\/\-]+)\s+([^\]]+)\]\]/g;
+Resolve.rxExternalLink = /\[\[\s*(https?\:[^ \]]+)\s+([^\]]+)\]\]/g;
 Resolve.rxInternalLink = /\[\[\s*([^\]]+)\s*\]\]/g;
 
 //TODO: add HTML sanitation
