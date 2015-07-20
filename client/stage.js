@@ -2,6 +2,7 @@ import "util/ObjectId.js";
 import "util/Notifier.js";
 import "kb.js";
 import "page.js";
+import "tracking.js";
 
 KB.Stage = (function(){
 	"use strict";
@@ -202,9 +203,13 @@ KB.Stage = (function(){
 					this.urlChanged();
 				}
 			}
+
+
 			this.page = page;
 			this.state = "loaded";
 			this.changed();
+
+			TrackPageView(this.url, this.page.title);
 		},
 		pullError_: function(ev){
 			this.state = "failed";

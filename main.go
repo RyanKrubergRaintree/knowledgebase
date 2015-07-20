@@ -123,7 +123,8 @@ func main() {
 		Title:      "Knowledge Base",
 		Company:    "Raintree Systems Inc.",
 
-		Version: time.Now().Format("20060102150405"),
+		TrackingID: os.Getenv("TRACKING_ID"),
+		Version:    time.Now().Format("20060102150405"),
 	}, sec, client, db)
 
 	ruleset := MustLoadRules(*rules)

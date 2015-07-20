@@ -34,7 +34,8 @@ type ServerInfo struct {
 	Title      string
 	Company    string
 
-	Version string
+	TrackingID string
+	Version    string
 }
 
 type AuthLogin struct{ URL, Name, Icon string }
