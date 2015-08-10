@@ -53,6 +53,6 @@
 	"community": [
 		{"GroupID": "qa", "MemberID": "raintree", "Rights": "reader"},
 		{"GroupID": "engineering", "MemberID": "raintree", "Rights": "reader"},
-		{"GroupID": "kb", "MemberID": "raintree", "Rights": "editor"},
+		{"GroupID": "kb", "MemberID": "raintree", "Rights": "editor"}
 	]
 }
