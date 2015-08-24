@@ -192,3 +192,12 @@ h4 { font-size: 1.1em; }
 
 	background: url("/assets/img/background.png") center bottom no-repeat;
 }
+
+table.tight {
+	padding: 2px;
+	font-size: 13px;
+}
+
+ul.tight {
+	font-size: 13px;
+}

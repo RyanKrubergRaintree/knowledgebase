@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/raintreeinc/livebundle"
+	"github.com/raintreeinc/livepkg"
 
 	"github.com/raintreeinc/knowledgebase/auth"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -94,8 +94,8 @@ func main() {
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(*assetsdir))))
 
 	// Serve client
-	client := livebundle.New(*clientdir, "/client/", *development)
-	http.Handle("/client/", client)
+	client := livepkg.NewServer(http.Dir(*clientdir), *development, "/kb/app.js")
+	http.Handle("/kb/", client)
 
 	// Load database
 	db, err := pgdb.New(*database)
@@ -125,7 +125,7 @@ func main() {
 
 		TrackingID: os.Getenv("TRACKING_ID"),
 		Version:    time.Now().Format("20060102150405"),
-	}, sec, client, db)
+	}, sec, db)
 
 	ruleset := MustLoadRules(*rules)
 	server.Rules = ruleset

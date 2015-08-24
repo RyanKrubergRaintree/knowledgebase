@@ -13,10 +13,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Client interface {
-	Include(version string) string
-}
-
 type Module interface {
 	Info() Group
 	Pages() []PageEntry
@@ -52,20 +48,18 @@ type Server struct {
 
 	Auth Auth
 	Database
-	Client
 	Rules Rules
 
 	Modules map[Slug]Module
 }
 
-func NewServer(info ServerInfo, auth Auth, client Client, database Database) *Server {
+func NewServer(info ServerInfo, auth Auth, database Database) *Server {
 	return &Server{
 		ServerInfo: info,
 		Templates:  "templates",
 
 		Auth:     auth,
 		Database: database,
-		Client:   client,
 
 		Modules: make(map[Slug]Module),
 	}
@@ -357,9 +351,6 @@ func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname stri
 			"User": func() User {
 				user, _ := server.Sessions().GetUser(w, r)
 				return user
-			},
-			"Client": func() template.HTML {
-				return template.HTML(server.Client.Include(server.Version))
 			},
 		},
 	).ParseGlob(filepath.Join(server.Templates, "*.html"))

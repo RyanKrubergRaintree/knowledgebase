@@ -75,3 +75,8 @@ this.Hash = {
 		DocumentCookies.removeItem("hash");
 	}
 };
+
+this.GenerateID = function(){
+	return Math.random().toString(16).substr(2) +
+	       Math.random().toString(16).substr(2);
+};

@@ -3,14 +3,15 @@
 	{{ template "head.html" . }}
 
 	<script src="/assets/js/react.js"></script>
-	<script src="/client/global.js?{{Site.Version}}"></script>
 
 	<script>
-	Global.User = "{{User.Name}}";
-	Global.HomePage = "Community:Welcome";
-
-	Global.Groups.sort();
+	window.KBUser = "{{User.Name}}";
+	window.KBGroups = [];
+	window.KBHomePage = "Community:Welcome";
 	</script>
+
+	<script src="/kb/~pkg.css?{{Site.Version}}"></script>
+	<script src="/kb/~pkg.js?{{Site.Version}}"></script>
 
 	<script>window.Hash.restore()</script>
 </head>
@@ -28,4 +29,3 @@
 	ga('send', 'pageview');
 </script>
 {{ end }}
-{{ Client }}
