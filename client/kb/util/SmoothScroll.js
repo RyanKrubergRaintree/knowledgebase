@@ -6,15 +6,16 @@ package('kb.util', function(exports){
 
 	// returns true, if no additional movement is necessary
 	function scrollTowards(target){
-		if((target == null) || (target.parentNode == null)){
+		if((typeof target === 'undefined') ||
+			(target === null) || (target.parentNode === null)){
 			return true;
 		}
+
 		var parent = target.parentNode,
 			overTop = target.offsetTop - parent.offsetTop < parent.scrollTop,
 			overBottom = (target.offsetTop - parent.offsetTop + target.clientHeight) > (parent.scrollTop + parent.clientHeight),
 			overLeft = target.offsetLeft - parent.offsetLeft < parent.scrollLeft,
-			overRight = (target.offsetLeft - parent.offsetLeft + target.clientWidth) > (parent.scrollLeft + parent.clientWidth),
-			alignWithTop = overTop && !overBottom;
+			overRight = (target.offsetLeft - parent.offsetLeft + target.clientWidth) > (parent.scrollLeft + parent.clientWidth);
 
 		var prevTop = parent.scrollTop;
 		var prevLeft = parent.scrollLeft;
@@ -37,11 +38,11 @@ package('kb.util', function(exports){
 			parent.scrollLeft = newLeft;
 		}
 
-		if((parent.scrollTop == prevTop) && (parent.scrollLeft == prevLeft)){
+		if((parent.scrollTop === prevTop) && (parent.scrollLeft === prevLeft)){
 			return true;
 		}
-		return (parent.scrollTop == newTop) && (parent.scrollLeft == newLeft)
-	};
+		return (parent.scrollTop === newTop) && (parent.scrollLeft === newLeft);
+	}
 
 	function cancel(){
 		if(timer){
@@ -58,7 +59,7 @@ package('kb.util', function(exports){
 		cancel();
 		if(scrollTowards(target)){
 			return;
-		};
+		}
 
 		if(window.requestAnimationFrame){
 			timer = window.requestAnimationFrame(function(){ to(target); });

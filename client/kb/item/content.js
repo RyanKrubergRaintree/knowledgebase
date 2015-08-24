@@ -27,10 +27,10 @@ package('kb.item.content', function(exports){
 		{name: 'Text', type: 'paragraph', desc: 'simple text paragraph'},
 		{name: 'HTML', type: 'html', desc: 'a subset of html for more advanced content'},
 		{name: 'Code', type: 'code', desc: 'item especially designed for code'},
-		{name: 'Tags', type: 'tags', desc: 'tags for the page'},
+		{name: 'Tags', type: 'tags', desc: 'tags for the page'}
 	];
 
-	exports['factory'] = React.createClass({
+	exports.factory = React.createClass({
 		displayName: 'Factory',
 		convert: function(ev){
 			var type = GetDataAttribute(ev.currentTarget, 'type');
@@ -70,7 +70,7 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['image'] = React.createClass({
+	exports.image = React.createClass({
 		displayName: 'Image',
 		render: function(){
 			return React.DOM.div({
@@ -82,7 +82,7 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['paragraph'] = React.createClass({
+	exports.paragraph = React.createClass({
 		displayName: 'Paragraph',
 		render: function(){
 			var stage = this.props.stage;
@@ -90,7 +90,7 @@ package('kb.item.content', function(exports){
 			var paragraphs = resolved.split('\n\n');
 			if(paragraphs.length > 1){
 				return React.DOM.div({
-					className: 'item-content content-paragraph',
+					className: 'item-content content-paragraph'
 				}, paragraphs.map(function(p, i){
 					return React.DOM.p({key: i, dangerouslySetInnerHTML: {__html: kb.item.Sanitize(p)}});
 				}));
@@ -105,7 +105,7 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['html'] = React.createClass({
+	exports.html = React.createClass({
 		displayName: 'HTML',
 		render: function(){
 			var stage = this.props.stage;
@@ -118,7 +118,7 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['code'] = React.createClass({
+	exports.code = React.createClass({
 		displayName: 'Code',
 		render: function(){
 			return React.DOM.div({
@@ -127,13 +127,13 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['reference'] = React.createClass({
+	exports.reference = React.createClass({
 		displayName: 'Reference',
 		render: function(){
 			var item = this.props.item;
 			var url = item.url;
 			var loc = kb.convert.URLToLocation(url);
-			var external = loc.origin && (loc.origin != window.location.origin);
+			var external = loc.origin && (loc.origin !== window.location.origin);
 
 			return React.DOM.div({className: 'item-content content-reference'},
 				React.DOM.a({
@@ -146,14 +146,14 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['entry'] = React.createClass({
+	exports.entry = React.createClass({
 		displayName: 'Entry',
 		render: function(){
 			var item = this.props.item;
 			var ref = kb.convert.LinkToReference(item.link);
 			var url = ref.url;
 			return React.DOM.div({
-				className: 'item-content content-entry',
+				className: 'item-content content-entry'
 			},
 				React.DOM.a({
 					className: 'entry-title',
@@ -171,19 +171,18 @@ package('kb.item.content', function(exports){
 		}
 	});
 
-	exports['tags'] = React.createClass({
+	exports.tags = React.createClass({
 		displayName: 'Tags',
 		render: function(){
-			var item = this.props.item,
-				stage = this.props.stage;
+			var item = this.props.item;
 
-			var text = typeof item.text == 'undefined' ? '' : item.text.trim();
+			var text = typeof item.text === 'undefined' ? '' : item.text.trim();
 			var tags = [];
 			if(text !== '') {
 				tags =  text.split(',');
 			}
 			tags = tags.map(function(tag){ return tag.trim(); })
-						.filter(function(tag){ return tag != ''; });
+						.filter(function(tag){ return tag !== ''; });
 			return React.DOM.div({className: 'item-contet content-tags'},
 				tags.length > 0 ?
 					tags.map(function(tag, i){

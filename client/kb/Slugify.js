@@ -35,11 +35,11 @@ package('kb', function(exports){
 				cutdash = false;
 				continue;
 			}
-			if((r == '/') || (r == ':')){
+			if((r === '/') || (r === ':')){
 				slug += r;
 				emitdash = false;
 				cutdash = true;
-			} else if ((r == '-') || (r == ',') || (r == '.') || (r == ' ') || (r == '_')) {
+			} else if ((r === '-') || (r === ',') || (r === '.') || (r === ' ') || (r === '_')) {
 				emitdash = true;
 			} else {
 				var name = kb.unicode.RuneName[r];
@@ -54,7 +54,7 @@ package('kb', function(exports){
 			}
 		}
 
-		if(slug.length == 0){
+		if(slug.length === 0){
 			return '-';
 		}
 

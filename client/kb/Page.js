@@ -13,7 +13,7 @@ package('kb', function(exports){
 		this.journal = data.journal || [];
 		this.version = data.version || 0;
 		this.modified = data.modified || (new Date()).toISOString();
-	};
+	}
 
 	Page.prototype = {
 		clone: function(){
@@ -23,7 +23,7 @@ package('kb', function(exports){
 		indexOf_: function(id){
 			var story = this.story;
 			for(var i = 0; i < story.length; i += 1){
-				if(story[i].id == id){
+				if(story[i].id === id){
 					return i;
 				}
 			}

@@ -4,12 +4,12 @@ package('kb.item', function(exports){
 	depends('Editor.js');
 	depends('content.js');
 
-	window.DropCanceled = null;
+	exports.DropCanceled = null;
 	exports.View = React.createClass({
 		displayName: 'Item',
 
 		dragStart: function(ev, node, item){
-			DropCanceled = false;
+			kb.item.DropCanceled = false;
 			var stage = this.props.stage,
 				item = this.props.item;
 
@@ -42,14 +42,14 @@ package('kb.item', function(exports){
 		},
 		drag: function(ev){ ev.preventDefault(); },
 		dragEnd: function(ev){
-			if(window.DropCanceled){
+			if(kb.item.DropCanceled){
 				ev.preventDefault();
 				return;
 			}
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if(ev.dataTransfer.dropEffect == 'move'){
+			if(ev.dataTransfer.dropEffect === 'move'){
 				stage.patch({
 					type: 'remove',
 					id: item.id

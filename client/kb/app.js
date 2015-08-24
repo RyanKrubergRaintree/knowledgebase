@@ -1,11 +1,11 @@
 package('kb.app', function(exports){
 	'use strict';
 
-	depends("app.css");
+	depends('app.css');
 
-	depends("Crumbs.js");
-	depends("Lineup.js");
-	depends("Site.js");
+	depends('Crumbs.js');
+	depends('Lineup.js');
+	depends('Site.js');
 
 	var app = exports;
 
@@ -18,14 +18,14 @@ package('kb.app', function(exports){
 		React.render(site, mountNode);
 
 		app.Crumbs.initLineup(KBHomePage);
-		window.addEventListener("click",
+		window.addEventListener('click',
 			app.Lineup.handleClickLink.bind(app.Lineup));
 	}
 
-	initialize(document.getElementById("site"));
+	initialize(document.getElementById('site'));
 
 	// closing of the last page
-	window.addEventListener("keydown", function(ev){
+	window.addEventListener('keydown', function(ev){
 		function elementIsEditable(elem){
 			return elem && (
 				((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
@@ -37,7 +37,7 @@ package('kb.app', function(exports){
 		if(ev.defaultPrevented || elementIsEditable(ev.target)){
 			return;
 		}
-		if(ev.keyCode == 27){
+		if(ev.keyCode === 27){
 			app.Lineup.closeLast();
 			ev.preventDefault();
 			ev.stopPropagation();

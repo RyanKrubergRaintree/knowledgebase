@@ -1,9 +1,9 @@
-package("kb", function(exports){
+package('kb', function(exports){
 	'use strict';
 
-	depends("Lineup.js");
-	depends("Convert.js");
-	depends("Stage.js");
+	depends('Lineup.js');
+	depends('Convert.js');
+	depends('Stage.js');
 
 	// converts to
 	// #┃ref1┃ref2┃ref3
@@ -15,7 +15,7 @@ package("kb", function(exports){
 	// #┃ref1┃ref2┃ref3
 	function fromHash(hash){
 		// IE doesn't have the first #
-		if(hash[0] == '#'){
+		if(hash[0] === '#'){
 			hash = hash.substr(1);
 		} else {
 			hash = hash.substr(0);
@@ -32,19 +32,19 @@ package("kb", function(exports){
 	exports.Crumbs = Crumbs;
 	function Crumbs(lineup){
 		this.lineup_ = lineup;
-		this.navigatingTo_ = "";
+		this.navigatingTo_ = '';
 
 		this.lineup_.on('changed', this.lineupChanged, this);
 		var self = this;
-		window.addEventListener('hashchange', function(ev){
+		window.addEventListener('hashchange', function(/*ev*/){
 			if(window.location.hash !== self.navigatingTo_){
 				self.lineup_.updateRefs(fromHash(window.location.hash));
 			}
-		})
+		});
 	}
 
 	Crumbs.prototype = {
-		lineupChanged: function(event){
+		lineupChanged: function(/*ev*/){
 			this.navigatingTo_ = toHash(this.lineup_.stages);
 			window.location.hash = this.navigatingTo_;
 		},

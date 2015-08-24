@@ -1,35 +1,35 @@
 package('kb.Page', function(exports){
 	'use strict';
 
-	depends("Page.js");
-	depends("Drop.js");
-	depends("item/View.js");
+	depends('Page.js');
+	depends('Drop.js');
+	depends('item/View.js');
 
 	// ensure that we clear all the place-holders
-	window.removeEventListener("dragend", clearDropPosition);
-	window.removeEventListener("drop", clearDropPosition);
-	window.addEventListener("dragend", clearDropPosition);
-	window.addEventListener("drop", clearDropPosition);
+	window.removeEventListener('dragend', clearDropPosition);
+	window.removeEventListener('drop', clearDropPosition);
+	window.addEventListener('dragend', clearDropPosition);
+	window.addEventListener('drop', clearDropPosition);
 
 	function clearDropPosition(){
-		var els = document.getElementsByClassName("drop-after");
+		var els = document.getElementsByClassName('drop-after');
 		for(var i = 0; i < els.length; i += 1){
-			els[i].classList.remove("drop-after");
+			els[i].classList.remove('drop-after');
 		}
-		var els = document.getElementsByClassName("drop-before");
-		for(var i = 0; i < els.length; i += 1){
-			els[i].classList.remove("drop-before");
+		els = document.getElementsByClassName('drop-before');
+		for(i = 0; i < els.length; i += 1){
+			els[i].classList.remove('drop-before');
 		}
 	}
 
 	function getAfter(page, drop){
-		if(drop == null){
+		if(drop === null){
 			return;
 		}
 		var story = page.story;
 
-		if(drop.node == null){
-			if(drop.rel == 'after'){
+		if(drop.node === null){
+			if(drop.rel === 'after'){
 				if(story.length > 0){
 					return story[story.length-1].id; // as last
 				}
@@ -37,13 +37,13 @@ package('kb.Page', function(exports){
 			return; // as first
 		}
 
-		var id = GetDataAttribute(drop.node, "id");
-		if(id == null){
+		var id = GetDataAttribute(drop.node, 'id');
+		if(id === null){
 			return; // as first
 		}
 		for(var i = 0; i < story.length; i += 1){
-			if(story[i].id == id){
-				if(drop.rel == 'after'){
+			if(story[i].id === id){
+				if(drop.rel === 'after'){
 					return id;
 				} else if (i > 0) {
 					// as first
@@ -71,7 +71,7 @@ package('kb.Page', function(exports){
 
 	function findListPosition(ev, containerClass, listClass, skip){
 		var list = findListContainer(ev.target, containerClass, listClass);
-		if(list == null){
+		if(list === null){
 			return;
 		}
 
@@ -80,14 +80,15 @@ package('kb.Page', function(exports){
 			y: ev.pageY
 		};
 
+
 		var child = list.firstChild;
 		if(child){
 			var box = child.getBoundingClientRect();
 			if(child && (mouse.y < box.top)){
-				return {node: null, rel: "before"};
+				return {node: null, rel: 'before'};
 			}
 		} else {
-			return {node: null, rel: "before"};
+			return {node: null, rel: 'before'};
 		}
 
 		for(var i = 0; i < list.children.length; i += 1){
@@ -100,21 +101,21 @@ package('kb.Page', function(exports){
 			if(mouse.y > box.bottom){
 				continue;
 			}
-			return {node: child, rel: "after"};
+			return {node: child, rel: 'after'};
 		}
 
-		return {node: null, rel: "after"};
+		return {node: null, rel: 'after'};
 	}
 
 	exports.View = React.createClass({
-		displayName: "Page",
+		displayName: 'Page',
 
 		createReference: function(ev){
 			var stage = this.props.stage,
 				page = stage.page;
 			var item = {
 				id: GenerateID(),
-				type: "reference",
+				type: 'reference',
 				url: stage.url,
 				title: page.title,
 				text: page.synopsis
@@ -125,11 +126,11 @@ package('kb.Page', function(exports){
 				item: item
 			};
 
-			ev.dataTransfer.setData("Text", JSON.stringify(data));
+			ev.dataTransfer.setData('Text', JSON.stringify(data));
 		},
 
 		dropEffectFor: function(ev){
-			var effect = "copy";
+			var effect = 'copy';
 			try {
 				effect = ev.dataTransfer.effectAllowed;
 			} catch (ex){
@@ -145,31 +146,31 @@ package('kb.Page', function(exports){
 			return 'move';
 		},
 
-		dragEnter: function(ev){},
+		dragEnter: function(/*ev*/){},
 		dragOver: function(ev){
 			clearDropPosition();
 			if(!this.props.stage.canModify()){
 				return;
 			}
 
-			var drop = findListPosition(ev, "page", "page-story");
-			if(drop == null){
-				return
+			var drop = findListPosition(ev, 'page', 'page-story');
+			if(drop === null){
+				return;
 			}
 
 			ev.preventDefault();
 			ev.dataTransfer.dropEffect = this.dropEffectFor(ev);
 
-			var drop = findListPosition(ev, "page", "page-story");
-			if(drop == null){
-				return
+			var drop = findListPosition(ev, 'page', 'page-story');
+			if(drop === null){
+				return;
 			}
 
-			if(drop.node != null){
-				drop.node.classList.add("drop-" + drop.rel);
+			if(drop.node !== null){
+				drop.node.classList.add('drop-' + drop.rel);
 			} else {
-				var story = this.refs.story.getDOMNode();;
-				story.classList.add("drop-" + drop.rel);
+				var story = this.refs.story.getDOMNode();
+				story.classList.add('drop-' + drop.rel);
 			}
 		},
 		dragDrop: function(ev){
@@ -184,15 +185,15 @@ package('kb.Page', function(exports){
 				return;
 			}
 
-			var drop = findListPosition(ev, "page", "page-story");
-			if(drop == null){
-				return
+			var drop = findListPosition(ev, 'page', 'page-story');
+			if(drop === null){
+				return;
 			}
 			var after = getAfter(page, drop);
 
 			var dropEffect = this.dropEffectFor(ev);
 
-			var data = ev.dataTransfer.getData("Text");
+			var data = ev.dataTransfer.getData('Text');
 			try { JSON.parse(data); } catch (ex) { data = null; }
 			if(data){
 				var data = ParseJSON(data);
@@ -211,7 +212,7 @@ package('kb.Page', function(exports){
 
 				// are we moving on the same page?
 				if((dropEffect === 'move') && (data.url === stage.url)){
-					window.DropCanceled = true;
+					kb.item.DropCanceled = true;
 					stage.patch({
 						type: 'move',
 						id: item.id,
@@ -235,44 +236,44 @@ package('kb.Page', function(exports){
 				kb.DropData(stage, after, ev.dataTransfer);
 			}
 		},
-		dragLeave: function(ev){
+		dragLeave: function(/*ev*/){
 			//TODO: fix glitchy rendering
 			clearDropPosition();
 		},
 		render: function(){
 			var stage = this.props.stage,
-				owner = kb.convert.LinkToOwner(stage.link || stage.slug || stage.url || ""),
+				owner = kb.convert.LinkToOwner(stage.link || stage.slug || stage.url || ''),
 				page = this.props.page;
 
-			var status = undefined;
-			if (stage.state === "loading"){
-				status = React.DOM.div({className: "page-loading"});
-			} else if (stage.state !== "loaded") {
-				status = React.DOM.div({className: "page-error"},
+			var status;
+			if (stage.state === 'loading'){
+				status = React.DOM.div({className: 'page-loading'});
+			} else if (stage.state !== 'loaded') {
+				status = React.DOM.div({className: 'page-error'},
 					React.DOM.h2(null, stage.lastStatusText),
 					React.DOM.p(null, stage.lastError)
-				)
+				);
 			}
 
 			return React.DOM.div(
 				{
-					className: "page",
+					className: 'page',
 
 					onDragEnter: this.dragEnter,
 					onDragOver: this.dragOver,
 					onDrop: this.dragDrop,
 					onDragLeave: this.dragLeave
 				},
-				React.DOM.h2({ className: "page-owner" }, owner),
+				React.DOM.h2({ className: 'page-owner' }, owner),
 				React.DOM.h1({
-					title: "Drag to create a page reference.",
+					title: 'Drag to create a page reference.',
 					draggable: true,
 					onDragStart: this.createReference,
-					style: {cursor: "move"}
+					style: {cursor: 'move'}
 				}, page.title),
 				status,
 				React.createElement(Story, {
-					ref: "story",
+					ref: 'story',
 
 					stage: stage,
 					page: page,
@@ -283,17 +284,16 @@ package('kb.Page', function(exports){
 	});
 
 	var Story = React.createClass({
-		displayName: "Story",
+		displayName: 'Story',
 		render: function(){
 			var stage = this.props.stage,
-				page = this.props.page,
 				story = this.props.story;
 
 			return React.DOM.div(
-				{className: "page-story"},
+				{className: 'page-story'},
 				story.map(function(item, i){
 					return React.createElement(kb.item.View, {
-						key: i + "|" + item.id,
+						key: i + '|' + item.id,
 						stage: stage,
 						item: item
 					});

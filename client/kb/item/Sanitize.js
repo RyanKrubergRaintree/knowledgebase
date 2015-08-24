@@ -2,10 +2,11 @@ package('kb.item', function(exports){
 	'use strict';
 
 	var iframe = document.createElement('iframe');
-	if (iframe['sandbox'] === undefined) {
-		return function(input){
-			return input
+	if (typeof iframe.sandbox === 'undefined') {
+		exports.Sanitize = function(input){
+			return input;
 		};
+		return;
 	}
 
 	iframe.sandbox = 'allow-same-origin';

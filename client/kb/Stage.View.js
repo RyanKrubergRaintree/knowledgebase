@@ -96,8 +96,8 @@ package('kb.Stage', function(exports){
 		},
 
 		groupsReceived: function(ev){
-			var xhr = ev.target
-			if(xhr.status == 200){
+			var xhr = ev.target;
+			if(xhr.status === 200){
 				var info = JSON.parse(ev.target.responseText);
 				this.setState({groups: info.groups || []});
 			}
@@ -137,9 +137,7 @@ package('kb.Stage', function(exports){
 				},
 					React.DOM.label({}, 'Link'),
 					React.DOM.span({className:'link'}, link),
-					React.DOM.label({
-						htmlFor: 'new-page-title',
-					}, 'Title'),
+					React.DOM.label({ htmlFor: 'new-page-title' }, 'Title'),
 					React.DOM.input({
 						id: 'new-page-title',
 						className: 'title',
@@ -151,8 +149,8 @@ package('kb.Stage', function(exports){
 					React.DOM.label({}, 'Owner'),
 					React.DOM.div(
 						{ className: 'group' },
-						this.state.groups.map(function(group, i){
-							var checked = owner == group;
+						this.state.groups.map(function(group){
+							var checked = owner === group;
 							return (
 								React.DOM.div(
 									{
@@ -178,7 +176,7 @@ package('kb.Stage', function(exports){
 				)
 			);
 		}
-	})
+	});
 
 	exports.View = React.createClass({
 		displayName: 'Stage',
@@ -196,7 +194,7 @@ package('kb.Stage', function(exports){
 			window.setTimeout(this.activate, 100);
 		},
 		activate: function(ev){
-			if(typeof ev == 'undefined'){
+			if(typeof ev === 'undefined'){
 				kb.util.SmoothScroll.to(this.getDOMNode());
 			} else if (!ev.defaultPrevented){
 				kb.util.SmoothScroll.to(this.getDOMNode());
@@ -243,7 +241,7 @@ package('kb.Stage', function(exports){
 					{ className:'stage-scroll round-scrollbar'},
 					React.createElement(kb.Page.View, {
 						stage: this.props.stage,
-						page: this.props.stage.page,
+						page: this.props.stage.page
 					})
 				)
 			);

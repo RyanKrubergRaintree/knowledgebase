@@ -42,7 +42,7 @@ package('kb', function(exports){
 			ctx.drawImage(image, 0, 0, image.width, image.height);
 
 			onResized(canvas.toDataURL());
-		}
+		};
 		image.src = src;
 	}
 
@@ -71,7 +71,7 @@ package('kb', function(exports){
 						}
 					});
 				});
-			}
+			};
 			reader.readAsDataURL(image);
 			return item;
 		}

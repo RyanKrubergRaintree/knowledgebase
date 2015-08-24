@@ -2,8 +2,20 @@
   "browser": true,
   "esnext": true,
   "globals": {
-    "goog": true,
-    "console": true
+    "ga": true,
+    "React": true,
+    "kb": true,
+    "JSON": true,
+    "console": true,
+    "depends": true,
+    "package": true,
+
+    "GenerateID": true,
+    "ParseJSON": true,
+    "KBHomePage": true,
+    "KBUser": true,
+    "GetDataAttribute": true,
+    "DeepClone": true
   },
   "globalstrict": true,
   "quotmark": "single",
@@ -11,6 +23,8 @@
   "unused": true,
 
   "enforceall": true,
-  "nocomma": false,
-  "singleGroups": false
+  "singleGroups": false,
+
+  "newcap": false,
+  "shadow": true
 }

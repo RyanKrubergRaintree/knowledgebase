@@ -1,23 +1,26 @@
 package('kb.item', function(exports){
 	'use strict';
 
+	depends('../Convert.js');
+
+	var rxExternalLink = /\[\[\s*(https?\:[^ \]]+)\s+([^\]]+)\]\]/g;
+	var rxInternalLink = /\[\[\s*([^\]]+)\s*\]\]/g;
+
 	exports.Resolve = Resolve;
 	function Resolve(stage, text){
-		if(text == null) {
+		if((typeof text === 'undefined') || (text === null)){
 			return '';
 		}
 
-		text = text.replace(Resolve.rxExternalLink,
+		text = text.replace(rxExternalLink,
 			'<a href="$1" class="external-link" target="_blank" rel="nofollow">$2</a>');
 
-		text = text.replace(Resolve.rxInternalLink, function(match, link){
-			var ref = Convert.LinkToReference(link, stage);
-			return '<a href="' + ref.url + '" data-link="' + ref.link + '" >' + ref.title + "</a>";
+		text = text.replace(rxInternalLink, function(match, link){
+			var ref = kb.convert.LinkToReference(link, stage);
+			return '<a href="' + ref.url + '" data-link="' + ref.link + '" >' + ref.title + '</a>';
 		});
 		return text;
 	}
-	Resolve.rxExternalLink = /\[\[\s*(https?\:[^ \]]+)\s+([^\]]+)\]\]/g;
-	Resolve.rxInternalLink = /\[\[\s*([^\]]+)\s*\]\]/g;
 
 	//TODO: add HTML sanitation
 	exports.ResolveHTML = ResolveHTML;

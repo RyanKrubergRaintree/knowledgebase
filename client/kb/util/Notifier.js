@@ -40,7 +40,7 @@ package('kb.util', function(exports){
 		remove: function(recv){
 			this.listeners = this.listeners.filter(
 				function(listener){
-					return !(listener.recv === recv);
+					return listener.recv !== recv;
 				}
 			);
 		},
@@ -52,7 +52,7 @@ package('kb.util', function(exports){
 		},
 		handle: function(event){
 			this.listeners.map(function(listener){
-				if(listener.event == event.type){
+				if(listener.event === event.type){
 					listener.handler.call(listener.recv, event);
 				}
 			});

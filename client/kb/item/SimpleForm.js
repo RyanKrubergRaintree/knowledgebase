@@ -12,12 +12,12 @@ package('kb.item.content', function(exports){
 
 		done: function(ev){
 			var xhr = ev.currentTarget;
-			if(xhr.status != 200){
+			if(xhr.status !== 200){
 				this.setState({message: '', error: xhr.responseText});
 				return;
 			}
 			var message = 'done';
-			if(xhr.responseText != '') {
+			if(xhr.responseText !== '') {
 				message = xhr.responseText;
 			}
 			this.setState({message:message, error:''});
@@ -56,7 +56,6 @@ package('kb.item.content', function(exports){
 
 		render: function(){
 			var item = this.props.item,
-				stage = this.props.stage,
 				message = this.state.message,
 				error = this.state.error;
 
@@ -90,10 +89,10 @@ package('kb.item.content', function(exports){
 						return React.DOM.select({
 							key: i,
 							ref: item.id,
-							name: item.id,
+							name: item.id
 						}, item.values.map(function(value, i){
 							return React.DOM.option({key: i, value: value}, value);
-						}))
+						}));
 					}
 				})
 			);

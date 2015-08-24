@@ -22,7 +22,7 @@ package('kb', function(exports){
 
 		stageById: function(id){
 			for(var i = 0; i < this.stages.length; i += 1){
-				if(this.stages[i].id == id){
+				if(this.stages[i].id === id){
 					return this.stages[i];
 				}
 			}
@@ -33,7 +33,7 @@ package('kb', function(exports){
 				return -1;
 			}
 			for(var i = 0; i < this.stages.length; i += 1){
-				if(this.stages[i].id == id){
+				if(this.stages[i].id === id){
 					return i;
 				}
 			}
@@ -107,7 +107,7 @@ package('kb', function(exports){
 			});
 			this.changed();
 		},
-		handleURLChanged: function(ev){
+		handleURLChanged: function(/*ev*/){
 			this.changed();
 		},
 
@@ -130,14 +130,13 @@ package('kb', function(exports){
 			var stages = this.stages.slice();
 			var changed = false;
 
-			var self = this;
 			var newstages = nextstages.map(function(stage){
 				var prev = stages.shift();
 
 				if(prev){
 					var plink = kb.convert.ReferenceToLink(prev);
 					var slink = kb.convert.ReferenceToLink(stage);
-					if(plink == slink) {
+					if(plink === slink) {
 						return prev;
 					}
 				}
@@ -158,7 +157,7 @@ package('kb', function(exports){
 
 		findStageFromElement: function(el){
 			for(var i = 0; i < 32; i += 1){
-				if(el == null){ return null; }
+				if(el === null){ return null; }
 				if(el.classList.contains('stage')){
 					var id = GetDataAttribute(el, 'id');
 					return this.stageById(id);
@@ -181,7 +180,7 @@ package('kb', function(exports){
 			if(stage){
 				var locFrom = kb.convert.URLToLocation(stage.url);
 				var locTo = kb.convert.URLToLocation(url);
-				if(locFrom.host == ''){
+				if(locFrom.host === ''){
 					url = '/' + locTo.pathname;
 				} else {
 					url = '//' + locFrom.host + locTo.pathname;
@@ -192,7 +191,7 @@ package('kb', function(exports){
 			var link = link || ref.link;
 			var title = target.innerText;
 
-			if(ev.button == 1){
+			if(ev.button === 1){
 				this.open({
 					url: url,
 					link: link,
@@ -209,22 +208,14 @@ package('kb', function(exports){
 		},
 
 		handleClickLink: function(ev){
-			if(ev.target.localName != 'a') return;
-			if(ev.target.classList.contains('external-link')) return;
-			if(ev.target.onclick != null) return;
-			if(ev.target.onmousedown != null) return;
-			if(ev.target.onmouseup != null) return;
-			if(ev.target.href == '') return;
+			if(ev.target.localName !== 'a'){ return; }
+			if(ev.target.classList.contains('external-link')){ return; }
+			if(ev.target.onclick != null){ return; }
+			if(ev.target.onmousedown != null){ return; }
+			if(ev.target.onmouseup != null){ return; }
+			if(ev.target.href === ''){ return; }
 
 			this.handleOpenLink(ev);
 		}
 	};
-
-	function elementIsEditable(elem){
-		return elem && (
-			((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
-			(elem.nodeName === 'TEXTAREA') ||
-			(elem.contentEditable === 'true')
-		);
-	}
 });

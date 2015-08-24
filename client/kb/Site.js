@@ -9,12 +9,12 @@ package('kb', function(exports){
 			return React.DOM.div({
 				className:'header-menu'
 			},
-				this.props.items.map(function(item, i){
+				this.props.items.map(function(item){
 					return React.DOM.a(item, item.caption);
 				})
 			);
 		}
-	})
+	});
 
 	var Search = React.createClass({
 		lastStageId: undefined,
@@ -33,12 +33,12 @@ package('kb', function(exports){
 		},
 		keyDown: function(ev){
 			var Lineup = this.props.Lineup;
-			if(ev.keyCode == 27){// esc
+			if(ev.keyCode === 27){// esc
 				Lineup.closeLast();
 				return;
 			}
 
-			if(ev.keyCode == 13){
+			if(ev.keyCode === 13){
 				// open page directly
 				if(ev.ctrlKey){
 					if(!ev.shiftKey){
@@ -57,19 +57,19 @@ package('kb', function(exports){
 			}
 
 			var stages = document.getElementsByClassName('stage');
-			if(stages.length == 0){
+			if(stages.length === 0){
 				return;
-			};
+			}
 
 			var stage = stages[stages.length-1];
 			var middle = stage.getElementsByClassName('stage-scroll')[0];
 
 			switch(ev.keyCode){
 			case 33: // pageup
-				middle.scrollTop -= middle.clientHeight
+				middle.scrollTop -= middle.clientHeight;
 				break;
 			case 34: // pagedown
-				middle.scrollTop += middle.clientHeight
+				middle.scrollTop += middle.clientHeight;
 				break;
 			}
 		},
@@ -91,7 +91,7 @@ package('kb', function(exports){
 				})
 			);
 		}
-	})
+	});
 
 	var Header = React.createClass({
 		openHome: function(ev){

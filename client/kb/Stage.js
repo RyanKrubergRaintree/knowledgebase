@@ -43,7 +43,7 @@ package('kb', function(exports){
 		},
 		item: function(id){
 			return this.items[id];
-		},
+		}
 	};
 
 	// Stage represents a staging area where modifications/loading are done.
@@ -51,7 +51,7 @@ package('kb', function(exports){
 	function Stage(ref, page){
 		this.id = GenerateID();
 
-		this.creating = ref.url == null;
+		this.creating = (ref.url === null) || (ref.url === '');
 		this.url = ref.url;
 		this.link = ref.link;
 		this.title = ref.title;
@@ -74,7 +74,7 @@ package('kb', function(exports){
 
 		this.patching_ = false;
 		this.patches_ = [];
-	};
+	}
 
 	Stage.prototype = {
 		close: function(){
@@ -127,7 +127,7 @@ package('kb', function(exports){
 		patch: function(op){
 			if(this.url == null){ return; }
 
-			var version = this.page.version;
+			// var version = this.page.version;
 			this.page.apply(op);
 
 			this.patches_.push(op);
@@ -165,7 +165,7 @@ package('kb', function(exports){
 			}
 			this.nextPatch_();
 		},
-		patchError_: function(ev){
+		patchError_: function(/* ev */){
 			this.patches_ = [];
 			this.patching_ = false;
 			this.pull();
@@ -198,7 +198,7 @@ package('kb', function(exports){
 			var data = ParseJSON(xhr.responseText),
 			page = new kb.Page(data);
 			if(xhr.responseURL){
-				if(this.url != xhr.responseURL){
+				if(this.url !== xhr.responseURL){
 					this.url = xhr.responseURL;
 					this.urlChanged();
 				}
@@ -211,7 +211,7 @@ package('kb', function(exports){
 
 			kb.TrackPageView(this.url, this.page.title);
 		},
-		pullError_: function(ev){
+		pullError_: function(/* ev */){
 			this.state = 'failed';
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
@@ -252,7 +252,7 @@ package('kb', function(exports){
 			this.state = 'created';
 			this.refresh();
 		},
-		createError_: function(ev){
+		createError_: function(/* ev */){
 			this.state = 'failed';
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
@@ -277,7 +277,7 @@ package('kb', function(exports){
 			this.changed();
 			this.pull();
 		},
-		destroyError_: function(ev){
+		destroyError_: function(/* ev */){
 			this.state = 'failed';
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
