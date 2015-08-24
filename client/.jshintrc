@@ -10,12 +10,11 @@
     "depends": true,
     "package": true,
 
-    "GenerateID": true,
-    "ParseJSON": true,
     "KBHomePage": true,
     "KBUser": true,
-    "GetDataAttribute": true,
-    "DeepClone": true
+
+    "GenerateID": true,
+    "GetDataAttribute": true
   },
   "globalstrict": true,
   "quotmark": "single",

@@ -5,6 +5,8 @@ package('kb.Page', function(exports){
 	depends('Drop.js');
 	depends('item/View.js');
 
+	depends('util/ParseJSON.js');
+
 	// ensure that we clear all the place-holders
 	window.removeEventListener('dragend', clearDropPosition);
 	window.removeEventListener('drop', clearDropPosition);
@@ -196,7 +198,7 @@ package('kb.Page', function(exports){
 			var data = ev.dataTransfer.getData('Text');
 			try { JSON.parse(data); } catch (ex) { data = null; }
 			if(data){
-				var data = ParseJSON(data);
+				var data = kb.util.ParseJSON(data);
 				var item = data.item;
 
 				if(data.url && (data.url !== page.url)){

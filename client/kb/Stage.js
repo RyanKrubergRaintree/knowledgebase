@@ -5,6 +5,7 @@ package('kb', function(exports){
 	depends('Page.js');
 	depends('Tracking.js');
 
+	depends('util/ParseJSON.js');
 
 	function success(xhr){
 		return (200 <= xhr.status) && (xhr.status < 300);
@@ -195,7 +196,7 @@ package('kb', function(exports){
 				return;
 			}
 
-			var data = ParseJSON(xhr.responseText),
+			var data = kb.util.ParseJSON(xhr.responseText),
 			page = new kb.Page(data);
 			if(xhr.responseURL){
 				if(this.url !== xhr.responseURL){

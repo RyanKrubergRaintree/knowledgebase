@@ -122,7 +122,7 @@ package('kb', function(exports){
 			};
 		}
 
-		console.log('Unhandled drop item:', DeepClone(dataTransfer));
+		console.log('Unhandled drop item:', JSON.parse(JSON.stringify(dataTransfer)));
 	}
 
 	exports.DropData = DropData;

@@ -34,7 +34,7 @@ package('kb.item', function(exports){
 			}
 
 			if(item.text !== text){
-				var next = DeepClone(item);
+				var next = JSON.parse(JSON.stringify(item));
 				next.text = text;
 				stage.patch({
 					id: next.id,

@@ -1,20 +1,6 @@
 'use strict';
 
-this.DeepClone = function DeepClone(obj){
-	return JSON.parse(JSON.stringify(obj));
-};
-
-this.ParseJSON = function ParseJSON(data){
-	try {
-		var result = JSON.parse(data);
-	} catch (err) {
-		console.error('Parsing failed:', data);
-		throw err;
-	}
-	return result;
-};
-
-this.DocumentCookies = {
+window.DocumentCookies = {
 	getItem: function (sKey) {
 		return;
 		return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
