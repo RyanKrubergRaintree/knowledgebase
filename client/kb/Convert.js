@@ -13,13 +13,25 @@ package('kb.convert', function(exports){
 		return link.trim();
 	}
 
+	TestCase('trimProtocol', function(assert){
+		assert.equal(trimProtocol(''), '');
+		assert.equal(trimProtocol('http://xyz'), '//xyz');
+		assert.equal(trimProtocol('https://xyz/zwy'), '//xyz/zwy');
+	});
+
 	function trimLeadingSlashes(link){
 		// remove prefix '/'
-		while(link[0] === '/') {
+		while(link.charAt(0) === '/') {
 			link = link.substr(1);
 		}
 		return link;
 	}
+
+	TestCase('trimLeadingSlashes', function(assert){
+		assert.equal(trimLeadingSlashes(''), '');
+		assert.equal(trimLeadingSlashes('xyz'), 'xyz');
+		assert.equal(trimLeadingSlashes('///xyz/zwy'), 'xyz/zwy');
+	});
 
 
 	// TextToSlug converts text to a slug
@@ -78,6 +90,12 @@ package('kb.convert', function(exports){
 
 		return slug;
 	}
+
+	TestCase('TextToSlug', function(assert){
+		assert.equal(TextToSlug(''), '-');
+		assert.equal(TextToSlug('&Hello_世界/+!'), 'amp-hello-世界/plus-excl');
+		assert.equal(TextToSlug('Hello  World  /  Test'), 'hello-world/test');
+	});
 
 	// There are several possible links
 	// 'http://kb.example.com/example'
@@ -143,9 +161,17 @@ package('kb.convert', function(exports){
 				return loc.pathname + loc.search + loc.hash;
 			}
 			return '/' + loc.pathname + loc.search + loc.hash;
+		} else {
+			return trimProtocol(loc.origin) + loc.pathname + loc.search + loc.hash;
 		}
-		return url;
 	}
+	TestCase('URLToReadable', function(assert){
+		assert.equal(URLToReadable(''), '/');
+		assert.equal(URLToReadable('/hello-world'), '/hello-world');
+		assert.equal(URLToReadable('/hello-world/test#'), '/hello-world/test');
+		assert.equal(URLToReadable(window.location.origin + '/hello-world'), '/hello-world');
+		assert.equal(URLToReadable('http://unknown.com/hello-world'), '//unknown.com/hello-world');
+	});
 
 	exports.URLToLocation = URLToLocation;
 	function URLToLocation(url){

@@ -3,66 +3,88 @@
 window.DocumentCookies = {
 	getItem: function (sKey) {
 		return;
-		return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+		return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null;
 	},
 	setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
 		return;
 		if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
-		var sExpires = "";
+		var sExpires = '';
 		if (vEnd) {
 			switch (vEnd.constructor) {
 				case Number:
-					sExpires = vEnd === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + vEnd;
+					sExpires = vEnd === Infinity ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : '; max-age=' + vEnd;
 					break;
 				case String:
-					sExpires = "; expires=" + vEnd;
+					sExpires = '; expires=' + vEnd;
 					break;
 				case Date:
-					sExpires = "; expires=" + vEnd.toUTCString();
+					sExpires = '; expires=' + vEnd.toUTCString();
 					break;
 			}
 		}
-		document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+		document.cookie = encodeURIComponent(sKey) + '=' + encodeURIComponent(sValue) + sExpires + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '') + (bSecure ? '; secure' : '');
 		return true;
 	},
 	removeItem: function (sKey, sPath, sDomain) {
 		return;
 		if (!sKey || !this.hasItem(sKey)) { return false; }
-		document.cookie = encodeURIComponent(sKey) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + ( sDomain ? "; domain=" + sDomain : "") + ( sPath ? "; path=" + sPath : "");
+		document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' + ( sDomain ? '; domain=' + sDomain : '') + ( sPath ? '; path=' + sPath : '');
 		return true;
 	},
 	hasItem: function (sKey) {
-		return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+		return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=')).test(document.cookie);
 	},
 	keys: /* optional method: you can safely remove it! */ function () {
-		var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
+		var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:\=[^;]*)?;\s*/);
 		for (var nIdx = 0; nIdx < aKeys.length; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
 		return aKeys;
 	}
 };
 
-this.GetDataAttribute = function(el, name){
-	if(typeof el.dataset !== "undefined"){
+window.GetDataAttribute = function(el, name){
+	if(typeof el.dataset !== 'undefined'){
 		return el.dataset[name];
 	} else {
-		return el.getAttribute("data-" + name);
+		return el.getAttribute('data-' + name);
 	}
 };
 
-this.Hash = {
+window.Hash = {
 	save: function(){
-		DocumentCookies.setItem("last-hash", document.location.hash, Infinity, "/");
+		DocumentCookies.setItem('last-hash', document.location.hash, Infinity, '/');
 	},
 	restore: function(){
-		var lastHash = DocumentCookies.getItem("hash");
-		if(lastHash && (document.location.hash == "")){
+		var lastHash = DocumentCookies.getItem('hash');
+		if(lastHash && (document.location.hash == '')){
 			document.location.hash = lastHash;
 		}
-		DocumentCookies.removeItem("hash");
+		DocumentCookies.removeItem('hash');
 	}
 };
 
-this.GenerateID = function(){
+window.GenerateID = function(){
 	return Math.random().toString(16).substr(2) +
-	       Math.random().toString(16).substr(2);
+		   Math.random().toString(16).substr(2);
 };
+
+window.TestCase = function(casename, runcase){
+	var assert = {
+		true: function(ok, msg){ if(!ok){ throw new Error(msg); } },
+		fail: function(err){ throw new Error(err); },
+		equal: function(actual, expect, msg){
+			if(actual !== expect) {
+				var full = "\ngot " + actual + "\nexp " + expect;
+				if(typeof msg !== 'undefined') {
+					full = msg + full;
+				}
+				throw new Error(full);
+			}
+		}
+	};
+
+	try {
+		runcase(assert);
+	} catch(err) {
+		console.error('assert ' + casename + ' failed:', err);
+	}
+}
