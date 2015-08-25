@@ -5,7 +5,6 @@ package('kb.item.content', function(exports){
 	depends('content.css');
 
 	depends('../Convert.js');
-	depends('../Slugify.js');
 
 	depends('Sanitize.js');
 	depends('Resolve.js');
@@ -190,7 +189,7 @@ package('kb.item.content', function(exports){
 						return React.DOM.a({
 							className: 'tag',
 							key: i,
-							href: '/tag:' + kb.Slugify(tag)
+							href: '/tag:' + kb.convert.TextToSlug(tag)
 						}, tag);
 					})
 				: React.DOM.p({}, 'Double click here to add page tags.'),

@@ -2,8 +2,7 @@
 
 The Client is structured as:
 
-- kb.convert: contains utilities for converting between URL, Link, Slug
-- kb.Slugify: converts text to a possible slug page
+- kb.convert: contains utilities for converting between text, URL, Link, Slug
 
 Knowledge Base parts:
 
