@@ -2,7 +2,9 @@ package('kb.item', function(exports){
 	'use strict';
 
 	depends('Editor.js');
+
 	depends('content.js');
+	depends('SimpleForm.js');
 
 	exports.DropCanceled = null;
 	exports.View = React.createClass({
