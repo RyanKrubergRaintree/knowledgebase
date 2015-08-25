@@ -24,7 +24,7 @@ package('kb', function(exports){
 		var slug = '';
 
 		for(var i = 0; i < title.length; i += 1){
-			var r = title[i];
+			var r = title.charAt(i);
 			if(kb.unicode.IsIdent(r)) {
 				if(emitdash && !cutdash){
 					slug += '-';

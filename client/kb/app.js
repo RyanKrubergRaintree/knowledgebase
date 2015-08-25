@@ -18,14 +18,13 @@ package('kb.app', function(exports){
 		React.render(site, mountNode);
 
 		app.Crumbs.initLineup(KBHomePage);
-		window.addEventListener('click',
-			app.Lineup.handleClickLink.bind(app.Lineup));
+		window.onclick = app.Lineup.handleClickLink.bind(app.Lineup);
 	}
 
 	initialize(document.getElementById('site'));
 
 	// closing of the last page
-	window.addEventListener('keydown', function(ev){
+	window.onkeydown = function(ev){
 		function elementIsEditable(elem){
 			return elem && (
 				((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
@@ -42,5 +41,5 @@ package('kb.app', function(exports){
 			ev.preventDefault();
 			ev.stopPropagation();
 		}
-	});
+	};
 });

@@ -36,11 +36,11 @@ package('kb', function(exports){
 
 		this.lineup_.on('changed', this.lineupChanged, this);
 		var self = this;
-		window.addEventListener('hashchange', function(/*ev*/){
+		window.onhashchange = function(/*ev*/){
 			if(window.location.hash !== self.navigatingTo_){
 				self.lineup_.updateRefs(fromHash(window.location.hash));
 			}
-		});
+		};
 	}
 
 	Crumbs.prototype = {

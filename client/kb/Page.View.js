@@ -8,10 +8,8 @@ package('kb.Page', function(exports){
 	depends('util/ParseJSON.js');
 
 	// ensure that we clear all the place-holders
-	window.removeEventListener('dragend', clearDropPosition);
-	window.removeEventListener('drop', clearDropPosition);
-	window.addEventListener('dragend', clearDropPosition);
-	window.addEventListener('drop', clearDropPosition);
+	window.ondragend = clearDropPosition;
+	window.ondrop = clearDropPosition;
 
 	function clearDropPosition(){
 		var els = document.getElementsByClassName('drop-after');

@@ -1,3 +1,4 @@
+
 *[data-dita="note"]:before {
 	content: 'Note: ';
 	font-weight: bold;
