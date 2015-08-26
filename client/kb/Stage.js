@@ -75,6 +75,8 @@ package('kb', function(exports){
 
 		this.patching_ = false;
 		this.patches_ = [];
+
+		this.wide = false;
 	}
 
 	Stage.prototype = {
@@ -88,6 +90,18 @@ package('kb', function(exports){
 		},
 		urlChanged: function(){
 			this.notifier.emit({type: 'urlChanged', stage: this});
+		},
+
+		wideChanged: function(){
+			this.notifier.emit({type: 'widthChanged', stage: this});
+		},
+		expand: function(){
+			this.wide = true;
+			this.wideChanged();
+		},
+		collapse: function(){
+			this.wide = false;
+			this.wideChanged();
 		},
 
 		canCreate: function(){

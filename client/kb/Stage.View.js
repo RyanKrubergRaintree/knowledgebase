@@ -180,16 +180,13 @@ package('kb.Stage', function(exports){
 	exports.View = React.createClass({
 		displayName: 'Stage',
 
-		getInitialState: function(){
-			return {
-				wide: false
-			};
-		},
-
 		toggleWidth: function(){
-			this.setState({
-				wide: !this.state.wide
-			});
+			if(this.props.stage.wide){
+				this.props.stage.collapse();
+			} else {
+				this.props.stage.expand();
+			}
+
 			window.setTimeout(this.activate, 100);
 		},
 		activate: function(ev){
@@ -201,19 +198,19 @@ package('kb.Stage', function(exports){
 		},
 
 		render: function(){
-			var wide = this.state.wide ? ' stage-wide' : '';
 			var stage = this.props.stage;
-
 			if(stage.creating){
 				return React.DOM.div(
 					{
-						className: 'stage' + wide,
+						className: 'stage',
 						onClick: this.activate,
-						'data-id': stage.id
+						'data-id': stage.id,
+
+						style: this.props.style
 					},
 					React.createElement(StageButtons, {
 						stage: this.props.stage,
-						isWide: this.state.wide,
+						isWide: stage.wide,
 						onToggleWidth: this.toggleWidth
 					}),
 					React.DOM.div(
@@ -227,13 +224,15 @@ package('kb.Stage', function(exports){
 
 			return React.DOM.div(
 				{
-					className: 'stage' + wide,
+					className: 'stage',
 					onClick: this.activate,
-					'data-id': stage.id
+					'data-id': stage.id,
+
+					style: this.props.style
 				},
 				React.createElement(StageButtons, {
 					stage: this.props.stage,
-					isWide: this.state.wide,
+					isWide: stage.wide,
 					onToggleWidth: this.toggleWidth
 				}),
 				React.DOM.div(
@@ -250,8 +249,12 @@ package('kb.Stage', function(exports){
 		changed: function(){
 			this.forceUpdate();
 		},
+		widthChanged: function(){
+			this.props.onWidthChanged();
+		},
 		componentDidMount: function(){
 			this.props.stage.on('changed', this.changed, this);
+			this.props.stage.on('widthChanged', this.widthChanged, this);
 			this.props.stage.pull();
 			this.activate();
 		},
@@ -259,6 +262,7 @@ package('kb.Stage', function(exports){
 			if(this.props.stage !== nextprops.stage){
 				this.props.stage.remove(this);
 				nextprops.stage.on('changed', this.changed, this);
+				nextprops.stage.on('widthChanged', this.widthChanged, this);
 				nextprops.stage.pull();
 			}
 		},

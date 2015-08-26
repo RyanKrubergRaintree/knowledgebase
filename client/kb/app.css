@@ -2,52 +2,18 @@
 	position: absolute;
 	top: 0; left: 0; right: 0; bottom: 0;
 	overflow-x: scroll;
-
-	display: -webkit-box;
-	display: -moz-box;
-	display: -ms-flexbox;
-	display: -webkit-flex;
-	display: flex;
-
-	-webkit-flex-flow: row;
-	-ms-flex-flow: row;
-	flex-flow: row;
 }
 
 .stage {
-	position: relative;
-
-	-webkit-flex: none;
-	-ms-flex: none;
-	flex: none;
-
-	width: 100%;
-	max-width: 500px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
 
 	transition:
+		left 0.3s ease-in-out,
 		width 0.3s ease-in-out,
 		max-width 0.3s ease-in-out
 	;
-}
-
-.stage-wide {
-	max-width: 700px;
-}
-
-/* 465 * 1.5 ~= 700 */
-@media(min-width:  700px) {
-	.stage { width: 50%; }
-	.stage-wide { width: 100%; }
-}
-/* 465 * 2.5 ~= 1163 */
-@media(min-width: 1163px) {
-	.stage { width: 33.3%; }
-	.stage-wide { width: 66.3%; }
-}
-/* 465 * 3.5 ~= 1628 */
-@media(min-width: 1628px) {
-	.stage { width: 25%; }
-	.stage-wide { width: 50%; }
 }
 
 .stage-buttons {
