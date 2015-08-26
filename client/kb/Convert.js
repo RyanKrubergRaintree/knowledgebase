@@ -163,23 +163,32 @@ package('kb.convert', function(exports){
 		}
 	}
 	TestCase('URLToReadable', function(assert){
-		assert.equal(URLToReadable(''), '');
+		assert.equal(URLToReadable(''), '/');
 		assert.equal(URLToReadable('/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('/hello-world/test#'), '/hello-world/test');
 		assert.equal(URLToReadable('https://' + window.location.host + '/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('http://unknown.com/hello-world'), '//unknown.com/hello-world');
 		assert.equal(URLToReadable('http://unknown.com:241/hello-world'), '//unknown.com:241/hello-world');
+
+		assert.equal(URLToReadable('http://unknown.com/hello:world'), '//unknown.com/hello:world');
+		assert.equal(URLToReadable('/hello:world'), '/hello:world');
+		assert.equal(URLToReadable('hello:world'), '/hello:world');
 	});
 
 	exports.URLToLocation = URLToLocation;
 	function URLToLocation(url){
-		var rx = new RegExp('^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
+		var rx = new RegExp('^((http|https):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
 		var matches = url.match(rx);
+
+		var path = matches[5] || '';
+		if(path.charAt(0) !== '/') {
+			path = '/' + path;
+		}
 
 		return {
 			scheme: matches[2] || '',
 			host: matches[4] || '',
-			path: matches[5] || '',
+			path: path,
 
 			query: matches[7] || '',
 			fragment : matches[9] || ''
