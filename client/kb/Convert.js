@@ -156,17 +156,14 @@ package('kb.convert', function(exports){
 	exports.URLToReadable = URLToReadable;
 	function URLToReadable(url){
 		var loc = URLToLocation(url);
-		if((typeof loc.origin === 'undefined') || (loc.origin === window.location.origin)){
-			if(loc.pathname[0] === '/'){
-				return loc.pathname + loc.search + loc.hash;
-			}
-			return '/' + loc.pathname + loc.search + loc.hash;
+		if((loc.origin === '') || (loc.origin === window.location.origin)){
+			return loc.path + loc.query + loc.fragment;
 		} else {
-			return trimProtocol(loc.origin) + loc.pathname + loc.search + loc.hash;
+			return '//' + loc.host + loc.path + loc.query + loc.fragment;
 		}
 	}
 	TestCase('URLToReadable', function(assert){
-		assert.equal(URLToReadable(''), '/');
+		assert.equal(URLToReadable(''), '');
 		assert.equal(URLToReadable('/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('/hello-world/test#'), '/hello-world/test');
 		assert.equal(URLToReadable(window.location.origin + '/hello-world'), '/hello-world');
@@ -175,20 +172,19 @@ package('kb.convert', function(exports){
 
 	exports.URLToLocation = URLToLocation;
 	function URLToLocation(url){
-		var a = document.createElement('a');
-		a.href = url;
+		var rx = new RegExp('^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
+		var matches = url.match(rx);
+
+		var scheme = matches[2] || '';
+		var host = matches[4] || '';
 		return {
-			hash: a.hash,
-			search: a.search,
-			pathname: a.pathname,
-			port: a.port,
-			hostname: a.hostname,
-			host: a.host,
-			password: a.password,
-			username: a.username,
-			protocol: a.protocol,
-			origin: a.origin,
-			href: a.href
+			scheme: matches[2] || '',
+			host: host,
+			path: matches[5] || '',
+			origin: (host === '') ? '' : (scheme ? scheme + '://' + host : '//' + host) || '',
+
+			query: matches[7] || '',
+			fragment : matches[9] || ''
 		};
 	}
 });

@@ -132,7 +132,8 @@ package('kb.item.content', function(exports){
 			var item = this.props.item;
 			var url = item.url;
 			var loc = kb.convert.URLToLocation(url);
-			var external = loc.origin && (loc.origin !== window.location.origin);
+			var external = (loc.origin !== '') &&
+				(loc.origin !== window.location.origin);
 
 			return React.DOM.div({className: 'item-content content-reference'},
 				React.DOM.a({

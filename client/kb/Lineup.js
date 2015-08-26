@@ -181,9 +181,9 @@ package('kb', function(exports){
 				var locFrom = kb.convert.URLToLocation(stage.url);
 				var locTo = kb.convert.URLToLocation(url);
 				if(locFrom.host === ''){
-					url = '/' + locTo.pathname;
+					url = locTo.path;
 				} else {
-					url = '//' + locFrom.host + locTo.pathname;
+					url = '//' + locFrom.host + locTo.path;
 				}
 			}
 
