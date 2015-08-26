@@ -156,7 +156,7 @@ package('kb.convert', function(exports){
 	exports.URLToReadable = URLToReadable;
 	function URLToReadable(url){
 		var loc = URLToLocation(url);
-		if((loc.origin === '') || (loc.origin === window.location.origin)){
+		if((loc.host === '') || (loc.host === window.location.host)){
 			return loc.path + loc.query + loc.fragment;
 		} else {
 			return '//' + loc.host + loc.path + loc.query + loc.fragment;
@@ -166,8 +166,9 @@ package('kb.convert', function(exports){
 		assert.equal(URLToReadable(''), '');
 		assert.equal(URLToReadable('/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('/hello-world/test#'), '/hello-world/test');
-		assert.equal(URLToReadable(window.location.origin + '/hello-world'), '/hello-world');
+		assert.equal(URLToReadable('https://' + window.location.host + '/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('http://unknown.com/hello-world'), '//unknown.com/hello-world');
+		assert.equal(URLToReadable('http://unknown.com:241/hello-world'), '//unknown.com:241/hello-world');
 	});
 
 	exports.URLToLocation = URLToLocation;
@@ -175,13 +176,10 @@ package('kb.convert', function(exports){
 		var rx = new RegExp('^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
 		var matches = url.match(rx);
 
-		var scheme = matches[2] || '';
-		var host = matches[4] || '';
 		return {
 			scheme: matches[2] || '',
-			host: host,
+			host: matches[4] || '',
 			path: matches[5] || '',
-			origin: (host === '') ? '' : (scheme ? scheme + '://' + host : '//' + host) || '',
 
 			query: matches[7] || '',
 			fragment : matches[9] || ''
