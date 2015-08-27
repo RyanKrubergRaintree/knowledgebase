@@ -115,7 +115,7 @@ package('kb', function(exports){
 			return this.allowed.indexOf('PUT') >= 0;
 		},
 		canModify: function(){
-			return this.allowed.indexOf('PATCH') >= 0;
+			return this.allowed.indexOf('POST') >= 0;
 		},
 		canDestroy: function(){
 			return this.allowed.indexOf('DELETE') >= 0;
@@ -167,7 +167,7 @@ package('kb', function(exports){
 				xhr.onreadystatechange = bindready(xhr, this.patchDone_, this);
 				xhr.onerror = this.patchError_.bind(this);
 
-				xhr.open('PATCH', this.url, true);
+				xhr.open('POST', this.url, true);
 
 				xhr.setRequestHeader('Accept', 'application/json');
 				xhr.setRequestHeader('Content-Type', 'application/json');
@@ -175,10 +175,7 @@ package('kb', function(exports){
 				xhr.send(JSON.stringify(patch));
 			}
 		},
-		patchDone_: function(ev){
-			var xhr = ev.target;
-			if(xhr.readyState !== 4){ return; }
-
+		patchDone_: function(xhr){
 			this.patching_ = false;
 
 			if(!this.updateStatus_(xhr)){

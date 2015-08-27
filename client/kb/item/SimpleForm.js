@@ -38,7 +38,7 @@ package('kb.item.content', function(exports){
 			xhr.onreadystatechange = this.done;
 			xhr.onerror = this.errored;
 
-			xhr.open('PATCH', url, true);
+			xhr.open('POST', url, true);
 
 			xhr.setRequestHeader('action', GetDataAttribute(ev.currentTarget, 'action'));
 

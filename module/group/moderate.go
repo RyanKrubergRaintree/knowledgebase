@@ -24,7 +24,7 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == "PATCH" {
+	if r.Method == "POST" {
 		action := r.Header.Get("action")
 		switch action {
 		case "add-user", "remove-user",

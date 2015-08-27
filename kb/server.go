@@ -168,9 +168,9 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case Reader:
 		allowedMethods = []string{"GET"}
 	case Editor:
-		allowedMethods = []string{"GET", "PATCH", "PUT"}
+		allowedMethods = []string{"GET", "POST", "PUT"}
 	case Moderator:
-		allowedMethods = []string{"GET", "PATCH", "PUT", "OVERWRITE", "DELETE"}
+		allowedMethods = []string{"GET", "POST", "PUT", "OVERWRITE", "DELETE"}
 	default:
 		log.Println("Invalid rights returned for user %s got %d.", user.ID, rights)
 		http.Error(w, "Invalid rights.", http.StatusInternalServerError)
@@ -232,7 +232,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 	// updating a page
-	case "PATCH":
+	case "POST":
 		version, err := getExpectedVersion(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

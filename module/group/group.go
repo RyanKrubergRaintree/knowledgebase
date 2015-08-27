@@ -45,7 +45,7 @@ func (mod *Module) init() {
 	mod.router.HandleFunc("/group:modules", mod.modules).Methods("GET")
 	mod.router.HandleFunc("/group:module-{module-id}", mod.modulePages).Methods("GET")
 
-	mod.router.HandleFunc("/group:moderate-{group-id}", mod.moderate).Methods("GET", "PATCH")
+	mod.router.HandleFunc("/group:moderate-{group-id}", mod.moderate).Methods("GET", "POST")
 	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
 }
 
