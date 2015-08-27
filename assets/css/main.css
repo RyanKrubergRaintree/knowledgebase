@@ -52,6 +52,8 @@ h4 { font-size: 1.1em; }
 	height: 46px;
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 
+	border-bottom: 1px solid #ddd;
+
 	z-index: 10;
 	transition: box-shadow 0.2s ease-in-out;
 }
@@ -78,6 +80,9 @@ h4 { font-size: 1.1em; }
 	box-shadow:
 		0 6px 10px 0 rgba(0, 0, 0, 0.3),
 		0 2px 2px 0 rgba(0, 0, 0, 0.2);
+
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
 }
 
 .header-menu a {
