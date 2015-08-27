@@ -12,6 +12,8 @@ package('kb.item.content', function(exports){
 
 		done: function(ev){
 			var xhr = ev.currentTarget;
+			if(xhr.readyState !== 4){ return; }
+
 			if(xhr.status !== 200){
 				this.setState({message: '', error: xhr.responseText});
 				return;
@@ -33,7 +35,7 @@ package('kb.item.content', function(exports){
 			var url = this.props.item.url;
 
 			var xhr = new XMLHttpRequest();
-			xhr.onload = this.done;
+			xhr.onreadystatechange = this.done;
 			xhr.onerror = this.errored;
 
 			xhr.open('PATCH', url, true);

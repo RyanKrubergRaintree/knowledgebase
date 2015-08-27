@@ -94,8 +94,7 @@ package('kb.Stage', function(exports){
 			};
 		},
 
-		groupsReceived: function(ev){
-			var xhr = ev.target;
+		groupsReceived: function(xhr){
 			if(xhr.status === 200){
 				var info = JSON.parse(ev.target.responseText);
 				this.setState({groups: info.groups || []});
@@ -104,7 +103,10 @@ package('kb.Stage', function(exports){
 
 		componentDidMount: function(){
 			var xhr = new XMLHttpRequest();
-			xhr.onload = this.groupsReceived;
+			xhr.onreadystatechange = function(){
+				if(xhr.readyState !== 4){ return; }
+				this.groupsReceived(xhr);
+			};
 			xhr.open('RAW', '/user:editor-groups', true);
 			xhr.setRequestHeader('Accept', 'application/json');
 			xhr.send();

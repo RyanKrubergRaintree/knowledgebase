@@ -11,6 +11,13 @@ package('kb', function(exports){
 		return (200 <= xhr.status) && (xhr.status < 300);
 	}
 
+	function bindready(xhr, fn, self){
+		return function(){
+			if(xhr.readyState !== 4){ return; }
+			fn.call(self, xhr);
+		}
+	}
+
 	function Editing(stage){
 		this.stage = stage;
 		this.items = {};
@@ -157,7 +164,7 @@ package('kb', function(exports){
 				this.patching_ = true;
 
 				var xhr = new XMLHttpRequest();
-				xhr.onload = this.patchDone_.bind(this);
+				xhr.onreadystatechange = bindready(xhr, this.patchDone_, this);
 				xhr.onerror = this.patchError_.bind(this);
 
 				xhr.open('PATCH', this.url, true);
@@ -169,8 +176,11 @@ package('kb', function(exports){
 			}
 		},
 		patchDone_: function(ev){
-			this.patching_ = false;
 			var xhr = ev.target;
+			if(xhr.readyState !== 4){ return; }
+
+			this.patching_ = false;
+
 			if(!this.updateStatus_(xhr)){
 				//TODO: don't drop changes in case of errors
 				this.patches_ = [];
@@ -196,15 +206,14 @@ package('kb', function(exports){
 			this.changed();
 
 			var xhr = new XMLHttpRequest();
-			xhr.onload = this.pullDone_.bind(this);
+			xhr.onreadystatechange = bindready(xhr, this.pullDone_, this);
 			xhr.onerror = this.pullError_.bind(this);
 
 			xhr.open('GET', this.url, true);
 			xhr.setRequestHeader('Accept', 'application/json');
 			xhr.send();
 		},
-		pullDone_: function(ev){
-			var xhr = ev.target;
+		pullDone_: function(xhr){
 			if(!this.updateStatus_(xhr)){
 				this.changed();
 				return;
@@ -240,7 +249,7 @@ package('kb', function(exports){
 			this.urlChanged();
 
 			var xhr = new XMLHttpRequest();
-			xhr.onload = this.createDone_.bind(this);
+			xhr.onreadystatechange = bindready(xhr, this.createDone_, this);
 			xhr.onerror = this.createError_.bind(this);
 
 			xhr.open('PUT', this.url, true);
@@ -257,8 +266,7 @@ package('kb', function(exports){
 
 			this.changed();
 		},
-		createDone_: function(ev){
-			var xhr = ev.target;
+		createDone_: function(xhr){
 			if(!this.updateStatus_(xhr)){
 				this.changed();
 				return;
@@ -281,7 +289,7 @@ package('kb', function(exports){
 			var xhr = new XMLHttpRequest();
 			xhr.open('DELETE', this.url, true);
 
-			xhr.onload = this.destroyDone_.bind(this);
+			xhr.onreadystatechange = bindready(xhr, this.destroyDone_, this);
 			xhr.onerror = this.destroyError_.bind(this);
 
 			xhr.send();

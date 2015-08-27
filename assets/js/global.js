@@ -41,7 +41,7 @@ window.DocumentCookies = {
 	}
 };
 
-window.GetDataAttribute = function(el, name){
+window.GetDataAttribute = function GetDataAttribute(el, name){
 	if(typeof el.dataset !== 'undefined'){
 		return el.dataset[name];
 	} else {
@@ -62,16 +62,16 @@ window.Hash = {
 	}
 };
 
-window.GenerateID = function(){
+window.GenerateID = function GenerateID(){
 	return Math.random().toString(16).substr(2) +
 		   Math.random().toString(16).substr(2);
 };
 
-window.TestCase = function(casename, runcase){
+window.TestCase = function TestCase(casename, runcase){
 	var assert = {
-		true: function(ok, msg){ if(!ok){ throw new Error(msg); } },
-		fail: function(err){ throw new Error(err); },
-		equal: function(actual, expect, msg){
+		'true': function(ok, msg){ if(!ok){ throw new Error(msg); } },
+		'fail': function(err){ throw new Error(err); },
+		'equal': function(actual, expect, msg){
 			if(actual !== expect) {
 				var full = "\ngot " + actual + "\nexp " + expect;
 				if(typeof msg !== 'undefined') {
@@ -87,4 +87,4 @@ window.TestCase = function(casename, runcase){
 	} catch(err) {
 		console.error('assert ' + casename + ' failed:', err);
 	}
-}
+};
