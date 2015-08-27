@@ -37,7 +37,7 @@ func (mod *Module) Info() kb.Group {
 
 func (mod *Module) init() {
 	mod.router.HandleFunc("/user:current", mod.current).Methods("GET")
-	mod.router.HandleFunc("/user:editor-groups", mod.groups).Methods("RAW")
+	mod.router.HandleFunc("/user:editor-groups", mod.groups).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -85,6 +85,11 @@ func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("Accept") != "application/json" {
+		http.Error(w, "Accept header must be application/json", http.StatusNotAcceptable)
+		return
+	}
+
 	context, ok := mod.server.UserContext(w, r)
 	if !ok {
 		return
