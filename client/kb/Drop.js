@@ -9,6 +9,9 @@ package('kb', function(exports){
 			'image/png': true,
 			'image/jpeg': true
 		};
+		if(typeof dataTransfer.files === 'undefined'){
+			return null;
+		}
 		for(var i = 0; i < dataTransfer.files.length; i += 1){
 			var file = dataTransfer.files[i];
 			if(acceptedImages[file.type]){
