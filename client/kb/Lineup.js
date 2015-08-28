@@ -208,12 +208,15 @@ package('kb', function(exports){
 		},
 
 		handleClickLink: function(ev){
-			if(ev.target.nodeName !== 'A'){ return; }
-			if(getClassList(ev.target).contains('external-link')){ return; }
-			if(ev.target.onclick != null){ return; }
-			if(ev.target.onmousedown != null){ return; }
-			if(ev.target.onmouseup != null){ return; }
-			if(ev.target.href === ''){ return; }
+			var t = ev.target;
+			if(t.nodeName !== 'A'){ return; }
+			if(getClassList(t).contains('external-link')){ return; }
+			if(t.onclick != null){ return; }
+			if(t.onmousedown != null){ return; }
+			if(t.onmouseup != null){ return; }
+
+			var path = t.pathname;
+			if((path === '')||(path === '/')){ return; }
 
 			this.handleOpenLink(ev);
 		}

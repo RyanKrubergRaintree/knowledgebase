@@ -167,10 +167,10 @@ package('kb.Page', function(exports){
 			}
 
 			if(drop.node !== null){
-				getClassList(node).add('drop-' + drop.rel);
+				getClassList(drop.node).add('drop-' + drop.rel);
 			} else {
 				var story = this.refs.story.getDOMNode();
-				getClassList(node).add('drop-' + drop.rel);
+				getClassList(story).add('drop-' + drop.rel);
 			}
 		},
 		dragDrop: function(ev){

@@ -147,7 +147,7 @@ package('kb', function(exports){
 		},
 
 		patch: function(op){
-			if(this.url == null){ return; }
+			if((this.url === null)||(this.url === '')){ return; }
 
 			// var version = this.page.version;
 			this.page.apply(op);
@@ -197,7 +197,7 @@ package('kb', function(exports){
 			this.pull();
 		},
 		pull: function(){
-			if(this.url == null){ return; }
+			if((this.url === null)||(this.url === '')){ return; }
 
 			this.state = 'loading';
 			this.changed();
@@ -281,7 +281,7 @@ package('kb', function(exports){
 		},
 
 		destroy: function(){
-			if(this.url == null){ return; }
+			if((this.url === null)||(this.url === '')){ return; }
 
 			var xhr = new XMLHttpRequest();
 			xhr.open('DELETE', this.url, true);

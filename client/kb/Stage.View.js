@@ -35,6 +35,7 @@ package('kb.Stage', function(exports){
 		deletePage: function(){
 			var stage = this.props.stage;
 			var check = window.prompt('Delete this page?\nType the page link \''+ stage.link + '\' to confirm:');
+			if(check === null){ return; }
 			if(check.trim() !== stage.link.trim()){
 				return;
 			}
@@ -146,6 +147,7 @@ package('kb.Stage', function(exports){
 						ref: 'title',
 						defaultValue: stage.title,
 						onChange: this.titleChanged,
+						onKeyUp: this.titleChanged,
 						autoFocus: true
 					}),
 					React.DOM.label({}, 'Owner'),

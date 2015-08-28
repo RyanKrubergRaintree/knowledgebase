@@ -95,26 +95,29 @@ package('kb', function(exports){
 
 	var Header = React.createClass({
 		openHome: function(ev){
+			ev.preventDefault();
+			ev.stopPropagation();
+
 			var lineup = this.props.Lineup;
 			lineup.clear();
 			lineup.openLink(KBHomePage);
-			ev.preventDefault();
-			ev.stopPropagation();
 		},
 		createNewPage: function(ev){
+			ev.preventDefault();
+			ev.stopPropagation();
+
 			var lineup = this.props.Lineup;
 			lineup.open({
-				url: null,
+				url: '',
 				link: '',
 				title: ''
 			});
-			ev.preventDefault();
-			ev.stopPropagation();
 		},
 		logout: function(ev){
-			window.location.pathname = '/system/auth/logout';
 			ev.preventDefault();
 			ev.stopPropagation();
+
+			window.location.pathname = '/system/auth/logout';
 		},
 		displayName: 'Header',
 		render: function(){
