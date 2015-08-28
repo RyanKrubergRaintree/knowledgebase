@@ -18,13 +18,18 @@ package('kb.app', function(exports){
 		React.render(site, mountNode);
 
 		app.Crumbs.initLineup(KBHomePage);
-		window.onclick = app.Lineup.handleClickLink.bind(app.Lineup);
+		document.onclick = function(ev){
+			ev = ev || window.event; // IE8 passes the event in global scope
+			app.Lineup.handleClickLink(ev);
+		};
 	}
 
 	initialize(document.getElementById('site'));
 
 	// closing of the last page
-	window.onkeydown = function(ev){
+	document.onkeydown = function(ev){
+		ev = ev || window.event; // IE8 passes the event in global scope
+
 		function elementIsEditable(elem){
 			return elem && (
 				((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||

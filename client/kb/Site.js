@@ -56,13 +56,13 @@ package('kb', function(exports){
 				return;
 			}
 
-			var stages = document.getElementsByClassName('stage');
+			var stages = document.querySelectorAll('.stage');
 			if(stages.length === 0){
 				return;
 			}
 
 			var stage = stages[stages.length-1];
-			var middle = stage.getElementsByClassName('stage-scroll')[0];
+			var middle = stage.querySelector('.stage-scroll');
 
 			switch(ev.keyCode){
 			case 33: // pageup

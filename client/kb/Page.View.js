@@ -12,13 +12,13 @@ package('kb.Page', function(exports){
 	window.ondrop = clearDropPosition;
 
 	function clearDropPosition(){
-		var els = document.getElementsByClassName('drop-after');
+		var els = document.querySelectorAll('.drop-after');
 		for(var i = 0; i < els.length; i += 1){
-			els[i].classList.remove('drop-after');
+			getClassList(els[i]).remove('drop-after')
 		}
-		els = document.getElementsByClassName('drop-before');
+		els = document.querySelectorAll('.drop-before');
 		for(i = 0; i < els.length; i += 1){
-			els[i].classList.remove('drop-before');
+			getClassList(els[i]).remove('drop-before');
 		}
 	}
 
@@ -58,11 +58,11 @@ package('kb.Page', function(exports){
 
 	function findListContainer(node, containerClass, listClass){
 		while(node){
-			if(node.classList.contains(listClass)){
+			if(getClassList(node).contains(listClass)){
 				return node;
 			}
-			if(node.classList.contains(containerClass)){
-				return node.getElementsByClassName(listClass)[0];
+			if(getClassList(node).contains(containerClass)){
+				return node.querySelector('.' + listClass);
 			}
 			node = node.parentElement;
 		}
@@ -167,10 +167,10 @@ package('kb.Page', function(exports){
 			}
 
 			if(drop.node !== null){
-				drop.node.classList.add('drop-' + drop.rel);
+				getClassList(node).add('drop-' + drop.rel);
 			} else {
 				var story = this.refs.story.getDOMNode();
-				story.classList.add('drop-' + drop.rel);
+				getClassList(node).add('drop-' + drop.rel);
 			}
 		},
 		dragDrop: function(ev){

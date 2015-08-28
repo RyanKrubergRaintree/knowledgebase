@@ -88,3 +88,25 @@ window.TestCase = function TestCase(casename, runcase){
 		console.error('assert ' + casename + ' failed:', err);
 	}
 };
+
+window.getClassList = function(el){
+	function split(s) { return s.length ? s.split(/\s+/g) : []; }
+
+	if('classList' in el){
+		return el.classList;
+	}
+
+	return {
+		add: function(token){
+			el.className += ' ' + token;
+		},
+		remove: function(token){
+			var tokens = ' ' + el.className + ' ';
+			tokens = tokens.replace(' ' + token + ' ', '');
+			el.className = tokens.trim();
+		},
+		contains: function(token){
+			return split(el.className).indexOf(token) >= 0;
+		}
+	};
+};

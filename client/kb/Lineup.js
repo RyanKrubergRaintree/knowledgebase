@@ -158,7 +158,7 @@ package('kb', function(exports){
 		findStageFromElement: function(el){
 			for(var i = 0; i < 32; i += 1){
 				if(el === null){ return null; }
-				if(el.classList.contains('stage')){
+				if(getClassList(el).contains('stage')){
 					var id = GetDataAttribute(el, 'id');
 					return this.stageById(id);
 				}
@@ -208,8 +208,8 @@ package('kb', function(exports){
 		},
 
 		handleClickLink: function(ev){
-			if(ev.target.localName !== 'a'){ return; }
-			if(ev.target.classList.contains('external-link')){ return; }
+			if(ev.target.nodeName !== 'A'){ return; }
+			if(getClassList(ev.target).contains('external-link')){ return; }
 			if(ev.target.onclick != null){ return; }
 			if(ev.target.onmousedown != null){ return; }
 			if(ev.target.onmouseup != null){ return; }
