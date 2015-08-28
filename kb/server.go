@@ -44,7 +44,7 @@ type Auth interface {
 
 type Server struct {
 	ServerInfo
-	Templates string
+	TemplatesDir string
 
 	Auth Auth
 	Database
@@ -55,8 +55,8 @@ type Server struct {
 
 func NewServer(info ServerInfo, auth Auth, database Database) *Server {
 	return &Server{
-		ServerInfo: info,
-		Templates:  "templates",
+		ServerInfo:   info,
+		TemplatesDir: filepath.Join("client", "templates"),
 
 		Auth:     auth,
 		Database: database,
@@ -353,7 +353,7 @@ func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname stri
 				return user
 			},
 		},
-	).ParseGlob(filepath.Join(server.Templates, "*.html"))
+	).ParseGlob(filepath.Join(server.TemplatesDir, "*.html"))
 
 	if err != nil {
 		log.Printf("Error parsing templates: %s", err)

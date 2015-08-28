@@ -44,10 +44,7 @@ func build() {
 	AddGlob("Docker*")
 	AddGlob("LICENSE-*")
 
-	AddDir("assets")
 	AddDir("client")
-	AddDir("templates")
-
 }
 
 func main() {

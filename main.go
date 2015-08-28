@@ -44,9 +44,7 @@ var (
 
 	rules = flag.String("rules", "rules.json", "different rules for server")
 
-	templatesdir = flag.String("templates", "templates", "templates `directory`")
-	assetsdir    = flag.String("assets", "assets", "assets `directory`")
-	clientdir    = flag.String("client", "client", "client `directory`")
+	clientdir = flag.String("client", "client", "client `directory`")
 )
 
 func main() {
@@ -57,9 +55,6 @@ func main() {
 		*addr = host + ":" + port
 	}
 
-	if os.Getenv("ASSETSDIR") != "" {
-		*assetsdir = os.Getenv("ASSETSDIR")
-	}
 	if os.Getenv("CLIENTDIR") != "" {
 		*clientdir = os.Getenv("CLIENTDIR")
 	}
@@ -91,7 +86,8 @@ func main() {
 	log.Printf("Starting %s on %s\n", *domain, *addr)
 
 	// Serve static files
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(*assetsdir))))
+	http.Handle("/assets/", http.StripPrefix("/assets/",
+		http.FileServer(http.Dir(filepath.Join(*clientdir, "assets")))))
 
 	// Serve client
 	client := livepkg.NewServer(http.Dir(*clientdir), *development, "/kb/app.js")
@@ -127,6 +123,8 @@ func main() {
 		Version:    time.Now().Format("20060102150405"),
 	}, sec, db)
 
+	server.TemplatesDir = filepath.Join(*clientdir, "templates")
+
 	ruleset := MustLoadRules(*rules)
 	server.Rules = ruleset
 
@@ -143,7 +141,7 @@ func main() {
 	}
 
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(*assetsdir, "ico", "favicon.ico"))
+		http.ServeFile(w, r, filepath.Join(*clientdir, "assets", "ico", "favicon.ico"))
 	})
 	http.Handle("/", server)
 	log.Fatal(http.ListenAndServe(*addr, nil))
