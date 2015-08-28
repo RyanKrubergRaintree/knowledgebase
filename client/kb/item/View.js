@@ -91,11 +91,12 @@ package('kb.item', function(exports){
 					onDoubleClick: stage.canModify() ? this.startEditing : null,
 					'data-id': item.id
 				},
-				!isEditing ? React.DOM.div({
+				!isEditing ? React.DOM.a({
 					className:'item-drag',
 					title: 'Move or copy item.',
 					draggable: 'true',
 
+					href: '#',
 					onDragStart: this.dragStart,
 					onDrag: this.drag,
 					onDragEnd: this.dragEnd

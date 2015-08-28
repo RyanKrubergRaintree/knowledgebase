@@ -101,10 +101,15 @@
 	overflow: auto;
 }
 
-.page h1 {
+.page .page-title {
 	position: relative;
 	margin: 34px 10px 16px 10px;
 	z-index: 10;
+}
+
+.page .page-title a {
+	text-decoration: none;
+	color: #333333;
 }
 
 .page-owner {

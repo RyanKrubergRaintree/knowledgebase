@@ -265,12 +265,14 @@ package('kb.Page', function(exports){
 					onDragLeave: this.dragLeave
 				},
 				React.DOM.h2({ className: 'page-owner' }, owner),
-				React.DOM.h1({
+				React.DOM.h1({ className: 'page-title' }, React.DOM.a({
 					title: 'Drag to create a page reference.',
 					draggable: true,
+					onClick: function(ev){ ev.preventDefault(); },
 					onDragStart: this.createReference,
+					href: stage.link,
 					style: {cursor: 'move'}
-				}, page.title),
+				}, page.title)),
 				status,
 				React.createElement(Story, {
 					ref: 'story',

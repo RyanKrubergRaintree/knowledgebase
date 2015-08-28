@@ -48,11 +48,12 @@ package('kb.Stage', function(exports){
 			var a = React.DOM.a;
 			return React.DOM.div(
 				{className: 'stage-buttons'},
-				stage.canModify() ? React.DOM.div({
+				stage.canModify() ? React.DOM.a({
 					className:'mdi mdi-playlist-plus',
 					title:'Drag to page to add an item.',
 					style: { cursor: 'move' },
 					draggable: 'true',
+					href: '#',
 					onDragStart: this.createFactory
 				}) : null,
 				stage.canDestroy() ? a({
