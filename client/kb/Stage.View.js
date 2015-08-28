@@ -54,6 +54,10 @@ package('kb.Stage', function(exports){
 					style: { cursor: 'move' },
 					draggable: 'true',
 					href: '#',
+					onClick: function(ev){
+						ev = ev || window.event;
+						ev.preventDefault();
+					},
 					onDragStart: this.createFactory
 				}) : null,
 				stage.canDestroy() ? a({

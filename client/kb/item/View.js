@@ -42,7 +42,8 @@ package('kb.item', function(exports){
 				};
 			}
 		},
-		drag: function(ev){ ev.preventDefault(); },
+		drag: function(ev){
+		},
 		dragEnd: function(ev){
 			if(kb.item.DropCanceled){
 				ev.preventDefault();
@@ -97,6 +98,11 @@ package('kb.item', function(exports){
 					draggable: 'true',
 
 					href: '#',
+					onClick: function(ev){
+						ev = ev || window.event;
+						ev.preventDefault();
+					},
+
 					onDragStart: this.dragStart,
 					onDrag: this.drag,
 					onDragEnd: this.dragEnd
