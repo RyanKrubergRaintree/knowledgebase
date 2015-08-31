@@ -26,6 +26,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/module/search"
 	"github.com/raintreeinc/knowledgebase/module/tag"
 	"github.com/raintreeinc/knowledgebase/module/user"
+	"github.com/raintreeinc/knowledgebase/module/dispatch"
 
 	_ "github.com/lib/pq"
 )
@@ -135,6 +136,12 @@ func main() {
 	server.AddModule(search.New(server))
 	server.AddModule(tag.New(server))
 	server.AddModule(user.New(server))
+	server.AddModule(dispatch.New(kb.Group{
+		ID:          "help",
+		Name:        "Help",
+		Public:      false,
+		Description: "Raintree Official Help",
+	}, server))
 
 	if *ditamap != "" {
 		server.AddModule(dita.New("Dita", *ditamap, server))

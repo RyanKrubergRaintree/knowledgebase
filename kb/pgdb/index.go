@@ -149,6 +149,14 @@ func (db Index) ByGroup(groupID kb.Slug) ([]kb.PageEntry, error) {
 	`, db.UserID, groupID)
 }
 
+func (db Index) ByTitle(suffix kb.Slug) ([]kb.PageEntry, error) {
+	return db.pageEntries(`
+		WHERE Slug LIKE '%:' || $2
+		  AND `+pageVisibleToUser+`
+		ORDER BY Slug DESC
+	`, db.UserID, suffix)
+}
+
 func (db Index) RecentChanges() ([]kb.PageEntry, error) {
 	n := 30
 	return db.pageEntries(`

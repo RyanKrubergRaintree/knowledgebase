@@ -105,6 +105,19 @@ func TokenizeLink(link string) (owner, page Slug) {
 	return slug[:i], slug
 }
 
+func TokenizeLink3(link string) (owner, title, page Slug) {
+	if strings.HasPrefix(link, "/") {
+		link = link[1:]
+	}
+	slug := Slugify(link)
+
+	i := strings.Index(string(slug), ":")
+	if i < 0 {
+		return "", slug, slug
+	}
+	return slug[:i], slug[i+1:], slug
+}
+
 func SlugToTitle(slug Slug) string {
 	title := strings.Replace(string(slug), "-", " ", -1)
 	return strings.Title(title)

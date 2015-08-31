@@ -129,6 +129,8 @@ type Index interface {
 	Groups(min Rights) ([]Group, error)
 	ByGroup(groupID Slug) ([]PageEntry, error)
 
+	ByTitle(title Slug) ([]PageEntry, error)
+
 	RecentChanges() ([]PageEntry, error)
 }
 
