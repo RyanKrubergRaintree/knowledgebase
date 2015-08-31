@@ -1,0 +1,12 @@
+{
+	"DBParams": "user=kbroot password='kbroot' dbname=knowledgebase sslmode=disable",
+	"Mapping": [{
+		"Group":       "Alpha",
+		"Ditamap":     "example/alpha/root.ditamap",
+		"Description": "Alpha content"
+	},{
+		"Group":       "Beta",
+		"Ditamap":     "example/beta/root.ditamap",
+		"Description": "Beta content"
+	}]
+}
