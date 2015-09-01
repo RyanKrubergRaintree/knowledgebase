@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/raintreeinc/knowledgebase/internal/natural"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
@@ -42,29 +43,15 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	temp, err := index.ByTitle(titleID)
+	entries, err := index.ByTitle(titleID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	entries := []kb.PageEntry{}
-	prefix := string(mod.group.ID + "/")
-	for _, entry := range temp {
-		if !strings.HasPrefix(string(entry.Slug), prefix) {
-			continue
-		}
-		groupID, _ := kb.TokenizeLink(string(entry.Slug))
-		title := strings.TrimPrefix(string(groupID), prefix)
-
-		entries = append(entries, kb.PageEntry{
-			Title: title,
-			Slug:  entry.Slug,
-		})
-	}
-
-	kb.SortPageEntriesByTitle(entries)
-	kb.ReversePageEntries(entries)
+	kb.SortPageEntries(entries, func(a, b *kb.PageEntry) bool {
+		return natural.Less(string(b.Slug), string(a.Slug))
+	})
 
 	page := &kb.Page{Slug: pageID}
 	if len(entries) > 0 {
@@ -79,10 +66,16 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.Paragraph("No pages."))
 	} else {
 		page.Story.Append(kb.HTML("<h2>Versions</h2>"))
-		for _, entry := range entries {
-			page.Story.Append(kb.Entry(entry.Title, "", entry.Slug))
-		}
 
+		prefix := string(mod.group.ID + "/")
+		for _, entry := range entries {
+			if !strings.HasPrefix(string(entry.Slug), prefix) {
+				continue
+			}
+			groupID, _ := kb.TokenizeLink(string(entry.Slug))
+			title := strings.TrimPrefix(string(groupID), prefix)
+			page.Story.Append(kb.Entry(title, "", entry.Slug))
+		}
 	}
 
 	page.WriteResponse(w)
