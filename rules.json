@@ -4,6 +4,7 @@
 		".*@raintreeinc.com": ["raintree"]
 	},
 	"byAuthProvider" : {
-		"guest": ["guests"]
+		"guest": ["guests"],
+		"community": ["community"]
 	}
 }
