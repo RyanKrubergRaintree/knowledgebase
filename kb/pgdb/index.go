@@ -153,7 +153,6 @@ func (db Index) ByTitle(suffix kb.Slug) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
 		WHERE Slug LIKE '%:' || $2
 		  AND `+pageVisibleToUser+`
-		ORDER BY Slug DESC
 	`, db.UserID, suffix)
 }
 

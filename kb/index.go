@@ -4,6 +4,8 @@ import (
 	"html"
 	"time"
 
+	"github.com/raintreeinc/knowledgebase/internal/natural"
+
 	"github.com/bradfitz/slice"
 )
 
@@ -41,6 +43,18 @@ type TagEntry struct {
 
 func SortPageEntriesByDate(xs []PageEntry) {
 	slice.Sort(xs, func(i, j int) bool { return xs[i].Modified.After(xs[j].Modified) })
+}
+
+func SortPageEntriesByTitle(xs []PageEntry) {
+	slice.Sort(xs, func(i, j int) bool {
+		return natural.Less(xs[i].Title, xs[j].Title)
+	})
+}
+
+func ReversePageEntries(xs []PageEntry) {
+	for i, j := 0, len(xs)-1; i < j; i, j = i+1, j-1 {
+		xs[i], xs[j] = xs[j], xs[i]
+	}
 }
 
 func SortPageEntriesBySlug(xs []PageEntry) {
