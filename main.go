@@ -20,13 +20,13 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 
 	"github.com/raintreeinc/knowledgebase/module/admin"
+	"github.com/raintreeinc/knowledgebase/module/dispatch"
 	"github.com/raintreeinc/knowledgebase/module/dita"
 	"github.com/raintreeinc/knowledgebase/module/group"
 	"github.com/raintreeinc/knowledgebase/module/page"
 	"github.com/raintreeinc/knowledgebase/module/search"
 	"github.com/raintreeinc/knowledgebase/module/tag"
 	"github.com/raintreeinc/knowledgebase/module/user"
-	"github.com/raintreeinc/knowledgebase/module/dispatch"
 
 	_ "github.com/lib/pq"
 )
@@ -39,6 +39,8 @@ var (
 	addr     = flag.String("listen", ":80", "http server `address`")
 	database = flag.String("database", "user=root dbname=knowledgebase sslmode=disable", "database `params`")
 	domain   = flag.String("domain", "", "`domain`")
+
+	redirecthttps = flag.Bool("redirecthttps", false, "redirect http to https")
 
 	development = flag.Bool("development", true, "development mode")
 	ditamap     = flag.String("dita", "", "ditamap file for showing live dita")
@@ -79,6 +81,13 @@ func main() {
 		v, err := strconv.ParseBool(os.Getenv("DEVELOPMENT"))
 		if err == nil {
 			*development = v
+		}
+	}
+
+	if os.Getenv("REDIRECTHTTPS") != "" {
+		v, err := strconv.ParseBool(os.Getenv("REDIRECTHTTPS"))
+		if err == nil {
+			*redirecthttps = v
 		}
 	}
 
@@ -150,7 +159,17 @@ func main() {
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(*clientdir, "assets", "ico", "favicon.ico"))
 	})
-	http.Handle("/", server)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		ishttps := r.Header.Get("X-Forwarded-Proto") == "https" || r.URL.Scheme == "https"
+		if *redirecthttps && !ishttps {
+			r.URL.Scheme = "https"
+			r.URL.Host = *domain
+			http.Redirect(w, r, r.URL.String(), http.StatusMovedPermanently)
+			return
+		}
+		server.ServeHTTP(w, r)
+	})
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
 
