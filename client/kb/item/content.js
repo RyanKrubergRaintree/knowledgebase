@@ -26,7 +26,8 @@ package('kb.item.content', function(exports){
 		{name: 'Text', type: 'paragraph', desc: 'simple text paragraph'},
 		{name: 'HTML', type: 'html', desc: 'a subset of html for more advanced content'},
 		{name: 'Code', type: 'code', desc: 'item especially designed for code'},
-		{name: 'Tags', type: 'tags', desc: 'tags for the page'}
+		{name: 'Tags', type: 'tags', desc: 'tags for the page'},
+		{name: 'Separator', type: 'separator', desc: 'line separator'}
 	];
 
 	exports.factory = React.createClass({
@@ -195,6 +196,36 @@ package('kb.item.content', function(exports){
 					})
 				: React.DOM.p({}, 'Double click here to add page tags.'),
 				React.DOM.div({className:'clear-fix'})
+			);
+		}
+	});
+
+	exports.separator = React.createClass({
+		displayName: 'Entry',
+		render: function(){
+			var item = this.props.item;
+
+			if(item.text === "") {
+				return React.DOM.div(
+					{className: 'item-content content-separator'},
+					React.DOM.hr(null)
+				);
+			}
+			return React.DOM.div({
+				className: 'item-content content-separator'
+			},
+				React.DOM.table(
+					{style:{width:"100%"}},
+					React.DOM.td(null, React.DOM.hr(null)),
+					React.DOM.td({
+						style: {
+							width: "1px",
+							padding: "0 10px",
+							whiteSpace: "nowrap"
+						}
+					}, this.props.item.text),
+					React.DOM.td(null, React.DOM.hr(null))
+				)
 			);
 		}
 	});
