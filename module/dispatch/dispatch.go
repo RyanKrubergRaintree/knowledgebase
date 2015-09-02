@@ -67,7 +67,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		page.Story.Append(kb.HTML("<h2>Versions</h2>"))
 
-		prefix := string(mod.group.ID + "/")
+		prefix := string(mod.group.ID + "-")
 		for _, entry := range entries {
 			if !strings.HasPrefix(string(entry.Slug), prefix) {
 				continue
