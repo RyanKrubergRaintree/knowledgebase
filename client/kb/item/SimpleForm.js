@@ -1,6 +1,8 @@
 package('kb.item.content', function(exports){
 	'use strict';
 
+	depends('SimpleForm.css');
+
 	exports['simple-form'] = React.createClass({
 		displayName: 'SimpleForm',
 		getInitialState: function(){
@@ -69,7 +71,7 @@ package('kb.item.content', function(exports){
 					className: 'item-content content-simple-form',
 					onSubmit: function(ev){ ev.preventDefault(); }
 				},
-				React.DOM.p({}, item.text || ''),
+				item.text ? React.DOM.p({}, item.text) : null,
 				message !== '' ? React.DOM.p({className:'message'}, message) : null,
 				error !== '' ? React.DOM.p({className:'error'}, error) : null,
 				items.map(function(item, i){

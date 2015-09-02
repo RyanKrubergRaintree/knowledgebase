@@ -1,0 +1,13 @@
+.content-simple-form {
+	padding: 8px 0;
+}
+
+.content-simple-form > * {
+	display: block;
+	width: 50%;
+
+	height: 24px;
+	line-height: 24px;
+
+	text-align: left;
+}

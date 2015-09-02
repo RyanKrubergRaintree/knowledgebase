@@ -24,6 +24,10 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 		switch action {
 		case "create-group":
 			name := strings.TrimSpace(r.FormValue("name"))
+			if name == "" {
+				http.Error(w, "Name not specified.", http.StatusBadRequest)
+				return
+			}
 			owner := strings.TrimSpace(r.FormValue("owner"))
 			description := strings.TrimSpace(r.FormValue("description"))
 			public := strings.TrimSpace(r.FormValue("visibility")) == "public"
@@ -32,19 +36,39 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 				owner = name
 			}
 
-			err := context.Groups().Create(kb.Group{
+			var err error
+			group := kb.Group{
 				ID:          kb.Slugify(name),
 				Name:        name,
 				OwnerID:     kb.Slugify(owner),
 				Public:      public,
 				Description: description,
-			})
+			}
 
+			err = context.Groups().Create(group)
 			if err != nil {
 				kb.WriteResult(w, err)
 				return
 			}
 			w.Write([]byte("group created"))
+			return
+		case "add-user":
+			user := strings.TrimSpace(r.FormValue("user"))
+			group := strings.TrimSpace(r.FormValue("group"))
+			if user == "" || group == "" {
+				http.Error(w, "User/Group not specified.", http.StatusBadRequest)
+				return
+			}
+
+			userid := kb.Slugify(user)
+			groupid := kb.Slugify(group)
+			err := context.Access().AddUser(groupid, userid)
+
+			if err != nil {
+				kb.WriteResult(w, err)
+				return
+			}
+			w.Write([]byte("user added"))
 			return
 		default:
 			http.Error(w, "Invalid action "+action+" specified", http.StatusBadRequest)
@@ -80,6 +104,15 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.Story.Append(kb.HTML(buf.String()))
+
+	page.Story.Append(kb.HTML("<h2>Add user</h2>"))
+	page.Story.Append(simpleform.New(
+		"/"+string(page.Slug), "",
+		simpleform.Field("group", "Group"),
+		simpleform.Field("user", "User"),
+		simpleform.Button("add-user", "Add"),
+	))
+
 	page.WriteResponse(w)
 }
 
