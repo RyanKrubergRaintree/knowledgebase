@@ -2,6 +2,8 @@ package auth
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/raintreeinc/knowledgebase/auth/trust"
@@ -23,12 +25,16 @@ func (cas *CAS) Logins() (logins []kb.AuthLogin)              { panic("unimpleme
 func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) {
 	id, err := trust.Peer{cas.Key}.Verify(r)
 	if err != nil {
+		log.Println("Token auth failed:", err)
 		return kb.User{}, err
 	}
 
 	// verify id
 	user := r.FormValue("user")
 	company := r.FormValue("company")
+
+	fmt.Printf("USER: %v; COMP: %v\n", user, company)
+	fmt.Printf("%#v\n", r)
 
 	if user+":"+company != id {
 		return kb.User{}, errors.New("invalid id provided")

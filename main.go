@@ -122,7 +122,7 @@ func main() {
 
 	sec := auth.New()
 	sec.Alternate["guest"] = auth.NewDB(db)
-	if caskey := os.Getenv("CAS-KEY"); caskey != "" {
+	if caskey := os.Getenv("CASKEY"); caskey != "" {
 		data, err := base64.StdEncoding.DecodeString(caskey)
 		if err != nil {
 			log.Fatal(err)

@@ -2,14 +2,13 @@ package trust
 
 import (
 	"crypto/hmac"
-	"crypto/sha256"
+	"crypto/sha1"
 	"errors"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 )
-
 
 var (
 	// Maximum skew in times between servers
@@ -41,7 +40,7 @@ func (peer Peer) Sign(id string, req *http.Request) error {
 		return err
 	}
 
-	mac := calculateMac(message(id, ts, nonce, req), peer.Key)
+	mac := Sign(SerializeParams(id, ts, nonce, req), peer.Key)
 
 	v := url.Values{}
 	v.Set("id", id)
@@ -72,6 +71,7 @@ func (peer Peer) Verify(req *http.Request) (id string, err error) {
 	}
 
 	id, ts, nonce, mac := v.Get("id"), v.Get("ts"), v.Get("nonce"), v.Get("mac")
+
 	if id == "" || ts == "" || nonce == "" {
 		return "", RequestNotTrusted
 	}
@@ -89,7 +89,7 @@ func (peer Peer) Verify(req *http.Request) (id string, err error) {
 		return "", RequestNotTrusted
 	}
 
-	expected := calculateMac(message(id, ts, nonce, req), peer.Key)
+	expected := Sign(SerializeParams(id, ts, nonce, req), peer.Key)
 	if !hmac.Equal(expected, []byte(mac)) {
 		return "", RequestNotTrusted
 	}
@@ -97,20 +97,20 @@ func (peer Peer) Verify(req *http.Request) (id string, err error) {
 	return id, nil
 }
 
-func calculateMac(normalized, key []byte) []byte {
-	return hmac.New(sha256.New, key).Sum(normalized)
+func Sign(serialized, key []byte) []byte {
+	m := hmac.New(sha1.New, key)
+	m.Write(serialized)
+	return m.Sum(nil)
 }
 
-func message(id, ts, nonce string, req *http.Request) []byte {
-	return serialize(
+func SerializeParams(id, ts, nonce string, req *http.Request) []byte {
+	return SerializeValues(
 		id, ts, nonce,
-		req.Method,
-		req.Host,
-		req.URL.Path,
+		req.Host, req.URL.Path,
 	)
 }
 
-func serialize(values ...string) []byte {
+func SerializeValues(values ...string) []byte {
 	t := 0
 	for _, v := range values {
 		t += len(v) + 1
@@ -118,7 +118,7 @@ func serialize(values ...string) []byte {
 	r := make([]byte, 0, t)
 	for _, v := range values {
 		r = append(r, []byte(v)...)
-		r = append(r, '\x00')
+		r = append(r, '\n')
 	}
 	return r
 }
