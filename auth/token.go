@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -32,9 +31,6 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 	// verify id
 	user := r.FormValue("user")
 	company := r.FormValue("company")
-
-	fmt.Printf("USER: %v; COMP: %v\n", user, company)
-	fmt.Printf("%#v\n", r)
 
 	if user+":"+company != id {
 		return kb.User{}, errors.New("invalid id provided")
