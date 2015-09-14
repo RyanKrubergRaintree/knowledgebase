@@ -14,12 +14,11 @@ import (
 var (
 	key = flag.String("key", "123456789", "key used for signing")
 
-	id     = flag.String("id", "User:Company", "id to be signed")
-	ts     = flag.String("ts", "2006-01-02T15:04:05Z07:00", "timestamp to be signed")
-	nonce  = flag.String("nonce", "1234567890", "")
-	method = flag.String("method", "POST", "")
-	host   = flag.String("host", "example.com", "")
-	path   = flag.String("path", "/system/auth/callback/community", "")
+	id    = flag.String("id", "User:Company", "id to be signed")
+	ts    = flag.String("ts", "2006-01-02T15:04:05Z07:00", "timestamp to be signed")
+	nonce = flag.String("nonce", "1234567890", "")
+	host  = flag.String("host", "example.com", "")
+	path  = flag.String("path", "/system/auth/callback/community", "")
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 	signature := trust.Sign(
 		trust.SerializeValues(
 			*id, *ts, *nonce,
-			*method, *host, *path,
+			*host, *path,
 		),
 		[]byte(*key),
 	)
