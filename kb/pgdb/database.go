@@ -71,8 +71,8 @@ func (ctx Context) pageEntries(filter string, args ...interface{}) (entries []kb
 	rows, err := ctx.Query(`
 	SELECT
 		Slug,
-		coalesce(Data->>'title', '') as Title,
-		coalesce(Data->>'synopsis', '') as Synopsis,
+		Title,
+		Synopsis,
 		Tags,
 		Modified
 	FROM Pages
