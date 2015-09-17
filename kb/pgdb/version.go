@@ -34,7 +34,7 @@ var migrations = []*migration{
 				AuthID       TEXT NOT NULL,
 				AuthProvider TEXT NOT NULL,
 
-				ALTER TABLE Users ADD COLUMN MaxAccess Rights NOT NULL DEFAULT 'moderator'
+				MaxAccess Rights NOT NULL DEFAULT 'moderator'
 			)`,
 			`CREATE TABLE Membership (
 				GroupID  TEXT   NOT NULL REFERENCES Groups(ID),
@@ -125,6 +125,35 @@ var migrations = []*migration{
 			`UPDATE Pages SET OwnerID = OwnerID`,
 			// create index for content
 			`CREATE INDEX PagesContentGIN ON Pages USING gin(Content)`,
+		},
+	},
+	{
+		Version: 5,
+		Scripts: []string{
+			`CREATE VIEW AccessView AS
+				WITH Accesses AS (
+					SELECT Groups.ID AS GroupID, Users.ID AS UserID, 'reader'::Rights AS Access
+					FROM Groups
+					CROSS JOIN Users
+					WHERE Groups.Public = true
+				UNION ALL
+					SELECT Membership.GroupID, Membership.UserID, 'moderator'::Rights AS Rights
+					FROM Membership
+				UNION ALL
+					SELECT Groups.ID, Membership.UserID, 'moderator'::Rights AS Rights
+					FROM Groups
+					JOIN Membership ON Membership.GroupID = Groups.ownerid
+				UNION ALL
+					SELECT Groups.ID, Membership.UserID, Community.Access
+					FROM Groups
+					JOIN Community ON Community.GroupID = Groups.ID
+					JOIN Membership ON Membership.GroupID = Community.memberid
+				)
+			SELECT Accesses.GroupID, Accesses.UserID, LEAST(MAX(Accesses.Access), Users.MaxAccess) AS Access
+			FROM Accesses
+			JOIN Users ON Users.ID = Accesses.UserID
+			GROUP BY Accesses.GroupID, Accesses.UserID, Users.ID
+			ORDER BY Accesses.GroupID, Accesses.UserID;`,
 		},
 	},
 }

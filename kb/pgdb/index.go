@@ -7,38 +7,20 @@ type Index struct {
 	UserID kb.Slug
 }
 
-const (
-	publicGroup   = `SELECT ID FROM Groups WHERE Public = TRUE`
-	directMember  = `SELECT GroupID FROM Membership WHERE UserID = $1`
-	memberOfOwner = `
-		SELECT ID FROM Groups
-		JOIN Membership ON Membership.GroupID = Groups.OwnerID
-		WHERE Membership.UserID = $1
-	`
-	memberOfCommunity = `
-		SELECT ID FROM Groups
-		JOIN Community  ON Community.GroupID = Groups.ID
-		JOIN Membership ON Membership.GroupID = Community.MemberID
-		WHERE Community.Access >= 'reader'
-		  AND Membership.UserID = $1
-	`
-	//TODO: figure out whether this needs to be optimized
-	pageVisibleToUser = `
-		  (   OwnerID IN (` + publicGroup + `)
-		   OR OwnerID IN (` + directMember + `)
-		   OR OwnerID IN (` + memberOfOwner + `)
-		   OR OwnerID IN (` + memberOfCommunity + `))
-	`
-)
-
 func (db Index) List() ([]kb.PageEntry, error) {
-	return db.pageEntries(`WHERE `+pageVisibleToUser+`ORDER BY Slug`, db.UserID)
+	return db.pageEntries(`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		ORDER BY Slug`, db.UserID)
 }
 
 func (db Index) Search(text string) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
-		WHERE `+pageVisibleToUser+`
-			AND	Content @@ plainto_tsquery('english', $2)
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND Content @@ plainto_tsquery('english', $2)
 		ORDER BY ts_rank(Content, plainto_tsquery('english', $2)) DESC
 		`, db.UserID, text)
 }
@@ -49,7 +31,8 @@ func (db Index) Tags() ([]kb.TagEntry, error) {
 			unnest(Tags) as Tag,
 			count(*) as Count
 		FROM Pages
-		WHERE `+pageVisibleToUser+`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1 AND AccessView.Access >= 'reader'
 		GROUP BY Tag
 		ORDER BY Tag
 	`, db.UserID)
@@ -75,8 +58,10 @@ func (db Index) ByTag(tag kb.Slug) ([]kb.PageEntry, error) {
 	tagSlugs := stringSlice(tags)
 
 	return db.pageEntries(`
-		WHERE TagSlugs @> $2
-		  AND `+pageVisibleToUser+`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND TagSlugs @> $2
 	`, db.UserID, tagSlugs)
 }
 
@@ -84,15 +69,9 @@ func (db Index) readable() (groups []kb.Group, err error) {
 	rows, err := db.Query(`
 		SELECT  ID, OwnerID, Name, Public, Description
 		FROM    Groups
-		WHERE Public
-		   OR ID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
-		   OR OwnerID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
-		   OR ID IN (
-				SELECT Community.GroupID FROM Community
-				JOIN  Membership ON Community.MemberID = Membership.GroupID
-				WHERE Membership.UserID = $1
-				  AND Community.Access >= 'reader'
-			)
+		JOIN AccessView ON Groups.ID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
 	`, db.UserID)
 	if err != nil {
 		return nil, err
@@ -120,14 +99,9 @@ func (db Index) Groups(min kb.Rights) (groups []kb.Group, err error) {
 	rows, err := db.Query(`
 		SELECT  ID, OwnerID, Name, Public, Description
 		FROM    Groups
-		WHERE ID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
-		   OR OwnerID IN (SELECT GroupID FROM Membership WHERE UserID = $1)
-		   OR ID IN (
-				SELECT Community.GroupID FROM Community
-				JOIN  Membership ON Community.MemberID = Membership.GroupID
-				WHERE Membership.UserID = $1
-				  AND Community.Access >= $2
-			)
+		JOIN AccessView ON Groups.ID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= $2
 	`, db.UserID, string(min))
 	if err != nil {
 		return nil, err
@@ -144,22 +118,28 @@ func (db Index) Groups(min kb.Rights) (groups []kb.Group, err error) {
 
 func (db Index) ByGroup(groupID kb.Slug) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
-		WHERE OwnerID = $2
-		  AND `+pageVisibleToUser+`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND OwnerID = $2
 	`, db.UserID, groupID)
 }
 
 func (db Index) ByTitle(suffix kb.Slug) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
-		WHERE Slug LIKE '%:' || $2
-		  AND `+pageVisibleToUser+`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND Slug LIKE '%:' || $2
 	`, db.UserID, suffix)
 }
 
 func (db Index) RecentChanges() ([]kb.PageEntry, error) {
 	n := 30
 	return db.pageEntries(`
-		WHERE `+pageVisibleToUser+`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
 		ORDER BY Modified DESC, OwnerID, Slug
 		LIMIT $2
 	`, db.UserID, n)

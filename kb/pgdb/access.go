@@ -1,9 +1,7 @@
 package pgdb
 
 import (
-	"database/sql"
 	"errors"
-	"log"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 )
@@ -45,34 +43,12 @@ func (db Access) Rights(group, user kb.Slug) kb.Rights {
 	// If a person is a direct member of the owner group,
 	// then he has MaxAccess possible
 	err := db.QueryRow(`
-		SELECT Users.MaxAccess FROM Membership
-		JOIN Groups ON Membership.GroupID = Groups.OwnerID
-		JOIN Users ON Membership.UserID = Users.ID
-		WHERE Groups.ID = $1 AND UserID = $2
+		SELECT Access FROM AccessView
+		WHERE GroupID = $1 AND UserID = $2
 	`, group, user).Scan(&rights)
 	if err == nil {
 		return kb.Rights(rights)
 	}
-
-	err = db.QueryRow(`
-		SELECT LEAST(Access, Users.MaxAccess) FROM Community
-		JOIN Membership ON Community.MemberID = Membership.GroupID
-		JOIN Users ON Users.ID = Membership.UserID
-		WHERE Community.GroupID = $1 AND Membership.UserID = $2
-		ORDER BY ACCESS DESC
-	`, group, user).Scan(&rights)
-	if err == nil {
-		return kb.Rights(rights)
-	}
-	if err != sql.ErrNoRows {
-		log.Println(err)
-	}
-
-	// is it a public group?
-	if db.BoolQuery(`SELECT FROM Groups WHERE ID = $1 AND Public`, group) {
-		return kb.Reader
-	}
-
 	return kb.Blocked
 }
 
