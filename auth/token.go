@@ -32,7 +32,7 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 	user := r.FormValue("user")
 	company := r.FormValue("company")
 
-	if user+":"+company != id {
+	if company+":"+user != id {
 		return kb.User{}, errors.New("invalid id provided")
 	}
 

@@ -1,15 +1,15 @@
-package('kb', function(exports){
+package('kb', function(exports) {
 	'use strict';
 
 	depends('Lineup.View.js');
 
 	var HeaderMenu = React.createClass({
 		displayName: 'HeaderMenu',
-		render: function(){
+		render: function() {
 			return React.DOM.div({
-				className:'header-menu'
-			},
-				this.props.items.map(function(item){
+					className: 'header-menu'
+				},
+				this.props.items.map(function(item) {
 					return React.DOM.a(item, item.caption);
 				})
 			);
@@ -18,30 +18,30 @@ package('kb', function(exports){
 
 	var Search = React.createClass({
 		lastStageId: undefined,
-		search: function(ev){
+		search: function(ev) {
 			var Lineup = this.props.Lineup;
 			var query = this.refs.query.getDOMNode().value.trim();
-			if(ev.shiftKey){
+			if (ev.shiftKey) {
 				this.lastStageId = undefined;
 			}
 			this.lastStageId = Lineup.open({
-				url: '/search:search?q='+query,
+				url: '/search:search?q=' + query,
 				title: '"' + query + '"',
 				insteadOf: this.lastStageId
 			});
 			ev.preventDefault();
 		},
-		keyDown: function(ev){
+		keyDown: function(ev) {
 			var Lineup = this.props.Lineup;
-			if(ev.keyCode === 27){// esc
+			if (ev.keyCode === 27) { // esc
 				Lineup.closeLast();
 				return;
 			}
 
-			if(ev.keyCode === 13){
+			if (ev.keyCode === 13) {
 				// open page directly
-				if(ev.ctrlKey){
-					if(!ev.shiftKey){
+				if (ev.ctrlKey) {
+					if (!ev.shiftKey) {
 						Lineup.clear();
 					}
 
@@ -57,35 +57,34 @@ package('kb', function(exports){
 			}
 
 			var stages = document.querySelectorAll('.stage');
-			if(stages.length === 0){
+			if (stages.length === 0) {
 				return;
 			}
 
-			var stage = stages[stages.length-1];
+			var stage = stages[stages.length - 1];
 			var middle = stage.querySelector('.stage-scroll');
 
-			switch(ev.keyCode){
-			case 33: // pageup
-				middle.scrollTop -= middle.clientHeight;
-				break;
-			case 34: // pagedown
-				middle.scrollTop += middle.clientHeight;
-				break;
+			switch (ev.keyCode) {
+				case 33: // pageup
+					middle.scrollTop -= middle.clientHeight;
+					break;
+				case 34: // pagedown
+					middle.scrollTop += middle.clientHeight;
+					break;
 			}
 		},
-		render: function(){
-			return React.DOM.form(
-				{
-					className:'search',
+		render: function() {
+			return React.DOM.form({
+					className: 'search',
 					onSubmit: this.search
 				},
 				React.DOM.input({
 					ref: 'query',
-					placeholder:'Search...',
+					placeholder: 'Search...',
 					onKeyDown: this.keyDown
 				}),
 				React.DOM.button({
-					className:'search-icon mdi mdi-magnify',
+					className: 'search-icon mdi mdi-magnify',
 					type: 'submit',
 					tabIndex: -1
 				})
@@ -93,8 +92,23 @@ package('kb', function(exports){
 		}
 	});
 
+	var LoginInfo = React.createClass({
+		render: function() {
+			return React.DOM.div({
+					className: 'background-info'
+				},
+				React.DOM.div({
+					style: {
+						fontSize: 'smaller'
+					}
+				}, 'logged in as:'),
+				React.DOM.div({}, this.props.User)
+			);
+		}
+	});
+
 	var Header = React.createClass({
-		openHome: function(ev){
+		openHome: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -102,7 +116,7 @@ package('kb', function(exports){
 			lineup.clear();
 			lineup.openLink(KBHomePage);
 		},
-		createNewPage: function(ev){
+		createNewPage: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -113,33 +127,44 @@ package('kb', function(exports){
 				title: ''
 			});
 		},
-		logout: function(ev){
+		logout: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
 			window.location.pathname = '/system/auth/logout';
 		},
 		displayName: 'Header',
-		render: function(){
-			var a = React.DOM.a;
+		render: function() {
 			return React.DOM.div({
-				id:'header'
-			},
-				a({className:'button home mdi mdi-home', href:'#', title:'Home', onClick: this.openHome}),
-				React.createElement(Search, this.props),
-				a({
-					className:'button userinfo',
-					id:'userinfo',
-					href:'/user:current'
+					id: 'header'
 				},
-					KBUser
-				),
+				React.DOM.a({
+					className: 'button home mdi mdi-home',
+					href: '#',
+					title: 'Home',
+					onClick: this.openHome
+				}),
+				React.createElement(Search, this.props),
 				React.createElement(HeaderMenu, {
-					items: [
-						{key:'0', href: '#', onClick: this.createNewPage, caption: 'New Page'},
-						{key:'1', href: '/page:recent-changes', caption: 'Recent Changes'},
-						{key:'2', href: '#', onClick: this.logout, caption: 'Logout'}
-					]
+					items: [{
+						key: '0',
+						href: '#',
+						onClick: this.createNewPage,
+						caption: 'New Page'
+					}, {
+						key: '1',
+						href: '/page:recent-changes',
+						caption: 'Recent Changes'
+					}, {
+						key: '2',
+						href: '/user:current',
+						caption: 'User'
+					}, {
+						key: '3',
+						href: '#',
+						onClick: this.logout,
+						caption: 'Logout'
+					}]
 				})
 			);
 		}
@@ -147,10 +172,13 @@ package('kb', function(exports){
 
 	var Content = React.createClass({
 		displayName: 'Content',
-		render: function(){
+		render: function() {
 			return React.DOM.div({
-				id: 'content'
-			},
+					id: 'content'
+				},
+				React.createElement(LoginInfo, {
+					User: KBUser
+				}),
 				React.createElement(kb.Lineup.View, this.props)
 			);
 		}
@@ -159,20 +187,20 @@ package('kb', function(exports){
 	exports.Site = React.createClass({
 		displayName: 'Site',
 
-		componentDidMount: function(){
+		componentDidMount: function() {
 			var self = this;
-			window.LiveBundleChange = function(){
+			window.LiveBundleChange = function() {
 				self.forceUpdate();
 			};
 		},
 
-		componentWillUnmount: function(){
-			window.LiveBundleChange = function(){};
+		componentWillUnmount: function() {
+			window.LiveBundleChange = function() {};
 		},
 
-		render: function(){
+		render: function() {
 			return React.DOM.div({},
-				React.createElement(Header,  this.props),
+				React.createElement(Header, this.props),
 				React.createElement(Content, this.props)
 			);
 		}

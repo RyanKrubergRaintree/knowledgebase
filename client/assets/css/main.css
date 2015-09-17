@@ -134,7 +134,7 @@ h4 { font-size: 1.1em; }
 #header .search {
 	position: absolute;
 	left: 56px;
-	right: 120px;
+	right: 0px;
 
 	padding: 0 10px;
 	margin: 10px 0;
@@ -172,13 +172,6 @@ h4 { font-size: 1.1em; }
 	background-color: transparent;
 
 	cursor: pointer;
-}
-
-#header .userinfo {
-	position: absolute;
-	max-width: 130px;
-	right: 0;
-	overflow: hidden;
 }
 
 @media(max-width: 400px) {
