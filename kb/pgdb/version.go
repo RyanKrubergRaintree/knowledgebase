@@ -132,22 +132,26 @@ var migrations = []*migration{
 		Scripts: []string{
 			`CREATE VIEW AccessView AS
 				WITH Accesses AS (
+					-- public pages
 					SELECT Groups.ID AS GroupID, Users.ID AS UserID, 'reader'::Rights AS Access
 					FROM Groups
 					CROSS JOIN Users
 					WHERE Groups.Public = true
 				UNION ALL
+					-- member of group
 					SELECT Membership.GroupID, Membership.UserID, 'moderator'::Rights AS Rights
 					FROM Membership
 				UNION ALL
+					-- member of group owner
 					SELECT Groups.ID, Membership.UserID, 'moderator'::Rights AS Rights
 					FROM Groups
-					JOIN Membership ON Membership.GroupID = Groups.ownerid
+					JOIN Membership ON Membership.GroupID = Groups.OwnerID
 				UNION ALL
+					-- member of group community
 					SELECT Groups.ID, Membership.UserID, Community.Access
 					FROM Groups
 					JOIN Community ON Community.GroupID = Groups.ID
-					JOIN Membership ON Membership.GroupID = Community.memberid
+					JOIN Membership ON Membership.GroupID = Community.MemberID
 				)
 			SELECT Accesses.GroupID, Accesses.UserID, LEAST(MAX(Accesses.Access), Users.MaxAccess) AS Access
 			FROM Accesses
