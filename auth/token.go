@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/raintreeinc/knowledgebase/auth/trust"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -32,6 +33,14 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 	user := r.FormValue("user")
 	company := r.FormValue("company")
 	companyid := r.FormValue("companyid")
+	branch := r.FormValue("branch")
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "filter",
+		Path:    "/",
+		Value:   branch,
+		Expires: time.Now().Add(365 * 24 * time.Hour),
+	})
 
 	if company+":"+user != id {
 		return kb.User{}, errors.New("invalid id provided")

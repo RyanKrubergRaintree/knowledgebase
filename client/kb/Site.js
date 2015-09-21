@@ -33,7 +33,7 @@ package('kb', function(exports) {
 						'9.4',
 						'9.3'
 					],
-					selected: '10.2.600'
+					selected: DocumentCookies.getItem('filter') || '10.2.600'
 				}
 			};
 		},
