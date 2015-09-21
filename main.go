@@ -161,7 +161,7 @@ func main() {
 	}, server))
 
 	if *ditamap != "" {
-		server.AddModule(dita.New("Dita", *ditamap, server))
+		server.AddModule(dita.New("DITA", *ditamap, server))
 	}
 
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {

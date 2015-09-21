@@ -31,18 +31,20 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 	// verify id
 	user := r.FormValue("user")
 	company := r.FormValue("company")
+	companyid := r.FormValue("companyid")
 
 	if company+":"+user != id {
 		return kb.User{}, errors.New("invalid id provided")
 	}
 
 	return kb.User{
-		AuthID:       string(kb.Slugify(id)),
+		AuthID:       string(kb.Slugify(companyid + ":" + user)),
 		AuthProvider: cas.Provider,
 
-		ID:    kb.Slugify(id),
-		Email: "",
-		Name:  id,
+		ID:      kb.Slugify(id),
+		Email:   "",
+		Name:    id,
+		Company: company,
 
 		MaxAccess: kb.Editor,
 	}, nil
