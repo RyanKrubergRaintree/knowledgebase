@@ -72,7 +72,17 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := r.URL.Query().Get("q")
-	entries, err := index.Search(q)
+	filter := r.URL.Query().Get("filter")
+
+	var entries []kb.PageEntry
+	var err error
+	if filter == "" {
+		entries, err = index.Search(q)
+	} else {
+		filter = string(kb.Slugify(filter))
+		entries, err = index.SearchCustomFilter(q, "help-", "help-"+filter)
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

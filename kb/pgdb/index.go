@@ -25,6 +25,17 @@ func (db Index) Search(text string) ([]kb.PageEntry, error) {
 		`, db.UserID, text)
 }
 
+func (db Index) SearchCustomFilter(text, exclude, include string) ([]kb.PageEntry, error) {
+	return db.pageEntries(`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND (OwnerID NOT LIKE $3 || '%' OR OwnerID = $4)
+		  AND Content @@ plainto_tsquery('english', $2)
+		ORDER BY ts_rank(Content, plainto_tsquery('english', $2)) DESC
+		`, db.UserID, text, exclude, include)
+}
+
 func (db Index) Tags() ([]kb.TagEntry, error) {
 	rows, err := db.Query(`
 		SELECT

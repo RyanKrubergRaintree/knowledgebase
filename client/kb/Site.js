@@ -23,6 +23,7 @@ package('kb', function(exports) {
 			return {
 				filter: {
 					options: [
+						'All',
 						'10.2.600',
 						'10.2.500',
 						'10.2.400',
@@ -42,8 +43,15 @@ package('kb', function(exports) {
 			if (ev.shiftKey) {
 				this.lastStageId = undefined;
 			}
+
+			var param = 'q=' + query;
+			var filter = this.refs.filter.getDOMNode().value;
+			if (filter !== 'All') {
+				param += '&filter=' + filter;
+			}
+
 			this.lastStageId = Lineup.open({
-				url: '/search:search?q=' + query,
+				url: '/search:search?' + param,
 				title: '"' + query + '"',
 				insteadOf: this.lastStageId
 			});
