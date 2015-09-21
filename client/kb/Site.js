@@ -1,6 +1,7 @@
 package('kb', function(exports) {
 	'use strict';
 
+	depends('site.css');
 	depends('Lineup.View.js');
 
 	var HeaderMenu = React.createClass({
@@ -18,6 +19,23 @@ package('kb', function(exports) {
 
 	var Search = React.createClass({
 		lastStageId: undefined,
+		getInitialState: function() {
+			return {
+				filter: {
+					options: [
+						'10.2.600',
+						'10.2.500',
+						'10.2.400',
+						'10.2.300',
+						'10.2.200',
+						'10.2.100',
+						'9.4',
+						'9.3'
+					],
+					selected: '10.2.600'
+				}
+			};
+		},
 		search: function(ev) {
 			var Lineup = this.props.Lineup;
 			var query = this.refs.query.getDOMNode().value.trim();
@@ -74,6 +92,7 @@ package('kb', function(exports) {
 			}
 		},
 		render: function() {
+			var filter = this.state.filter;
 			return React.DOM.form({
 					className: 'search',
 					onSubmit: this.search
@@ -83,6 +102,18 @@ package('kb', function(exports) {
 					placeholder: 'Search...',
 					onKeyDown: this.keyDown
 				}),
+				React.DOM.select({
+						className: 'search-filter',
+						ref: 'filter',
+						defaultValue: filter.selected
+					},
+					filter.options.map(function(item) {
+						return React.DOM.option({
+							key: item,
+							value: item
+						}, item);
+					})
+				),
 				React.DOM.button({
 					className: 'search-icon mdi mdi-magnify',
 					type: 'submit',
@@ -187,16 +218,15 @@ package('kb', function(exports) {
 	exports.Site = React.createClass({
 		displayName: 'Site',
 
+		update: function() {
+			this.forceUpdate();
+		},
 		componentDidMount: function() {
-			var self = this;
-			window.LiveBundleChange = function() {
-				self.forceUpdate();
-			};
+			if (typeof Reloader !== 'undefined') {
+				Reloader.Change = this.update;
+			}
 		},
-
-		componentWillUnmount: function() {
-			window.LiveBundleChange = function() {};
-		},
+		componentWillUnmount: function() {},
 
 		render: function() {
 			return React.DOM.div({},
