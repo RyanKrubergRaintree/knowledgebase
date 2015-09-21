@@ -231,7 +231,11 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		}
 	}
 
-	return context.Access().VerifyUser(user)
+	err = context.Access().VerifyUser(user)
+	if err != nil {
+		log.Printf("Failed to login: %v\n", user)
+	}
+	return err
 }
 
 func MustLoadRules(filename string) *RuleSet {
