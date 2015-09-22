@@ -151,6 +151,10 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// disable caching of pages
+	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Add("Pragma", "no-cache")
+
 	// modules must handle everything by themselves
 	if module, ok := server.Modules[groupID]; ok {
 		module.ServeHTTP(w, r)

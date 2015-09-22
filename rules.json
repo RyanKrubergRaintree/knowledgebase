@@ -1,10 +1,6 @@
 {
 	"admins": ["egon-elbre"],
-	"byEmail" : {
+	"byEmail": {
 		".*@raintreeinc.com": ["raintree"]
-	},
-	"byAuthProvider" : {
-		"guest": ["guests"],
-		"community": ["community"]
 	}
 }

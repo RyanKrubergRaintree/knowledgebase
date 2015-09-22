@@ -216,6 +216,24 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		}
 	}
 
+	if user.AuthProvider == "community" {
+		createUserIfNeeded()
+
+		gid := kb.Slugify(user.Company)
+		_, err := context.Groups().ByID(gid)
+		if err == kb.ErrGroupNotExist {
+			context.Groups().Create(kb.Group{
+				ID:          gid,
+				OwnerID:     gid,
+				Name:        user.Company,
+				Public:      false,
+				Description: "Private group for " + user.Company,
+			})
+			context.Access().CommunityAdd("community", gid, kb.Editor)
+		}
+		context.Access().AddUser(gid, user.ID)
+	}
+
 	for prov, groups := range rs.ByAuthProvider {
 		if prov == user.AuthProvider {
 			createUserIfNeeded()

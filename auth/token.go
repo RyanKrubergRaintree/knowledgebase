@@ -55,6 +55,6 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 		Name:    id,
 		Company: company,
 
-		MaxAccess: kb.Editor,
+		MaxAccess: kb.Moderator,
 	}, nil
 }
