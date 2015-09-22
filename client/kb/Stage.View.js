@@ -1,4 +1,4 @@
-package('kb.Stage', function(exports){
+package('kb.Stage', function(exports) {
 	'use strict';
 
 	depends('util/SmoothScroll.js');
@@ -10,14 +10,14 @@ package('kb.Stage', function(exports){
 	var StageButtons = React.createClass({
 		displayName: 'StageButtons',
 
-		toggleWidth: function(){
+		toggleWidth: function() {
 			this.props.onToggleWidth();
 		},
-		close: function(){
+		close: function() {
 			this.props.stage.close();
 		},
 
-		createFactory: function(ev){
+		createFactory: function(ev) {
 			var item = {
 				id: GenerateID(),
 				type: 'factory',
@@ -32,47 +32,52 @@ package('kb.Stage', function(exports){
 			ev.dataTransfer.setData('Text', JSON.stringify(data));
 		},
 
-		deletePage: function(){
+		deletePage: function() {
 			var stage = this.props.stage;
-			var check = window.prompt('Delete this page?\nType the page link \''+ stage.link + '\' to confirm:');
-			if(check === null){ return; }
-			if(check.trim() !== stage.link.trim()){
+			var check = window.prompt('Delete this page?\nType the page link \'' + stage.link + '\' to confirm:');
+			if (check === null) {
+				return;
+			}
+			if (check.trim() !== stage.link.trim()) {
 				return;
 			}
 
 			stage.destroy();
 		},
 
-		render: function(){
+		render: function() {
 			var stage = this.props.stage;
 			var a = React.DOM.a;
-			return React.DOM.div(
-				{className: 'stage-buttons'},
+			return React.DOM.div({
+					className: 'stage-buttons'
+				},
 				stage.canModify() ? React.DOM.a({
-					className:'mdi mdi-playlist-plus',
-					title:'Drag to page to add an item.',
-					style: { cursor: 'move' },
+					className: 'mdi mdi-playlist-plus',
+					title: 'Drag to page to add an item.',
+					style: {
+						cursor: 'move'
+					},
 					draggable: 'true',
 					href: '#',
-					onClick: function(ev){
+					onClick: function(ev) {
 						ev = ev || window.event;
 						ev.preventDefault();
 					},
 					onDragStart: this.createFactory
 				}) : null,
 				stage.canDestroy() ? a({
-					className:'mdi mdi-delete',
-					title:'Delete this page.',
+					className: 'mdi mdi-delete',
+					title: 'Delete this page.',
 					onClick: this.deletePage
 				}) : null,
 				a({
-					className:'mdi ' + (this.props.isWide ? 'mdi-arrow-collapse' : 'mdi-arrow-expand'),
-					title:'Toggle page width.',
+					className: 'mdi ' + (this.props.isWide ? 'mdi-arrow-collapse' : 'mdi-arrow-expand'),
+					title: 'Toggle page width.',
 					onClick: this.toggleWidth
 				}),
 				a({
-					className:'mdi mdi-close',
-					title:'Close page.',
+					className: 'mdi mdi-close',
+					title: 'Close page.',
 					onClick: this.close
 				})
 			);
@@ -81,18 +86,18 @@ package('kb.Stage', function(exports){
 
 	var NewPage = React.createClass({
 		displayName: 'NewPage',
-		tryCreate: function(ev){
+		tryCreate: function(ev) {
 			var stage = this.props.stage;
 
 			stage.title = this.state.title;
-			stage.link  = kb.convert.TextToSlug(this.state.owner + ':' + stage.title);
+			stage.link = kb.convert.TextToSlug(this.state.owner + ':' + stage.title);
 			stage.create();
 
 			ev.preventDefault();
 			ev.stopPropagation();
 		},
 
-		getInitialState: function(){
+		getInitialState: function() {
 			return {
 				title: this.props.stage.title,
 				owner: kb.convert.LinkToOwner(this.props.stage.link) || '',
@@ -100,18 +105,22 @@ package('kb.Stage', function(exports){
 			};
 		},
 
-		groupsReceived: function(xhr){
-			if(xhr.status === 200){
+		groupsReceived: function(xhr) {
+			if (xhr.status === 200) {
 				var info = JSON.parse(xhr.responseText);
-				this.setState({groups: info.groups || []});
+				this.setState({
+					groups: info.groups || []
+				});
 			}
 		},
 
-		componentDidMount: function(){
+		componentDidMount: function() {
 			var xhr = new XMLHttpRequest();
 			var self = this;
-			xhr.onreadystatechange = function(){
-				if(xhr.readyState !== 4){ return; }
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState !== 4) {
+					return;
+				}
 				self.groupsReceived(xhr);
 			};
 			xhr.open('GET', '/user:editor-groups', true);
@@ -119,33 +128,38 @@ package('kb.Stage', function(exports){
 			xhr.send();
 		},
 
-		ownerChanged: function(ev){
+		ownerChanged: function(ev) {
 			this.setState({
 				owner: ev.currentTarget.value
 			});
 		},
 
-		titleChanged: function(){
+		titleChanged: function() {
 			this.setState({
 				title: this.refs.title.getDOMNode().value
 			});
 		},
 
-		render: function(){
+		render: function() {
 			var self = this;
 			var stage = this.props.stage;
 			var title = this.state.title,
 				owner = this.state.owner,
 				link = kb.convert.TextToSlug(owner + ':' + title);
 
-			return React.DOM.div(
-				{ className: 'page new-page' },
-				React.DOM.form({
-					onSubmit: this.tryCreate
+			return React.DOM.div({
+					className: 'page new-page'
 				},
+				React.DOM.form({
+						onSubmit: this.tryCreate
+					},
 					React.DOM.label({}, 'Link'),
-					React.DOM.span({className:'link'}, link),
-					React.DOM.label({ htmlFor: 'new-page-title' }, 'Title'),
+					React.DOM.span({
+						className: 'link'
+					}, link),
+					React.DOM.label({
+						htmlFor: 'new-page-title'
+					}, 'Title'),
 					React.DOM.input({
 						id: 'new-page-title',
 						className: 'title',
@@ -156,13 +170,13 @@ package('kb.Stage', function(exports){
 						autoFocus: true
 					}),
 					React.DOM.label({}, 'Owner'),
-					React.DOM.div(
-						{ className: 'group' },
-						this.state.groups.map(function(group){
+					React.DOM.div({
+							className: 'group'
+						},
+						this.state.groups.map(function(group) {
 							var checked = owner === group;
 							return (
-								React.DOM.div(
-									{
+								React.DOM.div({
 										key: group,
 										className: checked ? 'checked' : ''
 									},
@@ -181,7 +195,9 @@ package('kb.Stage', function(exports){
 							);
 						})
 					),
-					React.DOM.button({ type: 'submit' }, 'Create')
+					React.DOM.button({
+						type: 'submit'
+					}, 'Create')
 				)
 			);
 		}
@@ -190,8 +206,8 @@ package('kb.Stage', function(exports){
 	exports.View = React.createClass({
 		displayName: 'Stage',
 
-		toggleWidth: function(){
-			if(this.props.stage.wide){
+		toggleWidth: function() {
+			if (this.props.stage.wide) {
 				this.props.stage.collapse();
 			} else {
 				this.props.stage.expand();
@@ -199,19 +215,18 @@ package('kb.Stage', function(exports){
 
 			window.setTimeout(this.activate, 100);
 		},
-		activate: function(ev){
-			if(typeof ev === 'undefined'){
+		activate: function(ev) {
+			if (typeof ev === 'undefined') {
 				kb.util.SmoothScroll.to(this.getDOMNode());
-			} else if (!ev.defaultPrevented){
+			} else if (!ev.defaultPrevented) {
 				kb.util.SmoothScroll.to(this.getDOMNode());
 			}
 		},
 
-		render: function(){
+		render: function() {
 			var stage = this.props.stage;
-			if(stage.creating){
-				return React.DOM.div(
-					{
+			if (stage.creating) {
+				return React.DOM.div({
 						className: 'stage',
 						onClick: this.activate,
 						'data-id': stage.id,
@@ -223,8 +238,9 @@ package('kb.Stage', function(exports){
 						isWide: stage.wide,
 						onToggleWidth: this.toggleWidth
 					}),
-					React.DOM.div(
-						{ className:'stage-scroll round-scrollbar'},
+					React.DOM.div({
+							className: 'stage-scroll round-scrollbar'
+						},
 						React.createElement(NewPage, {
 							stage: this.props.stage
 						})
@@ -232,8 +248,7 @@ package('kb.Stage', function(exports){
 				);
 			}
 
-			return React.DOM.div(
-				{
+			return React.DOM.div({
 					className: 'stage',
 					onClick: this.activate,
 					'data-id': stage.id,
@@ -245,8 +260,9 @@ package('kb.Stage', function(exports){
 					isWide: stage.wide,
 					onToggleWidth: this.toggleWidth
 				}),
-				React.DOM.div(
-					{ className:'stage-scroll round-scrollbar'},
+				React.DOM.div({
+						className: 'stage-scroll round-scrollbar'
+					},
 					React.createElement(kb.Page.View, {
 						stage: this.props.stage,
 						page: this.props.stage.page
@@ -256,20 +272,20 @@ package('kb.Stage', function(exports){
 		},
 
 		// bindings to Stage
-		changed: function(){
+		changed: function() {
 			this.forceUpdate();
 		},
-		widthChanged: function(){
+		widthChanged: function() {
 			this.props.onWidthChanged();
 		},
-		componentDidMount: function(){
+		componentDidMount: function() {
 			this.props.stage.on('changed', this.changed, this);
 			this.props.stage.on('widthChanged', this.widthChanged, this);
 			this.props.stage.pull();
 			this.activate();
 		},
-		componentWillReceiveProps: function(nextprops){
-			if(this.props.stage !== nextprops.stage){
+		componentWillReceiveProps: function(nextprops) {
+			if (this.props.stage !== nextprops.stage) {
 				this.props.stage.remove(this);
 				nextprops.stage.on('changed', this.changed, this);
 				nextprops.stage.on('widthChanged', this.widthChanged, this);

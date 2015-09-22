@@ -18,9 +18,15 @@
 }
 
 .content-dita-index .dita-index-title {
-	margin-left: 24px;
+	margin-left: 20px;
+	padding: 1px 4px;
 
 	cursor: pointer;
+}
+
+.content-dita-index .dita-index-title-active {
+	background: #1260A2;
+	color: #fff;
 }
 
 .content-dita-index .dita-index-children {
