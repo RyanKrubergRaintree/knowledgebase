@@ -3,6 +3,7 @@ package dita
 import (
 	"encoding/xml"
 	"io/ioutil"
+	"log"
 )
 
 type Topic struct {
@@ -43,6 +44,11 @@ func LoadTopic(filename string) (*Topic, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
+	}
+
+	data, err = ReplaceConrefs(data, filename)
+	if err != nil {
+		log.Println(err)
 	}
 
 	err = xml.Unmarshal(data, topic)

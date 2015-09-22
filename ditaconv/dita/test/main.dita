@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//Raintree Systems//DTD Topic V1.0//EN" "topic.dtd">
+<topic id="main">
+  <title>Main</title>
+  <body>
+    <p>BEFORE</p>
+    <note conref="A.dita#alpha" attr="exists"></note>
+    <note conref="B.dita#nested/thing/beta" attr="exists">DISCARD</note>
+    <p>AFTER</p>
+  </body>
+</topic>
