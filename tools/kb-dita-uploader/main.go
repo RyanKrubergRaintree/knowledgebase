@@ -14,6 +14,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv"
+	"github.com/raintreeinc/knowledgebase/extra/ditaindex"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 	"github.com/raintreeinc/knowledgebase/module/dita"
@@ -123,6 +124,8 @@ func Upload(name string, config *Config) error {
 		mapping.BySlug[ownerslug] = topic
 	}
 
+	navindex := ditaindex.EntryToItem(mapping, index.Nav)
+
 	mapping.Rules.Merge(dita.RaintreeDITA())
 
 	log.Println()
@@ -150,6 +153,17 @@ func Upload(name string, config *Config) error {
 			page.Slug = page.Slug[1:]
 		}
 		pages[page.Slug] = page
+	}
+
+	navindexslug := kb.Slug(owner + ":index")
+	pages[navindexslug] = &kb.Page{
+		Slug:     navindexslug,
+		Title:    "Index",
+		Synopsis: "Help navigation index",
+		Modified: time.Now(),
+		Story: kb.Story{
+			ditaindex.New("index", navindex),
+		},
 	}
 
 	log.Println()
