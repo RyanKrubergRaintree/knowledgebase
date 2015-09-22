@@ -32,6 +32,7 @@ type Context struct {
 	Entry   *Entry
 	Type    dita.CollectionType
 	Linking dita.Linking
+	TOC     bool
 }
 
 type Map struct {
@@ -54,9 +55,11 @@ type Index struct {
 }
 
 type Entry struct {
-	Title   string
-	Topic   *Topic
-	Linking dita.Linking
+	Title     string
+	Topic     *Topic
+	Linking   dita.Linking
+	TOC       bool
+	LockTitle bool
 
 	Children []*Entry
 }
@@ -216,8 +219,10 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 
 	if node.XMLName == dita.TopicGroup || node.XMLName.Local == "map" {
 		var entries []*Entry
+		childcontext := context
+		childcontext.TOC = isChildTOC(context.TOC, node.TOC)
 		for _, child := range node.Children {
-			entries = append(entries, index.processNode(context, child)...)
+			entries = append(entries, index.processNode(childcontext, child)...)
 		}
 		context.Entry = &Entry{}
 		CreateLinks(context, entries)
@@ -225,7 +230,9 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 	}
 
 	if node.XMLName == dita.MapRef {
-		return index.loadMap(context, node.Href)
+		childcontext := context
+		childcontext.TOC = isChildTOC(context.TOC, node.TOC)
+		return index.loadMap(childcontext, node.Href)
 	}
 
 	if node.XMLName == dita.RelTable {
@@ -237,7 +244,11 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 		return []*Entry{}
 	}
 
-	entry := &Entry{Title: node.NavTitle}
+	entry := &Entry{
+		Title:     node.NavTitle,
+		LockTitle: node.LockTitle == "yes",
+		TOC:       isChildTOC(context.TOC, node.TOC),
+	}
 	if entry.Title == "" {
 		entry.Title = node.Title
 	}
@@ -245,13 +256,14 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 
 	if node.Href != "" {
 		entry.Topic = index.loadTopic(context, node.Href)
-		if entry.Title == "" && entry.Topic != nil {
+		if entry.Title == "" && entry.Topic != nil && !entry.LockTitle {
 			entry.Title = entry.Topic.Title
 		}
 	}
 
 	childcontext := context
 	childcontext.Entry = entry
+	childcontext.TOC = entry.TOC
 	var entries []*Entry
 	for _, child := range node.Children {
 		subentries := index.processNode(childcontext, child)
@@ -319,10 +331,18 @@ func LoadIndex(filename string) (*Index, []error) {
 		Entry:   index.Nav,
 		Type:    dita.Unordered,
 		Linking: dita.NormalLinking,
+		TOC:     true,
 	}
 
 	entries := index.loadMap(context, filepath.Base(filename))
 	index.Nav.Children = append(index.Nav.Children, entries...)
 
 	return index, index.Errors
+}
+
+func isChildTOC(parenttoc bool, childtoc string) bool {
+	if childtoc == "" {
+		return parenttoc
+	}
+	return childtoc == "yes"
 }

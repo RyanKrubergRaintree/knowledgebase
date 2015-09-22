@@ -12,7 +12,9 @@ type MapNode struct {
 	Type    CollectionType `xml:"collection-type,attr"`
 	Linking Linking        `xml:"linking,attr"`
 
-	Format string `xml:"format,attr"`
+	Format    string `xml:"format,attr"`
+	TOC       string `xml:"toc,attr"`
+	LockTitle string `xml:"locktitle,attr"`
 
 	Children []*MapNode `xml:",any"`
 }

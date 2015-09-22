@@ -1,27 +1,28 @@
-package('kb.item', function(exports){
+package('kb.item', function(exports) {
 	'use strict';
 
 	depends('Editor.js');
 
 	depends('content.js');
 	depends('SimpleForm.js');
+	depends('DITAIndex.js');
 
 	exports.DropCanceled = null;
 	exports.View = React.createClass({
 		displayName: 'Item',
 
-		dragStart: function(ev, node, item){
+		dragStart: function(ev, node, item) {
 			kb.item.DropCanceled = false;
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if(stage.canModify()){
+			if (stage.canModify()) {
 				ev.dataTransfer.effectAllowed = 'all';
 			} else {
 				ev.dataTransfer.effectAllowed = 'copy';
 			}
 
-			if(ev.dataTransfer.setDragImage){
+			if (ev.dataTransfer.setDragImage) {
 				var off = mouseOffset(ev);
 				ev.dataTransfer.setDragImage(this.getDOMNode(), off.x, off.y);
 			}
@@ -34,7 +35,7 @@ package('kb.item', function(exports){
 			};
 			ev.dataTransfer.setData('Text', JSON.stringify(data));
 
-			function mouseOffset(ev){
+			function mouseOffset(ev) {
 				ev = ev.nativeEvent || ev;
 				return {
 					x: ev.offsetX || ev.layerX || 0,
@@ -42,17 +43,16 @@ package('kb.item', function(exports){
 				};
 			}
 		},
-		drag: function(ev){
-		},
-		dragEnd: function(ev){
-			if(kb.item.DropCanceled){
+		drag: function() {},
+		dragEnd: function(ev) {
+			if (kb.item.DropCanceled) {
 				ev.preventDefault();
 				return;
 			}
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if(ev.dataTransfer.dropEffect === 'move'){
+			if (ev.dataTransfer.dropEffect === 'move') {
 				stage.patch({
 					type: 'remove',
 					id: item.id
@@ -63,7 +63,7 @@ package('kb.item', function(exports){
 			ev.stopPropagation();
 		},
 
-		startEditing: function(ev){
+		startEditing: function(ev) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
@@ -73,32 +73,30 @@ package('kb.item', function(exports){
 			ev.stopPropagation();
 		},
 
-		render: function(){
+		render: function() {
 			var stage = this.props.stage,
 				item = this.props.item;
 
 			var view = kb.item.content[item.type] || kb.item.content.Unknown;
 			var editingClass = '';
 			var isEditing = false;
-			if(stage.editing.item(item.id)){
+			if (stage.editing.item(item.id)) {
 				view = kb.item.Editor;
 				editingClass = ' item-editing';
 				isEditing = true;
 			}
 
-			return React.DOM.div(
-				{
+			return React.DOM.div({
 					className: 'item' + editingClass,
 					onDoubleClick: stage.canModify() ? this.startEditing : null,
 					'data-id': item.id
-				},
-				!isEditing ? React.DOM.a({
-					className:'item-drag',
+				}, !isEditing ? React.DOM.a({
+					className: 'item-drag',
 					title: 'Move or copy item.',
 					draggable: 'true',
 
 					href: '#',
-					onClick: function(ev){
+					onClick: function(ev) {
 						ev = ev || window.event;
 						ev.preventDefault();
 					},

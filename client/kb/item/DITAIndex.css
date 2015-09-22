@@ -1,0 +1,32 @@
+.content-dita-index {}
+
+.content-dita-index .dita-index-item {
+	position: relative;
+
+	font-size: 14px;
+}
+
+.content-dita-index .dita-index-toggle {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	display: block;
+	width: 24px;
+
+	cursor: pointer;
+}
+
+.content-dita-index .dita-index-title {
+	margin-left: 24px;
+}
+
+.content-dita-index .dita-index-children {
+	margin-left: 8px;
+	padding-left: 16px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+	border-left: 1px dotted #aaa;
+	border-bottom: 1px dotted #aaa;
+	border-radius: 0 0 0 16px;
+}

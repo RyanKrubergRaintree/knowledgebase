@@ -16,6 +16,7 @@ import (
 
 	"github.com/bradfitz/slice"
 
+	"github.com/raintreeinc/knowledgebase/extra/ditaindex"
 	"github.com/raintreeinc/knowledgebase/kb"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv"
@@ -106,6 +107,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		return
+
 	case name + ":all-pages":
 		page := &kb.Page{
 			Slug:     name + ":all-pages",
@@ -121,6 +123,17 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		content += "</ul>"
 
 		page.Story.Append(kb.HTML(content))
+		page.WriteResponse(w)
+		return
+
+	case name + ":index":
+		page := &kb.Page{
+			Slug:     name + ":index",
+			Title:    "Index",
+			Modified: time.Now(),
+		}
+
+		page.Story.Append(ditaindex.New("index", store.index))
 		page.WriteResponse(w)
 		return
 	}
@@ -163,6 +176,7 @@ type store struct {
 	pages map[kb.Slug]*kb.Page
 	raw   map[kb.Slug][]byte
 	slugs []kb.Slug
+	index *ditaindex.Item
 
 	errLoad    []error
 	errMapping []error
@@ -190,6 +204,8 @@ func load(prefix, ditamap string) *store {
 		delete(mapping.BySlug, slug)
 		mapping.BySlug[ownerslug] = topic
 	}
+
+	store.index = ditaindex.EntryToItem(mapping, index.Nav)
 
 	mapping.Rules.Merge(RaintreeDITA())
 	for slug, topic := range mapping.BySlug {
