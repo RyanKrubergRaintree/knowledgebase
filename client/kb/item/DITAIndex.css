@@ -2,8 +2,8 @@
 
 .content-dita-index .dita-index-item {
 	position: relative;
-
 	font-size: 14px;
+	margin-bottom: 2px;
 }
 
 .content-dita-index .dita-index-toggle {
@@ -19,6 +19,8 @@
 
 .content-dita-index .dita-index-title {
 	margin-left: 24px;
+
+	cursor: pointer;
 }
 
 .content-dita-index .dita-index-children {

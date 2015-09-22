@@ -28,6 +28,9 @@ func EntryToItem(mapping *ditaconv.Mapping, entry *ditaconv.Entry) *Item {
 	}
 
 	for _, child := range entry.Children {
+		if !child.TOC {
+			continue
+		}
 		childitem := EntryToItem(mapping, child)
 		item.Children = append(item.Children, childitem)
 	}
