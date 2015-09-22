@@ -46,7 +46,7 @@ func LoadTopic(filename string) (*Topic, error) {
 		return nil, err
 	}
 
-	data, err = ReplaceConrefs(data, filename)
+	data, err = replaceConrefs(data, filename)
 	if err != nil {
 		log.Println(err)
 	}

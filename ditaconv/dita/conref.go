@@ -111,7 +111,7 @@ func (r *replacer) emit(dec *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
-func ReplaceConrefs(data []byte, filename string) ([]byte, error) {
+func replaceConrefs(data []byte, filename string) ([]byte, error) {
 	if !bytes.Contains(data, []byte("conref=")) {
 		return data, nil
 	}
