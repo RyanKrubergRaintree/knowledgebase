@@ -28,37 +28,33 @@ package('kb.item.content', function(exports) {
 			var toggle = null;
 			var children = null;
 
-			if (Array.isArray(item.children)) {
+			if (item.children.length > 0) {
 				toggle = React.DOM.span({
 					className: 'dita-index-toggle mdi ' + (expanded ? 'mdi-minus' : 'mdi-plus'),
 					onClick: this.toggle
 				});
 
-				if (expanded) {
-					var opened = this.props.opened;
+				if (expanded || item.activechild) {
 					children = React.DOM.div({
 						className: 'dita-index-children'
 					}, item.children.map(function(item, i) {
 						return React.createElement(Item, {
 							key: i,
-							item: item,
-							opened: opened
+							item: item
 						});
 					}));
 				}
 			}
 
-			var isactive = this.props.opened.indexOf(item.slug) >= 0;
-
 			var link = null;
 			if (item.slug === '') {
 				link = React.DOM.span({
-					className: 'dita-index-title ' + (isactive ? 'dita-index-title-active' : ''),
+					className: 'dita-index-title ' + (item.active ? 'dita-index-title-active' : ''),
 					onClick: this.open
 				}, item.title);
 			} else {
 				link = React.DOM.a({
-					className: 'dita-index-title ' + (isactive ? 'dita-index-title-active' : ''),
+					className: 'dita-index-title ' + (item.active ? 'dita-index-title-active' : ''),
 					href: item.slug,
 					'data-link': item.slug,
 					onClick: this.open
@@ -75,27 +71,50 @@ package('kb.item.content', function(exports) {
 		}
 	});
 
-	function extractSlugs(stages) {
-		var r = [];
+	// builds a item tree that contains the active/activechild properties
+	function build(root, stages) {
+		var isactive = {};
 		for (var i = 0; i < stages.length; i++) {
 			var stage = stages[i];
 			if (stage.page.slug !== '') {
-				r.push(stage.page.slug);
+				isactive[stage.page.slug] = true;
 			}
 		}
-		return r;
+
+		console.log(root);
+
+		function mknode(item) {
+			var n = {
+				title: item.title,
+				slug: item.slug,
+				active: isactive[item.slug],
+				activechild: false,
+				children: []
+			};
+
+			if (Array.isArray(item.children)) {
+				for (var i = 0; i < item.children.length; i++) {
+					var c = mknode(item.children[i]);
+					n.activechild = n.activechild || c.active || c.activechild;
+					n.children.push(c);
+				}
+			}
+			return n;
+		}
+
+		return mknode(root);
 	}
 
 	exports['dita-index'] = React.createClass({
 		displayName: 'DITAIndex',
 		getInitialState: function() {
 			return {
-				opened: []
+				root: build(this.props.item.root, kb.app.Lineup.stages)
 			};
 		},
 		activeChanged: function(ev) {
 			this.setState({
-				opened: extractSlugs(ev.lineup.stages)
+				root: build(this.props.item.root, ev.lineup.stages)
 			});
 		},
 		componentDidMount: function() {
@@ -111,16 +130,14 @@ package('kb.item.content', function(exports) {
 				}, 'No index available.');
 			}
 
-			var root = this.props.item.root;
-			var opened = this.state.opened;
+			var root = this.state.root;
 			return React.DOM.div({
 					className: 'item-content content-dita-index'
 				},
 				root.children.map(function(item, i) {
 					return React.createElement(Item, {
 						key: i,
-						item: item,
-						opened: opened
+						item: item
 					});
 				})
 
