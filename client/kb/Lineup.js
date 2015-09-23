@@ -228,8 +228,8 @@ package('kb', function(exports) {
 				return;
 			}
 
-			var path = t.href;
-			if ((path === '') || (path === '/')) {
+			var path = t.attributes['href'].value;
+			if ((path === '') || (path === '/') || (path === '#')) {
 				return;
 			}
 
