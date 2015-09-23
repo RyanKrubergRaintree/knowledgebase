@@ -96,7 +96,7 @@ func fixSlug(config *Config) error {
 				Data = $3,
 				Tags = $4,
 				TagSlugs = $5,
-				Version = Version+1
+				Version = Version
 			WHERE Slug = $1
 		`, slug, string(newslug), newdata, stringSlice(tags), stringSlice(tagSlugs))
 
