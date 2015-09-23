@@ -1,4 +1,4 @@
-package('kb', function(exports){
+package('kb', function(exports) {
 	'use strict';
 
 	depends('util/Notifier.js');
@@ -6,66 +6,67 @@ package('kb', function(exports){
 	depends('Stage.js');
 
 	exports.Lineup = Lineup;
-	function Lineup(){
+
+	function Lineup() {
 		this.stages = [];
 		this.notifier = new kb.util.Notifier();
 		this.notifier.mixto(this);
 	}
 
 	Lineup.prototype = {
-		changed: function(){
+		changed: function() {
 			this.notifier.emit({
-				type:'changed',
+				type: 'changed',
 				lineup: this
 			});
 		},
 
-		stageById: function(id){
-			for(var i = 0; i < this.stages.length; i += 1){
-				if(this.stages[i].id === id){
+		stageById: function(id) {
+			for (var i = 0; i < this.stages.length; i += 1) {
+				if (this.stages[i].id === id) {
 					return this.stages[i];
 				}
 			}
 			return undefined;
 		},
-		indexOf_: function(id){
-			if(typeof id === 'undefined'){
+		indexOf_: function(id) {
+			if (typeof id === 'undefined') {
 				return -1;
 			}
-			for(var i = 0; i < this.stages.length; i += 1){
-				if(this.stages[i].id === id){
+			for (var i = 0; i < this.stages.length; i += 1) {
+				if (this.stages[i].id === id) {
 					return i;
 				}
 			}
 			return -1;
 		},
 
-		trim_: function(id){
-			if(typeof id === 'undefined'){
+		trim_: function(id) {
+			if (typeof id === 'undefined') {
 				return;
 			}
 			var i = this.indexOf_(id);
-			if(i >= 0){
+			if (i >= 0) {
 				this.stages = this.stages.slice(0, i + 1);
 			}
 		},
 
-		clear: function(){
+		clear: function() {
 			this.removeListeners();
 			this.stages = [];
 			this.changed();
 		},
 
-		closeLast: function(){
+		closeLast: function() {
 			// always keep one stage open
-			if(this.stages.length > 1){
-				this.stages[this.stages.length-1].close();
+			if (this.stages.length > 1) {
+				this.stages[this.stages.length - 1].close();
 			}
 		},
 
-		changeRef: function(id, stage){
+		changeRef: function(id, stage) {
 			var i = this.indexOf_(id);
-			if(i >= 0){
+			if (i >= 0) {
 				var ref = this.stages[i];
 				ref.url = kb.convert.URLToReadable(stage.url);
 				ref.link = kb.convert.URLToLink(stage.link);
@@ -79,12 +80,12 @@ package('kb', function(exports){
 		// link
 		// after, optional
 		// insteadOf, optional
-		open: function(props){
+		open: function(props) {
 			this.trim_(props.after);
 			var stage = new kb.Stage(props);
 
 			var i = this.indexOf_(props.insteadOf);
-			if(i >= 0){
+			if (i >= 0) {
 				this.stages[i].remove(this);
 				this.stages[i] = stage;
 			} else {
@@ -97,46 +98,46 @@ package('kb', function(exports){
 			return stage.id;
 		},
 
-		openLink: function(link){
+		openLink: function(link) {
 			this.open(kb.convert.LinkToReference(link));
 		},
 
-		handleClose: function(ev){
-			this.stages = this.stages.filter(function(stage){
+		handleClose: function(ev) {
+			this.stages = this.stages.filter(function(stage) {
 				return stage != ev.stage;
 			});
 			this.changed();
 		},
-		handleURLChanged: function(/*ev*/){
+		handleURLChanged: function( /*ev*/ ) {
 			this.changed();
 		},
 
-		removeListeners: function(){
-			this.stages.map(function(stage){
+		removeListeners: function() {
+			this.stages.map(function(stage) {
 				stage.remove(this);
 			});
 		},
-		addListeners: function(){
+		addListeners: function() {
 			var self = this;
-			this.stages.map(function(stage){
+			this.stages.map(function(stage) {
 				stage.on('closed', self.handleClose, self);
 				stage.on('urlChanged', self.handleURLChanged, self);
 			});
 		},
 
-		updateRefs: function(nextstages){
+		updateRefs: function(nextstages) {
 			this.removeListeners();
 
 			var stages = this.stages.slice();
 			var changed = false;
 
-			var newstages = nextstages.map(function(stage){
+			var newstages = nextstages.map(function(stage) {
 				var prev = stages.shift();
 
-				if(prev){
+				if (prev) {
 					var plink = kb.convert.ReferenceToLink(prev);
 					var slink = kb.convert.ReferenceToLink(stage);
-					if(plink === slink) {
+					if (plink === slink) {
 						return prev;
 					}
 				}
@@ -144,10 +145,10 @@ package('kb', function(exports){
 				return stage;
 			});
 
-			if(stages.length > 0){
+			if (stages.length > 0) {
 				changed = true;
 			}
-			if(changed){
+			if (changed) {
 				this.stages = newstages;
 				this.changed();
 			}
@@ -155,10 +156,12 @@ package('kb', function(exports){
 			this.addListeners();
 		},
 
-		findStageFromElement: function(el){
-			for(var i = 0; i < 32; i += 1){
-				if(el === null){ return null; }
-				if(getClassList(el).contains('stage')){
+		findStageFromElement: function(el) {
+			for (var i = 0; i < 32; i += 1) {
+				if (el === null) {
+					return null;
+				}
+				if (getClassList(el).contains('stage')) {
 					var id = GetDataAttribute(el, 'id');
 					return this.stageById(id);
 				}
@@ -167,7 +170,7 @@ package('kb', function(exports){
 			return undefined;
 		},
 
-		handleOpenLink: function(ev){
+		handleOpenLink: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -177,10 +180,10 @@ package('kb', function(exports){
 			var ref = kb.convert.LinkToReference(target.href);
 			var url = ref.url;
 
-			if(stage){
+			if (stage) {
 				var locFrom = kb.convert.URLToLocation(stage.url);
 				var locTo = kb.convert.URLToLocation(url);
-				if(locFrom.host === ''){
+				if (locFrom.host === '') {
 					url = locTo.path;
 				} else {
 					url = '//' + locFrom.host + locTo.path;
@@ -191,7 +194,7 @@ package('kb', function(exports){
 			var link = link || ref.link;
 			var title = target.innerText;
 
-			if(ev.button === 1){
+			if (ev.button === 1) {
 				this.open({
 					url: url,
 					link: link,
@@ -207,16 +210,28 @@ package('kb', function(exports){
 			}
 		},
 
-		handleClickLink: function(ev){
+		handleClickLink: function(ev) {
 			var t = ev.target;
-			if(t.nodeName !== 'A'){ return; }
-			if(getClassList(t).contains('external-link')){ return; }
-			if(t.onclick != null){ return; }
-			if(t.onmousedown != null){ return; }
-			if(t.onmouseup != null){ return; }
+			if (t.nodeName !== 'A') {
+				return;
+			}
+			if (getClassList(t).contains('external-link')) {
+				return;
+			}
+			if (t.onclick != null) {
+				return;
+			}
+			if (t.onmousedown != null) {
+				return;
+			}
+			if (t.onmouseup != null) {
+				return;
+			}
 
 			var path = t.pathname;
-			if((path === '')||(path === '/')){ return; }
+			if ((path === '') || (path === '/')) {
+				return;
+			}
 
 			this.handleOpenLink(ev);
 		}

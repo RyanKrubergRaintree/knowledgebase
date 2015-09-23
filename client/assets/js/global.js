@@ -5,7 +5,6 @@ window.DocumentCookies = {
 		return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null;
 	},
 	setItem: function(sKey, sValue, vEnd, sPath, sDomain, bSecure) {
-		return;
 		if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
 			return false;
 		}
@@ -27,7 +26,6 @@ window.DocumentCookies = {
 		return true;
 	},
 	removeItem: function(sKey, sPath, sDomain) {
-		return;
 		if (!sKey || !this.hasItem(sKey)) {
 			return false;
 		}
@@ -56,14 +54,14 @@ window.GetDataAttribute = function GetDataAttribute(el, name) {
 
 window.Hash = {
 	save: function() {
-		DocumentCookies.setItem('last-hash', document.location.hash, Infinity, '/');
+		window.DocumentCookies.setItem('last-hash', document.location.hash, Infinity, '/');
 	},
 	restore: function() {
-		var lastHash = DocumentCookies.getItem('hash');
-		if (lastHash && (document.location.hash == '')) {
+		var lastHash = window.DocumentCookies.getItem('hash');
+		if (lastHash && (document.location.hash === '')) {
 			document.location.hash = lastHash;
 		}
-		DocumentCookies.removeItem('hash');
+		window.DocumentCookies.removeItem('hash');
 	}
 };
 
@@ -84,7 +82,7 @@ window.TestCase = function TestCase(casename, runcase) {
 		},
 		'equal': function(actual, expect, msg) {
 			if (actual !== expect) {
-				var full = "\ngot " + actual + "\nexp " + expect;
+				var full = '\ngot ' + actual + '\nexp ' + expect;
 				if (typeof msg !== 'undefined') {
 					full = msg + full;
 				}

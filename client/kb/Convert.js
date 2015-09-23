@@ -1,33 +1,33 @@
-package('kb.convert', function(exports){
+package('kb.convert', function(exports) {
 	'use strict';
 
 	depends('unicode/identifier.js');
 	depends('unicode/runename.js');
 
-	function trimProtocol(link){
-		if(link.indexOf('https://', link) === 0){
+	function trimProtocol(link) {
+		if (link.indexOf('https://', link) === 0) {
 			return link.substr(6).trim();
-		} else if(link.indexOf('http://', link) === 0){
+		} else if (link.indexOf('http://', link) === 0) {
 			return link.substr(5).trim();
 		}
 		return link.trim();
 	}
 
-	TestCase('trimProtocol', function(assert){
+	TestCase('trimProtocol', function(assert) {
 		assert.equal(trimProtocol(''), '');
 		assert.equal(trimProtocol('http://xyz'), '//xyz');
 		assert.equal(trimProtocol('https://xyz/zwy'), '//xyz/zwy');
 	});
 
-	function trimLeadingSlashes(link){
+	function trimLeadingSlashes(link) {
 		// remove prefix '/'
-		while(link.charAt(0) === '/') {
+		while (link.charAt(0) === '/') {
 			link = link.substr(1);
 		}
 		return link;
 	}
 
-	TestCase('trimLeadingSlashes', function(assert){
+	TestCase('trimLeadingSlashes', function(assert) {
 		assert.equal(trimLeadingSlashes(''), '');
 		assert.equal(trimLeadingSlashes('xyz'), 'xyz');
 		assert.equal(trimLeadingSlashes('///xyz/zwy'), 'xyz/zwy');
@@ -47,16 +47,17 @@ package('kb.convert', function(exports){
 	//   '&Hello_世界/+!' ==> 'amp-hello-世界/plus-excl'
 	//   'Hello  World  /  Test' ==> 'hello-world/test'
 	exports.TextToSlug = TextToSlug;
-	function TextToSlug(title){
+
+	function TextToSlug(title) {
 		var cutdash = true,
 			emitdash = false;
 
 		var slug = '';
 
-		for(var i = 0; i < title.length; i += 1){
+		for (var i = 0; i < title.length; i += 1) {
 			var r = title.charAt(i);
-			if(kb.unicode.IsIdent(r)) {
-				if(emitdash && !cutdash){
+			if (kb.unicode.IsIdent(r)) {
+				if (emitdash && !cutdash) {
 					slug += '-';
 				}
 				slug += r.toLowerCase();
@@ -65,7 +66,7 @@ package('kb.convert', function(exports){
 				cutdash = false;
 				continue;
 			}
-			if((r === '/') || (r === ':')){
+			if ((r === '/') || (r === ':')) {
 				slug += r;
 				emitdash = false;
 				cutdash = true;
@@ -73,8 +74,8 @@ package('kb.convert', function(exports){
 				emitdash = true;
 			} else {
 				var name = kb.unicode.RuneName[r];
-				if(name){
-					if(!cutdash){
+				if (name) {
+					if (!cutdash) {
 						slug += '-';
 					}
 					slug += name;
@@ -84,14 +85,14 @@ package('kb.convert', function(exports){
 			}
 		}
 
-		if(slug.length === 0){
+		if (slug.length === 0) {
 			return '-';
 		}
 
 		return slug;
 	}
 
-	TestCase('TextToSlug', function(assert){
+	TestCase('TextToSlug', function(assert) {
 		assert.equal(TextToSlug(''), '-');
 		assert.equal(TextToSlug('&Hello_世界/+!'), 'amp-hello-世界/plus-excl');
 		assert.equal(TextToSlug('Hello  World  /  Test'), 'hello-world/test');
@@ -104,21 +105,22 @@ package('kb.convert', function(exports){
 	// '/kb:example' - rooted local URL
 	// 'kb:Example' - local URL
 	exports.LinkToReference = LinkToReference;
-	function LinkToReference(link){
+
+	function LinkToReference(link) {
 		link = trimProtocol(link);
 		// External site:
 		// '//kb.example.com/example'
-		if((link[0] === '/') && (link[1] === '/') ) {
+		if ((link[0] === '/') && (link[1] === '/')) {
 			return {
 				link: URLToReadable(link),
-				url:  link,
+				url: link,
 				title: LinkToTitle(link)
 			};
 		}
 
 		link = trimLeadingSlashes(link);
 		var i = link.indexOf(':');
-		var owner = i >= 0 ? link.substr(0,i): '';
+		var owner = i >= 0 ? link.substr(0, i) : '';
 
 		return {
 			link: URLToReadable(link),
@@ -129,12 +131,14 @@ package('kb.convert', function(exports){
 	}
 
 	exports.ReferenceToLink = ReferenceToLink;
-	function ReferenceToLink(ref){
+
+	function ReferenceToLink(ref) {
 		return URLToReadable(ref.url);
 	}
 
 	exports.LinkToTitle = LinkToTitle;
-	function LinkToTitle(link){
+
+	function LinkToTitle(link) {
 		link = trimProtocol(link);
 		link = trimLeadingSlashes(link);
 		var i = Math.max(link.lastIndexOf('/'), link.indexOf(':'));
@@ -143,7 +147,8 @@ package('kb.convert', function(exports){
 	}
 
 	exports.LinkToOwner = LinkToOwner;
-	function LinkToOwner(link){
+
+	function LinkToOwner(link) {
 		link = URLToReadable(link);
 		link = trimProtocol(link);
 		link = trimLeadingSlashes(link);
@@ -154,15 +159,16 @@ package('kb.convert', function(exports){
 	}
 
 	exports.URLToReadable = URLToReadable;
-	function URLToReadable(url){
+
+	function URLToReadable(url) {
 		var loc = URLToLocation(url);
-		if((loc.host === '') || (loc.host === window.location.host)){
+		if ((loc.host === '') || (loc.host === window.location.host)) {
 			return loc.path + loc.query + loc.fragment;
 		} else {
 			return '//' + loc.host + loc.path + loc.query + loc.fragment;
 		}
 	}
-	TestCase('URLToReadable', function(assert){
+	TestCase('URLToReadable', function(assert) {
 		assert.equal(URLToReadable(''), '/');
 		assert.equal(URLToReadable('/hello-world'), '/hello-world');
 		assert.equal(URLToReadable('/hello-world/test#'), '/hello-world/test');
@@ -176,12 +182,13 @@ package('kb.convert', function(exports){
 	});
 
 	exports.URLToLocation = URLToLocation;
-	function URLToLocation(url){
+
+	function URLToLocation(url) {
 		var rx = new RegExp('^((http|https):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
 		var matches = url.match(rx);
 
 		var path = matches[5] || '';
-		if(path.charAt(0) !== '/') {
+		if (path.charAt(0) !== '/') {
 			path = '/' + path;
 		}
 
@@ -191,7 +198,7 @@ package('kb.convert', function(exports){
 			path: path,
 
 			query: matches[7] || '',
-			fragment : matches[9] || ''
+			fragment: matches[9] || ''
 		};
 	}
 });

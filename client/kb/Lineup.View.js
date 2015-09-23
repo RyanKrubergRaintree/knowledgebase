@@ -1,4 +1,4 @@
-package('kb.Lineup', function(exports){
+package('kb.Lineup', function(exports) {
 	'use strict';
 
 	depends('Lineup.js');
@@ -7,34 +7,37 @@ package('kb.Lineup', function(exports){
 	exports.View = React.createClass({
 		displayName: 'Lineup',
 
-		getInitialState: function(){
-			return { width: window.clientWidth };
+		getInitialState: function() {
+			return {
+				width: window.clientWidth
+			};
 		},
 
-		render: function(){
+		render: function() {
 			var self = this;
 			var containerWidth = this.state.width;
 
 			// try to calculate the best sizes for normal and wide stages
 			var normal = containerWidth;
 			var wide = containerWidth;
-			if(containerWidth > 465*3.5) {
+			if (containerWidth > 465 * 3.5) {
 				normal = containerWidth * 0.25;
-				wide   = containerWidth * 0.50;
-			} else if (containerWidth > 465*2.5) {
+				wide = containerWidth * 0.50;
+			} else if (containerWidth > 465 * 2.5) {
 				normal = containerWidth * 0.33;
-				wide   = containerWidth * 0.663;
-			} else if (containerWidth > 465*1.5) {
+				wide = containerWidth * 0.663;
+			} else if (containerWidth > 465 * 1.5) {
 				normal = containerWidth * 0.50;
-				wide   = containerWidth * 1.00;
+				wide = containerWidth * 1.00;
 			}
 			normal = Math.min(normal, 500);
 			wide = Math.min(wide, 700);
 
 			var left = 0;
-			return React.DOM.div(
-				{ className: 'lineup' },
-				this.props.Lineup.stages.map(function(stage, i){
+			return React.DOM.div({
+					className: 'lineup'
+				},
+				this.props.Lineup.stages.map(function(stage) {
 					var width = stage.wide ? wide : normal;
 					var r = React.createElement(kb.Stage.View, {
 						style: {
@@ -47,8 +50,7 @@ package('kb.Lineup', function(exports){
 					});
 					left += width;
 					return r;
-				}
-			));
+				}));
 		},
 
 		// bindings to Lineup
@@ -56,20 +58,24 @@ package('kb.Lineup', function(exports){
 			this.forceUpdate();
 		},
 
-		onStageWidthChanged: function(){
+		onStageWidthChanged: function() {
 			this.forceUpdate();
 		},
-		resized: function(){
-			this.setState({width: this.getDOMNode().clientWidth });
+		resized: function() {
+			this.setState({
+				width: this.getDOMNode().clientWidth
+			});
 		},
-		componentDidMount: function(){
+		componentDidMount: function() {
 			this.props.Lineup.on('changed', this.changed, this);
 			window.onresize = this.resized;
 
-			this.setState({width: this.getDOMNode().clientWidth });
+			this.setState({
+				width: this.getDOMNode().clientWidth
+			});
 		},
-		componentWillReceiveProps: function(nextprops){
-			if(this.props.Lineup !== nextprops.Lineup){
+		componentWillReceiveProps: function(nextprops) {
+			if (this.props.Lineup !== nextprops.Lineup) {
 				this.props.Lineup.remove(this);
 				nextprops.Lineup.on('changed', this.changed, this);
 			}

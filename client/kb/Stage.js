@@ -17,7 +17,7 @@ package('kb', function(exports) {
 				return;
 			}
 			fn.call(self, xhr);
-		}
+		};
 	}
 
 	function Editing(stage) {

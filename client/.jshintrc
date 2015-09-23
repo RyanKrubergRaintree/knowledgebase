@@ -14,7 +14,12 @@
     "KBUser": true,
 
     "GenerateID": true,
-    "GetDataAttribute": true
+    "GetDataAttribute": true,
+
+    "TestCase": true,
+    "getClassList": true,
+
+    "DocumentCookies": true
   },
   "globalstrict": true,
   "quotmark": "single",

@@ -1,38 +1,38 @@
-package('kb', function(exports){
+package('kb', function(exports) {
 	'use strict';
 
 	depends('Convert.js');
 	var rxCode = /[=><;{}\[\]]/;
 
-	function getImage(dataTransfer){
+	function getImage(dataTransfer) {
 		var acceptedImages = {
 			'image/png': true,
 			'image/jpeg': true
 		};
-		if(typeof dataTransfer.files === 'undefined'){
+		if (typeof dataTransfer.files === 'undefined') {
 			return null;
 		}
-		for(var i = 0; i < dataTransfer.files.length; i += 1){
+		for (var i = 0; i < dataTransfer.files.length; i += 1) {
 			var file = dataTransfer.files[i];
-			if(acceptedImages[file.type]){
+			if (acceptedImages[file.type]) {
 				return file;
 			}
 		}
 		return null;
 	}
 
-	function resizeImage(src, onResized){
+	function resizeImage(src, onResized) {
 		var MaxWidth = 1024,
 			MaxHeight = 1024;
 
 		var image = new Image();
-		image.onload = function(){
+		image.onload = function() {
 			var canvas = document.createElement('canvas');
-			if(image.height > MaxHeight) {
+			if (image.height > MaxHeight) {
 				image.width *= MaxHeight / image.height;
 				image.height = MaxHeight;
 			}
-			if(image.width > MaxWidth) {
+			if (image.width > MaxWidth) {
 				image.height *= MaxWidth / image.width;
 				image.width = MaxWidth;
 			}
@@ -49,9 +49,9 @@ package('kb', function(exports){
 		image.src = src;
 	}
 
-	function createItem(stage, dataTransfer){
+	function createItem(stage, dataTransfer) {
 		var image = getImage(dataTransfer);
-		if(image){
+		if (image) {
 			var item = {
 				id: GenerateID(),
 				type: 'image',
@@ -61,8 +61,8 @@ package('kb', function(exports){
 
 			// do delayed loading
 			var reader = new FileReader();
-			reader.onload = function(ev){
-				resizeImage(ev.target.result, function(data){
+			reader.onload = function(ev) {
+				resizeImage(ev.target.result, function(data) {
 					stage.patch({
 						type: 'edit',
 						id: item.id,
@@ -83,8 +83,8 @@ package('kb', function(exports){
 			var html = dataTransfer.getData('text/html');
 			var href = dataTransfer.getData('text/uri-list');
 
-			if(href){
-				if(html){
+			if (href) {
+				if (html) {
 					var rxTags = /<[^>]+>/g;
 					html = html.replace(rxTags, '');
 				} else {
@@ -103,14 +103,14 @@ package('kb', function(exports){
 		}
 		try {
 			var text = dataTransfer.getData('text/plain');
-			if(text === ''){
+			if (text === '') {
 				text = dataTransfer.getData('Text');
 			}
 		} catch (ex) {
 			text = dataTransfer.getData('Text');
 		}
-		if(text){
-			if(text.match(rxCode)){
+		if (text) {
+			if (text.match(rxCode)) {
 				return {
 					id: GenerateID(),
 					type: 'code',
@@ -129,9 +129,10 @@ package('kb', function(exports){
 	}
 
 	exports.DropData = DropData;
-	function DropData(stage, after, dataTransfer){
+
+	function DropData(stage, after, dataTransfer) {
 		var item = createItem(stage, dataTransfer);
-		if(item){
+		if (item) {
 			stage.patch({
 				type: 'add',
 				after: after,
