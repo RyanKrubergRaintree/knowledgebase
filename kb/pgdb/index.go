@@ -141,7 +141,7 @@ func (db Index) ByTitle(suffix kb.Slug) ([]kb.PageEntry, error) {
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
 		  AND AccessView.Access >= 'reader'
-		  AND Slug LIKE '%:' || $2
+		  AND Slug LIKE '%=' || $2
 	`, db.UserID, suffix)
 }
 
