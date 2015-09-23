@@ -30,8 +30,7 @@ package('kb', function(exports) {
 						'10.2.300',
 						'10.2.200',
 						'10.2.100',
-						'9.4',
-						'9.3'
+						'9.4'
 					],
 					selected: DocumentCookies.getItem('filter') || '10.2.600'
 				}
@@ -186,20 +185,24 @@ package('kb', function(exports) {
 				React.createElement(Search, this.props),
 				React.createElement(HeaderMenu, {
 					items: [{
-						key: '0',
+						key: 'new-page',
 						href: '#',
 						onClick: this.createNewPage,
 						caption: 'New Page'
 					}, {
-						key: '1',
+						key: 'index',
+						href: '/help:index',
+						caption: 'Index'
+					}, {
+						key: 'recent-changes',
 						href: '/page:recent-changes',
 						caption: 'Recent Changes'
 					}, {
-						key: '2',
+						key: 'user',
 						href: '/user:current',
 						caption: 'User'
 					}, {
-						key: '3',
+						key: 'logout',
 						href: '#',
 						onClick: this.logout,
 						caption: 'Logout'
