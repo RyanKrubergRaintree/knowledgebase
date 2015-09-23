@@ -119,7 +119,7 @@ package('kb.convert', function(exports) {
 		}
 
 		link = trimLeadingSlashes(link);
-		var i = link.indexOf(':');
+		var i = link.indexOf('=');
 		var owner = i >= 0 ? link.substr(0, i) : '';
 
 		return {
