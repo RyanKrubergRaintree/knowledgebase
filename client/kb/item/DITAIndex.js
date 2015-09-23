@@ -29,8 +29,13 @@ package('kb.item.content', function(exports) {
 			var children = null;
 
 			if (item.children.length > 0) {
+				var icon = (expanded ? 'mdi-minus' : 'mdi-plus');
+				if (item.active || item.activechild) {
+					icon += '-circle-outline';
+				}
+
 				toggle = React.DOM.span({
-					className: 'dita-index-toggle mdi ' + (expanded ? 'mdi-minus' : 'mdi-plus'),
+					className: 'dita-index-toggle mdi ' + icon,
 					onClick: this.toggle
 				});
 

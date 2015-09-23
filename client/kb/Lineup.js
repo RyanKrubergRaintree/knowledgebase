@@ -218,17 +218,15 @@ package('kb', function(exports) {
 			if (getClassList(t).contains('external-link')) {
 				return;
 			}
-			if (t.onclick != null) {
-				return;
-			}
-			if (t.onmousedown != null) {
-				return;
-			}
-			if (t.onmouseup != null) {
+			if ((t.onclick != null) || (t.onmousedown != null) || (t.onmouseup != null)) {
 				return;
 			}
 
-			var path = t.attributes['href'].value;
+			var href = t.attributes['href'];
+			if (typeof href === 'undefined') {
+				return;
+			}
+			var path = href.value;
 			if ((path === '') || (path === '/') || (path === '#')) {
 				return;
 			}
