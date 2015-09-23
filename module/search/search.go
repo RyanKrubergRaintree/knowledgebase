@@ -37,7 +37,7 @@ func (mod *Module) Pages() []kb.PageEntry {
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/search:search", mod.search).Methods("GET")
+	mod.router.HandleFunc("/search=search", mod.search).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +51,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "page:pages",
+		Slug:  "page=pages",
 		Title: "Pages",
 	}
 
@@ -89,7 +89,7 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "search:search",
+		Slug:  "search=search",
 		Title: "Search \"" + q + "\"",
 		Story: kb.StoryFromEntries(entries),
 	}

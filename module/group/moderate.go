@@ -82,7 +82,7 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "group:moderate-" + groupID + "",
+		Slug:  "group=moderate-" + groupID + "",
 		Title: "Moderate " + group.Name,
 	}
 

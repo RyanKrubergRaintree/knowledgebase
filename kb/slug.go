@@ -67,7 +67,7 @@ func Slugify(s string) Slug {
 			continue
 		}
 		switch r {
-		case '/', ':':
+		case '/', '=':
 			slug = append(slug, r)
 			emitdash = false
 			cutdash = true
@@ -98,7 +98,7 @@ func TokenizeLink(link string) (owner, page Slug) {
 	}
 	slug := Slugify(link)
 
-	i := strings.Index(string(slug), ":")
+	i := strings.Index(string(slug), "=")
 	if i < 0 {
 		return "", slug
 	}
@@ -111,7 +111,7 @@ func TokenizeLink3(link string) (owner, title, page Slug) {
 	}
 	slug := Slugify(link)
 
-	i := strings.Index(string(slug), ":")
+	i := strings.Index(string(slug), "=")
 	if i < 0 {
 		return "", slug, slug
 	}

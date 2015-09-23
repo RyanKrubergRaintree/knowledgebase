@@ -197,14 +197,14 @@ func TestIntegration(t *testing.T) {
 	log("Creating page", context.Pages("private").Create(welcomePage))
 	assert("Duplicate page creation", context.Pages("private").Create(welcomePage) == kb.ErrPageExists)
 
-	page, err := context.Pages("private").Load("private:welcome")
+	page, err := context.Pages("private").Load("private=welcome")
 	log("Loading page", err)
 	assert("Correct page", samePage(page, welcomePage))
 
-	log("Overwrite page", context.Pages("private").Overwrite("private:welcome", 1, welcomePage2))
-	assert("Concurrent edit", context.Pages("private").Overwrite("private:welcome", 1, welcomePage2) == kb.ErrConcurrentEdit)
+	log("Overwrite page", context.Pages("private").Overwrite("private=welcome", 1, welcomePage2))
+	assert("Concurrent edit", context.Pages("private").Overwrite("private=welcome", 1, welcomePage2) == kb.ErrConcurrentEdit)
 
-	log("Add paragraph", context.Pages("private").Edit("private:welcome", 4, kb.Action{
+	log("Add paragraph", context.Pages("private").Edit("private=welcome", 4, kb.Action{
 		"type": "add",
 		"item": kb.Paragraph("Hello World..."),
 	}))
@@ -213,9 +213,9 @@ func TestIntegration(t *testing.T) {
 	log("List pages", err)
 	assert("Must have 1 entry", len(pages) == 1)
 
-	assert("Concurrent delete page", context.Pages("private").Delete("private:welcome", 1) == kb.ErrConcurrentEdit)
-	log("Delete page", context.Pages("private").Delete("private:welcome", 5))
-	_, err = context.Pages("private").Load("private:welcome")
+	assert("Concurrent delete page", context.Pages("private").Delete("private=welcome", 1) == kb.ErrConcurrentEdit)
+	log("Delete page", context.Pages("private").Delete("private=welcome", 5))
+	_, err = context.Pages("private").Load("private=welcome")
 	assert("Loading deleted page", err == kb.ErrPageNotExist)
 
 	// index handling
@@ -243,7 +243,7 @@ func TestIntegration(t *testing.T) {
 }
 
 var welcomePage = &kb.Page{
-	Slug:     "private:welcome",
+	Slug:     "private=welcome",
 	Title:    "Welcome",
 	Version:  1,
 	Synopsis: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",
@@ -254,7 +254,7 @@ var welcomePage = &kb.Page{
 }
 
 var welcomePage2 = &kb.Page{
-	Slug:     "private:welcome",
+	Slug:     "private=welcome",
 	Title:    "Welcome",
 	Version:  4,
 	Synopsis: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.",

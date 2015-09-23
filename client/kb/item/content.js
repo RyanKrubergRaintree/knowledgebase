@@ -1,4 +1,4 @@
-package('kb.item.content', function(exports){
+package('kb.item.content', function(exports) {
 	'use strict';
 
 	depends('dita.css');
@@ -11,28 +11,49 @@ package('kb.item.content', function(exports){
 
 	exports.Unknown = React.createClass({
 		displayName: 'Unknown',
-		render: function(){
+		render: function() {
 			var item = this.props.item;
-			return React.DOM.div(
-				{ className: 'item-content content-unknown' },
-				React.DOM.span({style: {'float': 'right'}}, item.type),
+			return React.DOM.div({
+					className: 'item-content content-unknown'
+				},
+				React.DOM.span({
+					style: {
+						'float': 'right'
+					}
+				}, item.type),
 				React.DOM.p({}, item.text),
-				React.DOM.div({className:'clear-fix'})
+				React.DOM.div({
+					className: 'clear-fix'
+				})
 			);
 		}
 	});
 
-	var ContentTypes = [
-		{name: 'Text', type: 'paragraph', desc: 'simple text paragraph'},
-		{name: 'HTML', type: 'html', desc: 'a subset of html for more advanced content'},
-		{name: 'Code', type: 'code', desc: 'item especially designed for code'},
-		{name: 'Tags', type: 'tags', desc: 'tags for the page'},
-		{name: 'Separator', type: 'separator', desc: 'line separator'}
-	];
+	var ContentTypes = [{
+		name: 'Text',
+		type: 'paragraph',
+		desc: 'simple text paragraph'
+	}, {
+		name: 'HTML',
+		type: 'html',
+		desc: 'a subset of html for more advanced content'
+	}, {
+		name: 'Code',
+		type: 'code',
+		desc: 'item especially designed for code'
+	}, {
+		name: 'Tags',
+		type: 'tags',
+		desc: 'tags for the page'
+	}, {
+		name: 'Separator',
+		type: 'separator',
+		desc: 'line separator'
+	}];
 
 	exports.factory = React.createClass({
 		displayName: 'Factory',
-		convert: function(ev){
+		convert: function(ev) {
 			var type = GetDataAttribute(ev.currentTarget, 'type');
 			var stage = this.props.stage,
 				item = this.props.item;
@@ -50,21 +71,21 @@ package('kb.item.content', function(exports){
 			stage.editing.start(item.id);
 		},
 
-		render: function(){
+		render: function() {
 			var self = this;
 			var item = this.props.item;
-			return React.DOM.div(
-				{ className: 'item-content content-factory'	},
+			return React.DOM.div({
+					className: 'item-content content-factory'
+				},
 				React.DOM.p({}, item.text || 'Create new '),
-				ContentTypes.map(function(item){
-					return React.DOM.button(
-						{
-							key: item.type,
-							className: 'factory-item',
-							'data-type': item.type,
-							title: item.desc,
-							onClick: self.convert
-						}, item.name);
+				ContentTypes.map(function(item) {
+					return React.DOM.button({
+						key: item.type,
+						className: 'factory-item',
+						'data-type': item.type,
+						title: item.desc,
+						onClick: self.convert
+					}, item.name);
 				})
 			);
 		}
@@ -72,11 +93,13 @@ package('kb.item.content', function(exports){
 
 	exports.image = React.createClass({
 		displayName: 'Image',
-		render: function(){
+		render: function() {
 			return React.DOM.div({
-				className: 'item-content content-image'
-			},
-				React.DOM.img({src: this.props.item.url}),
+					className: 'item-content content-image'
+				},
+				React.DOM.img({
+					src: this.props.item.url
+				}),
 				React.DOM.p({}, this.props.item.text)
 			);
 		}
@@ -84,15 +107,20 @@ package('kb.item.content', function(exports){
 
 	exports.paragraph = React.createClass({
 		displayName: 'Paragraph',
-		render: function(){
+		render: function() {
 			var stage = this.props.stage;
 			var resolved = kb.item.Resolve(stage, this.props.item.text);
 			var paragraphs = resolved.split('\n\n');
-			if(paragraphs.length > 1){
+			if (paragraphs.length > 1) {
 				return React.DOM.div({
 					className: 'item-content content-paragraph'
-				}, paragraphs.map(function(p, i){
-					return React.DOM.p({key: i, dangerouslySetInnerHTML: {__html: kb.item.Sanitize(p)}});
+				}, paragraphs.map(function(p, i) {
+					return React.DOM.p({
+						key: i,
+						dangerouslySetInnerHTML: {
+							__html: kb.item.Sanitize(p)
+						}
+					});
 				}));
 			} else {
 				return React.DOM.p({
@@ -107,7 +135,7 @@ package('kb.item.content', function(exports){
 
 	exports.html = React.createClass({
 		displayName: 'HTML',
-		render: function(){
+		render: function() {
 			var stage = this.props.stage;
 			return React.DOM.div({
 				className: 'item-content content-html',
@@ -120,7 +148,7 @@ package('kb.item.content', function(exports){
 
 	exports.code = React.createClass({
 		displayName: 'Code',
-		render: function(){
+		render: function() {
 			return React.DOM.div({
 				className: 'item-content content-code'
 			}, this.props.item.text);
@@ -129,17 +157,19 @@ package('kb.item.content', function(exports){
 
 	exports.reference = React.createClass({
 		displayName: 'Reference',
-		render: function(){
+		render: function() {
 			var item = this.props.item;
 			var url = item.url;
 			var loc = kb.convert.URLToLocation(url);
 			var external = (loc.host !== '') &&
 				(loc.host !== window.location.host);
 
-			return React.DOM.div({className: 'item-content content-reference'},
+			return React.DOM.div({
+					className: 'item-content content-reference'
+				},
 				React.DOM.a({
-					className: external ? 'external-link': '',
-					target: external ? '_blank': '',
+					className: external ? 'external-link' : '',
+					target: external ? '_blank' : '',
 					href: url
 				}, item.title),
 				React.DOM.p({}, this.props.item.text)
@@ -149,19 +179,21 @@ package('kb.item.content', function(exports){
 
 	exports.entry = React.createClass({
 		displayName: 'Entry',
-		render: function(){
+		render: function() {
 			var item = this.props.item;
 			var ref = kb.convert.LinkToReference(item.link);
 			var url = ref.url;
 			return React.DOM.div({
-				className: 'item-content content-entry'
-			},
+					className: 'item-content content-entry'
+				},
 				React.DOM.a({
 					className: 'entry-title',
 					title: url,
 					href: url
 				}, item.title),
-				React.DOM.div({className: 'entry-owner'}, ref.owner),
+				React.DOM.div({
+					className: 'entry-owner'
+				}, ref.owner),
 				React.DOM.p({
 					className: 'entry-synopsis',
 					dangerouslySetInnerHTML: {
@@ -174,48 +206,59 @@ package('kb.item.content', function(exports){
 
 	exports.tags = React.createClass({
 		displayName: 'Tags',
-		render: function(){
+		render: function() {
 			var item = this.props.item;
 
 			var text = typeof item.text === 'undefined' ? '' : item.text.trim();
 			var tags = [];
-			if(text !== '') {
-				tags =  text.split(',');
+			if (text !== '') {
+				tags = text.split(',');
 			}
-			tags = tags.map(function(tag){ return tag.trim(); })
-						.filter(function(tag){ return tag !== ''; });
-			return React.DOM.div({className: 'item-contet content-tags'},
+			tags = tags.map(function(tag) {
+					return tag.trim();
+				})
+				.filter(function(tag) {
+					return tag !== '';
+				});
+			return React.DOM.div({
+					className: 'item-contet content-tags'
+				},
 				tags.length > 0 ?
-					tags.map(function(tag, i){
-						tag = tag.trim();
-						return React.DOM.a({
-							className: 'tag',
-							key: i,
-							href: '/tag:' + kb.convert.TextToSlug(tag)
-						}, tag);
-					})
-				: React.DOM.p({}, 'Double click here to add page tags.'),
-				React.DOM.div({className:'clear-fix'})
+				tags.map(function(tag, i) {
+					tag = tag.trim();
+					return React.DOM.a({
+						className: 'tag',
+						key: i,
+						href: '/tag=' + kb.convert.TextToSlug(tag)
+					}, tag);
+				}) : React.DOM.p({}, 'Double click here to add page tags.'),
+				React.DOM.div({
+					className: 'clear-fix'
+				})
 			);
 		}
 	});
 
 	exports.separator = React.createClass({
 		displayName: 'Entry',
-		render: function(){
+		render: function() {
 			var item = this.props.item;
 
-			if(item.text === "") {
-				return React.DOM.div(
-					{className: 'item-content content-separator'},
+			if (item.text === "") {
+				return React.DOM.div({
+						className: 'item-content content-separator'
+					},
 					React.DOM.hr(null)
 				);
 			}
 			return React.DOM.div({
-				className: 'item-content content-separator'
-			},
-				React.DOM.table(
-					{style:{width:"100%"}},
+					className: 'item-content content-separator'
+				},
+				React.DOM.table({
+						style: {
+							width: "100%"
+						}
+					},
 					React.DOM.td(null, React.DOM.hr(null)),
 					React.DOM.td({
 						style: {

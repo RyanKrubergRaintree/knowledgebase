@@ -42,12 +42,12 @@ func (cas *CAS) Finish(w http.ResponseWriter, r *http.Request) (kb.User, error) 
 		Expires: time.Now().Add(365 * 24 * time.Hour),
 	})
 
-	if company+":"+user != id {
+	if company+"="+user != id {
 		return kb.User{}, errors.New("invalid id provided")
 	}
 
 	return kb.User{
-		AuthID:       string(kb.Slugify(companyid + ":" + user)),
+		AuthID:       string(kb.Slugify(companyid + "=" + user)),
 		AuthProvider: cas.Provider,
 
 		ID:      kb.Slugify(id),

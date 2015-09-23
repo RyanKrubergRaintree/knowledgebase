@@ -14,7 +14,7 @@ import (
 var (
 	key = flag.String("key", "123456789", "key used for signing")
 
-	id    = flag.String("id", "User:Company", "id to be signed")
+	id    = flag.String("id", "User=Company", "id to be signed")
 	ts    = flag.String("ts", "2006-01-02T15:04:05Z07:00", "timestamp to be signed")
 	nonce = flag.String("nonce", "1234567890", "")
 	host  = flag.String("host", "example.com", "")

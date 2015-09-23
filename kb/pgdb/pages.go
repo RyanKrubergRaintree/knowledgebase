@@ -98,8 +98,6 @@ func (db Pages) Overwrite(id kb.Slug, version int, page *kb.Page) error {
 	page.Synopsis = kb.ExtractSynopsis(page)
 	tags := kb.ExtractTags(page)
 	tagSlugs := kb.SlugifyTags(tags)
-	//TODO: extract/update synopsis here
-	// synopsis := kb.ExtractSynopsis(page)
 
 	data, err := json.Marshal(page)
 	if err != nil {

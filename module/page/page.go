@@ -34,19 +34,19 @@ func (mod *Module) Info() kb.Group {
 
 func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{{
-		Slug:     "page:pages",
+		Slug:     "page=pages",
 		Title:    "Pages",
 		Synopsis: "List of all pages.",
 	}, {
-		Slug:     "page:recent-changes",
+		Slug:     "page=recent-changes",
 		Title:    "Recent Changes",
 		Synopsis: "Shows recently changed pages.",
 	}}
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/page:pages", mod.pages).Methods("GET")
-	mod.router.HandleFunc("/page:recent-changes", mod.recentChanges).Methods("GET")
+	mod.router.HandleFunc("/page=pages", mod.pages).Methods("GET")
+	mod.router.HandleFunc("/page=recent-changes", mod.recentChanges).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "page:pages",
+		Slug:  "page=pages",
 		Title: "Pages",
 	}
 
@@ -87,7 +87,7 @@ func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "page:recent-changes",
+		Slug:  "page=recent-changes",
 		Title: "Recent Changes",
 		Story: kb.StoryFromEntries(entries),
 	}

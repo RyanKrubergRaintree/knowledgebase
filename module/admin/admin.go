@@ -34,14 +34,14 @@ func (mod *Module) Info() kb.Group {
 
 func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{{
-		Slug:     "admin:groups",
+		Slug:     "admin=groups",
 		Title:    "Groups",
 		Synopsis: "Administrate groups",
 	}}
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/admin:groups", mod.groups).Methods("GET", "POST")
+	mod.router.HandleFunc("/admin=groups", mod.groups).Methods("GET", "POST")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {

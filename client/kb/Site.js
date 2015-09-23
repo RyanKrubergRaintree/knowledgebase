@@ -50,7 +50,7 @@ package('kb', function(exports) {
 			}
 
 			this.lastStageId = Lineup.open({
-				url: '/search:search?' + param,
+				url: '/search=search?' + param,
 				title: '"' + query + '"',
 				insteadOf: this.lastStageId
 			});
@@ -191,15 +191,15 @@ package('kb', function(exports) {
 						caption: 'New Page'
 					}, {
 						key: 'index',
-						href: '/help:index',
+						href: '/help=index',
 						caption: 'Index'
 					}, {
 						key: 'recent-changes',
-						href: '/page:recent-changes',
+						href: '/page=recent-changes',
 						caption: 'Recent Changes'
 					}, {
 						key: 'user',
-						href: '/user:current',
+						href: '/user=current',
 						caption: 'User'
 					}, {
 						key: 'logout',

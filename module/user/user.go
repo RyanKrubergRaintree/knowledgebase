@@ -36,8 +36,8 @@ func (mod *Module) Info() kb.Group {
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/user:current", mod.current).Methods("GET")
-	mod.router.HandleFunc("/user:editor-groups", mod.groups).Methods("GET")
+	mod.router.HandleFunc("/user=current", mod.current).Methods("GET")
+	mod.router.HandleFunc("/user=editor-groups", mod.groups).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{{
-		Slug:     "user:current",
+		Slug:     "user=current",
 		Title:    "Current",
 		Synopsis: "Information about the current user.",
 	}}
@@ -67,7 +67,7 @@ func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:     "user:current",
+		Slug:     "user=current",
 		Title:    "Current",
 		Synopsis: "Information about the current user.",
 	}

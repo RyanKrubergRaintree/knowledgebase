@@ -77,7 +77,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "admin:groups",
+		Slug:  "admin=groups",
 		Title: "Groups",
 	}
 
@@ -125,7 +125,7 @@ var templGroups = template.Must(template.New("").Parse(`
 			<td>{{if (ne .ID .OwnerID)}}{{.OwnerID}}{{end}}</td>
 			<td>{{if .Public}}{{ else }}private{{end}}</td>
 			<td>{{.Description}}</td>
-			<td><a class="mdi mdi-pencil" style="text-decoration:none;" href="/group:moderate-{{.ID}}"></a></td>
+			<td><a class="mdi mdi-pencil" style="text-decoration:none;" href="/group=moderate-{{.ID}}"></a></td>
 		</tr>
 		{{ end }}
 	</table>

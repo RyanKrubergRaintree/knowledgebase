@@ -118,7 +118,7 @@ func Upload(name string, config *Config) error {
 
 	owner := kb.Slugify(p.Group)
 	for topic, slug := range mapping.ByTopic {
-		ownerslug := owner + ":" + slug
+		ownerslug := owner + "=" + slug
 		mapping.ByTopic[topic] = ownerslug
 		delete(mapping.BySlug, slug)
 		mapping.BySlug[ownerslug] = topic
@@ -155,7 +155,7 @@ func Upload(name string, config *Config) error {
 		pages[page.Slug] = page
 	}
 
-	navindexslug := kb.Slug(owner + ":index")
+	navindexslug := kb.Slug(owner + "=index")
 	pages[navindexslug] = &kb.Page{
 		Slug:     navindexslug,
 		Title:    "Index",

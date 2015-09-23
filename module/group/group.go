@@ -34,19 +34,19 @@ func (mod *Module) Info() kb.Group {
 
 func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{{
-		Slug:     "group:groups",
+		Slug:     "group=groups",
 		Title:    "Groups",
 		Synopsis: "List of all groups.",
 	}}
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/group:groups", mod.groups).Methods("GET")
-	mod.router.HandleFunc("/group:modules", mod.modules).Methods("GET")
-	mod.router.HandleFunc("/group:module-{module-id}", mod.modulePages).Methods("GET")
+	mod.router.HandleFunc("/group=groups", mod.groups).Methods("GET")
+	mod.router.HandleFunc("/group=modules", mod.modules).Methods("GET")
+	mod.router.HandleFunc("/group=module-{module-id}", mod.modulePages).Methods("GET")
 
-	mod.router.HandleFunc("/group:moderate-{group-id}", mod.moderate).Methods("GET", "POST")
-	mod.router.HandleFunc("/group:{group-id}", mod.pages).Methods("GET")
+	mod.router.HandleFunc("/group=moderate-{group-id}", mod.moderate).Methods("GET", "POST")
+	mod.router.HandleFunc("/group={group-id}", mod.pages).Methods("GET")
 }
 
 func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func (mod *Module) modulePages(w http.ResponseWriter, r *http.Request) {
 
 	info := module.Info()
 	page := &kb.Page{
-		Slug:     "group:module-" + info.ID,
+		Slug:     "group=module-" + info.ID,
 		Title:    "Module " + info.Name,
 		Synopsis: info.Description,
 	}
@@ -100,7 +100,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:     "group:" + info.ID,
+		Slug:     "group=" + info.ID,
 		Title:    info.Name,
 		Synopsis: info.Description,
 	}
@@ -118,7 +118,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "group:groups",
+		Slug:  "group=groups",
 		Title: "Groups",
 	}
 
@@ -132,7 +132,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
-			page.Story.Append(kb.Entry(entry.Name, entry.Description, "group:"+entry.ID))
+			page.Story.Append(kb.Entry(entry.Name, entry.Description, "group="+entry.ID))
 		}
 	}
 
@@ -146,7 +146,7 @@ func (mod *Module) modules(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "group:modules",
+		Slug:  "group=modules",
 		Title: "Modules",
 	}
 
@@ -158,7 +158,7 @@ func (mod *Module) modules(w http.ResponseWriter, r *http.Request) {
 			page.Story.Append(kb.Entry(
 				esc("Module "+entry.Name),
 				esc(entry.Description),
-				"group:module-"+entry.ID,
+				"group=module-"+entry.ID,
 			))
 		}
 	}

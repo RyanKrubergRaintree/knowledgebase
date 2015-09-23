@@ -66,7 +66,7 @@ package('kb.convert', function(exports) {
 				cutdash = false;
 				continue;
 			}
-			if ((r === '/') || (r === ':')) {
+			if ((r === '/') || (r === '=')) {
 				slug += r;
 				emitdash = false;
 				cutdash = true;
@@ -102,8 +102,8 @@ package('kb.convert', function(exports) {
 	// 'http://kb.example.com/example'
 	// 'https://kb.example.com/example'
 	// '//kb.example.com/example'
-	// '/kb:example' - rooted local URL
-	// 'kb:Example' - local URL
+	// '/kb=example' - rooted local URL
+	// 'kb=Example' - local URL
 	exports.LinkToReference = LinkToReference;
 
 	function LinkToReference(link) {
@@ -141,7 +141,7 @@ package('kb.convert', function(exports) {
 	function LinkToTitle(link) {
 		link = trimProtocol(link);
 		link = trimLeadingSlashes(link);
-		var i = Math.max(link.lastIndexOf('/'), link.indexOf(':'));
+		var i = Math.max(link.lastIndexOf('/'), link.indexOf('='));
 		link = link.substr(i + 1);
 		return link;
 	}
@@ -153,7 +153,7 @@ package('kb.convert', function(exports) {
 		link = trimProtocol(link);
 		link = trimLeadingSlashes(link);
 
-		var i = link.indexOf(':');
+		var i = link.indexOf('=');
 		link = link.substr(0, i);
 		return link.trim().toLowerCase();
 	}
@@ -176,9 +176,9 @@ package('kb.convert', function(exports) {
 		assert.equal(URLToReadable('http://unknown.com/hello-world'), '//unknown.com/hello-world');
 		assert.equal(URLToReadable('http://unknown.com:241/hello-world'), '//unknown.com:241/hello-world');
 
-		assert.equal(URLToReadable('http://unknown.com/hello:world'), '//unknown.com/hello:world');
-		assert.equal(URLToReadable('/hello:world'), '/hello:world');
-		assert.equal(URLToReadable('hello:world'), '/hello:world');
+		assert.equal(URLToReadable('http://unknown.com/hello=world'), '//unknown.com/hello=world');
+		assert.equal(URLToReadable('/hello=world'), '/hello=world');
+		assert.equal(URLToReadable('hello=world'), '/hello=world');
 	});
 
 	exports.URLToLocation = URLToLocation;

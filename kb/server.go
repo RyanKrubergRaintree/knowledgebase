@@ -146,7 +146,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	groupID, pageID := TokenizeLink(r.URL.Path)
 	if groupID == "" {
 		http.Error(w, "No page owner specified:\n"+
-			"page links should have format owner:page-name.",
+			"page links should have format owner=page-name.",
 			http.StatusBadRequest)
 		return
 	}

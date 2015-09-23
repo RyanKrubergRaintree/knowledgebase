@@ -35,13 +35,13 @@ func (mod *Module) Info() kb.Group {
 }
 
 func (mod *Module) init() {
-	mod.router.HandleFunc("/tag:tags", mod.tags).Methods("GET")
-	mod.router.HandleFunc("/tag:{tag-id}", mod.pages).Methods("GET")
+	mod.router.HandleFunc("/tag=tags", mod.tags).Methods("GET")
+	mod.router.HandleFunc("/tag={tag-id}", mod.pages).Methods("GET")
 }
 
 func (mod *Module) Pages() []kb.PageEntry {
 	return []kb.PageEntry{{
-		Slug:     "tag:tags",
+		Slug:     "tag=tags",
 		Title:    "Tags",
 		Synopsis: "Listing of all tags.",
 	}}
@@ -70,7 +70,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "tag:" + tag,
+		Slug:  "tag=" + tag,
 		Title: kb.SlugToTitle(tag),
 		Story: kb.StoryFromEntries(entries),
 	}
@@ -91,7 +91,7 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := &kb.Page{
-		Slug:  "tag:tags",
+		Slug:  "tag=tags",
 		Title: "Tags",
 	}
 
@@ -102,7 +102,7 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 			page.Story.Append(kb.Entry(
 				html.EscapeString(entry.Name),
 				strconv.Itoa(entry.Count)+" pages",
-				kb.Slugify("tag:"+entry.Name)))
+				kb.Slugify("tag="+entry.Name)))
 		}
 	}
 

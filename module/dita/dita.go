@@ -77,9 +77,9 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	name := kb.Slugify(mod.name)
 	switch slug {
-	case name + ":errors":
+	case name + "=errors":
 		page := &kb.Page{}
-		page.Slug = name + ":errors"
+		page.Slug = name + "=errors"
 		page.Title = "Errors"
 		page.Modified = time.Now()
 
@@ -108,9 +108,9 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 
-	case name + ":all-pages":
+	case name + "=all-pages":
 		page := &kb.Page{
-			Slug:     name + ":all-pages",
+			Slug:     name + "=all-pages",
 			Title:    "All Pages",
 			Modified: time.Now(),
 		}
@@ -126,9 +126,9 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		page.WriteResponse(w)
 		return
 
-	case name + ":index":
+	case name + "=index":
 		page := &kb.Page{
-			Slug:     name + ":index",
+			Slug:     name + "=index",
 			Title:    "Index",
 			Modified: time.Now(),
 		}
@@ -199,7 +199,7 @@ func load(prefix, ditamap string) *store {
 	store.errMapping = errs
 
 	for topic, slug := range mapping.ByTopic {
-		ownerslug := kb.Slugify(prefix+":") + slug
+		ownerslug := kb.Slugify(prefix+"=") + slug
 		mapping.ByTopic[topic] = ownerslug
 		delete(mapping.BySlug, slug)
 		mapping.BySlug[ownerslug] = topic

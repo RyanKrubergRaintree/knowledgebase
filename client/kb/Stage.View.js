@@ -90,7 +90,7 @@ package('kb.Stage', function(exports) {
 			var stage = this.props.stage;
 
 			stage.title = this.state.title;
-			stage.link = kb.convert.TextToSlug(this.state.owner + ':' + stage.title);
+			stage.link = kb.convert.TextToSlug(this.state.owner + '=' + stage.title);
 			stage.create();
 
 			ev.preventDefault();
@@ -123,7 +123,7 @@ package('kb.Stage', function(exports) {
 				}
 				self.groupsReceived(xhr);
 			};
-			xhr.open('GET', '/user:editor-groups', true);
+			xhr.open('GET', '/user=editor-groups', true);
 			xhr.setRequestHeader('Accept', 'application/json');
 			xhr.send();
 		},
@@ -145,7 +145,7 @@ package('kb.Stage', function(exports) {
 			var stage = this.props.stage;
 			var title = this.state.title,
 				owner = this.state.owner,
-				link = kb.convert.TextToSlug(owner + ':' + title);
+				link = kb.convert.TextToSlug(owner + '=' + title);
 
 			return React.DOM.div({
 					className: 'page new-page'
