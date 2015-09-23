@@ -60,6 +60,7 @@ package('kb.item.content', function(exports) {
 				link = React.DOM.a({
 					className: 'dita-index-title ' + (isactive ? 'dita-index-title-active' : ''),
 					href: item.slug,
+					'data-link': item.slug,
 					onClick: this.open
 				}, item.title);
 			}

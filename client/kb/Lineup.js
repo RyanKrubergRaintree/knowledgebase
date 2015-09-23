@@ -104,7 +104,7 @@ package('kb', function(exports) {
 
 		handleClose: function(ev) {
 			this.stages = this.stages.filter(function(stage) {
-				return stage != ev.stage;
+				return stage !== ev.stage;
 			});
 			this.changed();
 		},
@@ -228,7 +228,7 @@ package('kb', function(exports) {
 				return;
 			}
 
-			var path = t.pathname;
+			var path = t.href;
 			if ((path === '') || (path === '/')) {
 				return;
 			}
