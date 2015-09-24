@@ -86,8 +86,6 @@ package('kb.item.content', function(exports) {
 			}
 		}
 
-		console.log(root);
-
 		function mknode(item) {
 			var n = {
 				title: item.title,

@@ -57,11 +57,11 @@ window.Hash = {
 		window.DocumentCookies.setItem('last-hash', document.location.hash, Infinity, '/');
 	},
 	restore: function() {
-		var lastHash = window.DocumentCookies.getItem('hash');
+		var lastHash = window.DocumentCookies.getItem('last-hash');
 		if (lastHash && (document.location.hash === '')) {
 			document.location.hash = lastHash;
 		}
-		window.DocumentCookies.removeItem('hash');
+		window.DocumentCookies.removeItem('last-hash');
 	}
 };
 

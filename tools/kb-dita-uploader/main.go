@@ -160,7 +160,6 @@ func Upload(name string, config *Config) error {
 		Slug:     navindexslug,
 		Title:    "Index",
 		Synopsis: "Help navigation index",
-		Modified: time.Now(),
 		Story: kb.Story{
 			ditaindex.New("index", navindex),
 		},
