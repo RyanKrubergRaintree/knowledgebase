@@ -234,7 +234,7 @@ package('kb', function(exports) {
 		},
 		componentDidMount: function() {
 			if (typeof Reloader !== 'undefined') {
-				Reloader.Change = this.update;
+				Reloader.onchange = this.update;
 			}
 		},
 		componentWillUnmount: function() {},
