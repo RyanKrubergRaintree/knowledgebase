@@ -132,15 +132,30 @@ package('kb', function(exports) {
 
 	var LoginInfo = React.createClass({
 		render: function() {
+			var infostyle = {
+				style: {
+					fontSize: 'smaller'
+				}
+			};
+
+			var username = this.props.User;
+			if (username.indexOf('=') >= 0) {
+				var tokens = username.split('=');
+				return React.DOM.div({
+						className: 'background-info'
+					},
+					React.DOM.div(infostyle, 'logged in as:'),
+					React.DOM.div({}, tokens[1]),
+					React.DOM.div(infostyle, 'customer:'),
+					React.DOM.div({}, tokens[0])
+				);
+			}
+
 			return React.DOM.div({
 					className: 'background-info'
 				},
-				React.DOM.div({
-					style: {
-						fontSize: 'smaller'
-					}
-				}, 'logged in as:'),
-				React.DOM.div({}, this.props.User)
+				React.DOM.div(infostyle, 'logged in as:'),
+				React.DOM.div({}, username)
 			);
 		}
 	});
