@@ -6,15 +6,18 @@ package('kb.app', function(exports) {
 	depends('Crumbs.js');
 	depends('Lineup.js');
 	depends('Site.js');
+	depends('Selection.js');
 
 	var app = exports;
 
 	app.Lineup = new kb.Lineup();
 	app.Crumbs = new kb.Crumbs(app.Lineup);
+	app.CurrentSelection = new kb.Selection();
 
 	function initialize(mountNode) {
 		var site = React.createElement(kb.Site, {
-			Lineup: app.Lineup
+			Lineup: app.Lineup,
+			CurrentSelection: app.CurrentSelection
 		});
 		ReactDOM.render(site, mountNode);
 

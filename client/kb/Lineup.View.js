@@ -4,6 +4,48 @@ package('kb.Lineup', function(exports) {
 	depends('Lineup.js');
 	depends('Stage.View.js');
 
+	var SelectionStyle = React.createClass({
+		displayName: 'SelectionStyle',
+		getInitialState: function() {
+			return {
+				selected: this.props.CurrentSelection.selected,
+				highlighted: this.props.CurrentSelection.highlighted
+			};
+		},
+		update: function(ev) {
+			this.setState({
+				selected: ev.selected,
+				highlighted: ev.highlighted
+			});
+		},
+		componentDidMount: function() {
+			this.props.CurrentSelection.on('changed', this.update, this);
+		},
+		componentWillUnmount: function() {
+			this.props.CurrentSelection.remove(this);
+		},
+
+		render: function() {
+			var state = this.state;
+
+			var style = '';
+			if (state.highlighted !== '') {
+				style += '[data-ditaid="' + state.highlighted + '"] {' +
+					'outline: 1px dashed #aaf !important;' +
+					'background: rgba(0,0,255,0.1);' +
+					'}';
+			}
+			if (state.selected !== '') {
+				style += '[data-ditaid="' + state.selected + '"] {' +
+					'outline: 2px solid #88f !important;' +
+					'background: rgba(0,0,255,0.1);' +
+					'}';
+			}
+
+			return React.DOM.style({}, style);
+		}
+	});
+
 	exports.View = React.createClass({
 		displayName: 'Lineup',
 
@@ -37,6 +79,7 @@ package('kb.Lineup', function(exports) {
 			return React.DOM.div({
 					className: 'lineup'
 				},
+				React.createElement(SelectionStyle, this.props),
 				this.props.Lineup.stages.map(function(stage) {
 					var width = stage.wide ? wide : normal;
 					var r = React.createElement(kb.Stage.View, {
@@ -73,6 +116,7 @@ package('kb.Lineup', function(exports) {
 			this.setState({
 				width: ReactDOM.findDOMNode(this).clientWidth
 			});
+
 		},
 		componentWillReceiveProps: function(nextprops) {
 			if (this.props.Lineup !== nextprops.Lineup) {

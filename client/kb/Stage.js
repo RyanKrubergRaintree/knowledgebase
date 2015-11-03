@@ -56,42 +56,6 @@ package('kb', function(exports) {
 		}
 	};
 
-	function Selection(stage) {
-		this.stage = stage;
-		this.selected = '';
-		this.highlighted = '';
-	}
-	Selection.prototype = {
-		select: function(id) {
-			this.selected = id;
-			this.stage.changed();
-		},
-		unselect: function(id) {
-			if (this.selected === id) {
-				this.selected = '';
-				this.stage.changed();
-			}
-		},
-		toggleSelect: function(id) {
-			if (this.selected !== id) {
-				this.selected = id;
-			} else {
-				this.selected = '';
-			}
-			this.stage.changed();
-		},
-		highlight: function(id) {
-			this.highlighted = id;
-			this.stage.changed();
-		},
-		unhighlight: function(id) {
-			if (this.highlighted === id) {
-				this.highlighted = '';
-				this.stage.changed();
-			}
-		}
-	};
-
 	// Stage represents a staging area where modifications/loading are done.
 	exports.Stage = Stage;
 
@@ -109,7 +73,6 @@ package('kb', function(exports) {
 
 		this.page = new kb.Page(page);
 		this.editing = new Editing(this);
-		this.selection = new Selection(this);
 
 		this.notifier = new kb.util.Notifier();
 		this.notifier.mixto(this);
