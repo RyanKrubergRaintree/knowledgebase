@@ -6,6 +6,7 @@ package('kb.item', function(exports) {
 	depends('content.js');
 	depends('SimpleForm.js');
 	depends('DITAIndex.js');
+	depends('ImageMap.js');
 
 	exports.DropCanceled = null;
 	exports.View = React.createClass({

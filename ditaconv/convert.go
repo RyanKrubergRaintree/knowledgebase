@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
+	"github.com/raintreeinc/knowledgebase/extra/imagemap"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
@@ -21,6 +22,22 @@ var alwaysHTML = map[string]bool{
 
 func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) {
 	switch start.Name.Local {
+	case "imagemap":
+		_, err := conv.handleAttrs(start)
+		conv.check(err)
+
+		var m imagemap.XML
+		err = decoder.DecodeElement(&m, start)
+		conv.check(err)
+
+		if err == nil {
+			m.Image.Href = conv.convertImageURL(m.Image.Href)
+			if item, err := imagemap.FromXML(&m); err == nil {
+				conv.Page.Story.Append(item)
+			} else {
+				conv.check(err)
+			}
+		}
 	case "data":
 		switch datatype := getAttr(start, "datatype"); strings.ToLower(datatype) {
 		case "rttutorial":

@@ -184,6 +184,15 @@ package('kb.convert', function(exports) {
 	exports.URLToLocation = URLToLocation;
 
 	function URLToLocation(url) {
+		if (typeof url === 'undefined') {
+			return {
+				scheme: '',
+				host: '',
+				path: '',
+				query: '',
+				fragment: ''
+			};
+		}
 		var rx = new RegExp('^((http|https):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
 		var matches = url.match(rx);
 
