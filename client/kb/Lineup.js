@@ -157,7 +157,7 @@ package('kb', function(exports) {
 		},
 
 		findStageFromElement: function(el) {
-			for (var i = 0; i < 32; i += 1) {
+			for (var i = 0; i < 64; i += 1) {
 				if (el === null) {
 					return null;
 				}

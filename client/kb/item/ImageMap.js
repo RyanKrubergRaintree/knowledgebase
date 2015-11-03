@@ -6,13 +6,16 @@ package('kb.item.content', function(exports) {
 	exports['image-map'] = React.createClass({
 		displayName: 'ImageMap',
 		areaHoverStart: function(ev) {
-			kb.app.CurrentSelection.highlight(ev.target.dataset.ditaid);
+			var id = GetDataAttribute(ev.target, 'ditaid');
+			kb.app.CurrentSelection.highlight(id);
 		},
 		areaHoverEnd: function(ev) {
-			kb.app.CurrentSelection.unhighlight(ev.target.dataset.ditaid);
+			var id = GetDataAttribute(ev.target, 'ditaid');
+			kb.app.CurrentSelection.unhighlight(id);
 		},
 		areaSelect: function(ev) {
-			kb.app.CurrentSelection.toggleSelect(ev.target.dataset.ditaid);
+			var id = GetDataAttribute(ev.target, 'ditaid');
+			kb.app.CurrentSelection.toggleSelect(id);
 		},
 		render: function() {
 			var item = this.props.item;

@@ -90,7 +90,7 @@ package('kb.item.content', function(exports) {
 			var n = {
 				title: item.title,
 				slug: item.slug,
-				active: isactive[item.slug],
+				active: isactive[item.slug] || isactive['/' + item.slug],
 				activechild: false,
 				children: []
 			};

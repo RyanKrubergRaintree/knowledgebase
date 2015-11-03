@@ -253,7 +253,7 @@ package('kb.Stage', function(exports) {
 			return React.DOM.div({
 					className: 'stage',
 					onClick: this.activate,
-					'data-ditaid': stage.id,
+					'data-id': stage.id,
 
 					style: this.props.style
 				},
