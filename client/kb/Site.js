@@ -38,13 +38,13 @@ package('kb', function(exports) {
 		},
 		search: function(ev) {
 			var Lineup = this.props.Lineup;
-			var query = this.refs.query.getDOMNode().value.trim();
+			var query = this.refs.query.value.trim();
 			if (ev.shiftKey) {
 				this.lastStageId = undefined;
 			}
 
 			var param = 'q=' + query;
-			var filter = this.refs.filter.getDOMNode().value;
+			var filter = this.refs.filter.value;
 			if (filter !== 'All') {
 				param += '&filter=' + filter;
 			}
@@ -70,7 +70,7 @@ package('kb', function(exports) {
 						Lineup.clear();
 					}
 
-					var query = this.refs.query.getDOMNode().value.trim();
+					var query = this.refs.query.value.trim();
 					Lineup.openLink(query);
 					ev.preventDefault();
 					return;

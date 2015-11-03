@@ -1,31 +1,35 @@
-package('kb.item', function(exports){
+package('kb.item', function(exports) {
 	'use strict';
 
 	exports.Editor = React.createClass({
-		blur: function(ev){
+		blur: function(ev) {
 			var self = this;
-			var container = this.getDOMNode();
-			if(ev.relatedTarget === null){
+			var container = ReactDOM.findDOMNode(this);
+			if (ev.relatedTarget === null) {
 				// HACK-FIX: Firefox doesn't have relatedTarget
 				// use a delayed commit if we don't know the related target
 				// that way any menu action can complete, before the commit
-				window.setTimeout(function(){ self.commit(); }, 300);
+				window.setTimeout(function() {
+					self.commit();
+				}, 300);
 				return;
 			}
-			if(!container.contains(ev.relatedTarget)){
+			if (!container.contains(ev.relatedTarget)) {
 				this.commit();
 			}
 		},
-		commit: function(/*ev*/){
+		commit: function( /*ev*/ ) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
 			// in case the delay
-			if(this.refs.text === undefined) { return; }
+			if (this.refs.text === undefined) {
+				return;
+			}
 
-			var text = this.refs.text.getDOMNode().value;
-			if((text === '') &&
-				((item.type === 'paragraph') || (item.type === 'html'))){
+			var text = this.refs.text.value;
+			if ((text === '') &&
+				((item.type === 'paragraph') || (item.type === 'html'))) {
 				stage.patch({
 					id: item.id,
 					type: 'remove'
@@ -33,7 +37,7 @@ package('kb.item', function(exports){
 				return;
 			}
 
-			if(item.text !== text){
+			if (item.text !== text) {
 				var next = JSON.parse(JSON.stringify(item));
 				next.text = text;
 				stage.patch({
@@ -44,25 +48,25 @@ package('kb.item', function(exports){
 			}
 			this.stopEditing();
 		},
-		stopEditing: function(){
+		stopEditing: function() {
 			var stage = this.props.stage,
 				item = this.props.item;
 
 			try {
 				var actual = stage.page.itemById(item.id);
-				if(actual && (actual.type === 'paragraph') && (actual.text === '')){
+				if (actual && (actual.type === 'paragraph') && (actual.text === '')) {
 					stage.patch({
 						id: actual.id,
 						type: 'remove'
 					});
 				}
-			} catch(ex){}
+			} catch (ex) {}
 
 
 			stage.editing.stop(item.id);
 		},
 
-		remove: function(ev){
+		remove: function(ev) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
@@ -75,8 +79,8 @@ package('kb.item', function(exports){
 			ev.stopPropagation();
 		},
 
-		handleKey: function(ev){
-			if(ev.keyCode === 27){
+		handleKey: function(ev) {
+			if (ev.keyCode === 27) {
 				this.stopEditing();
 				ev.preventDefault();
 				ev.stopPropagation();
@@ -85,19 +89,19 @@ package('kb.item', function(exports){
 
 			var stage = this.props.stage,
 				item = this.props.item,
-				node = this.refs.text.getDOMNode();
+				node = this.refs.text;
 
-			if((ev.ctrlKey) && (ev.keyCode === 13)){
+			if ((ev.ctrlKey) && (ev.keyCode === 13)) {
 
 				var pre = node.value.substr(0, node.selectionStart),
 					post = node.value.substr(node.selectionStart);
 
-				if(pre === ''){
+				if (pre === '') {
 					ev.preventDefault();
 					return;
 				}
 
-				if(pre !== node.value){
+				if (pre !== node.value) {
 					node.value = pre;
 					this.commit();
 					this.stopEditing();
@@ -125,22 +129,24 @@ package('kb.item', function(exports){
 				ev.preventDefault();
 			}
 		},
-		render: function(){
+		render: function() {
 			var item = this.props.item;
-			return React.DOM.div(
-				{
+			return React.DOM.div({
 					className: 'item-content content-editor',
 					onBlur: this.blur
 				},
-				React.DOM.div({className: 'item-type'}, item.type),
+				React.DOM.div({
+					className: 'item-type'
+				}, item.type),
 				React.DOM.textarea({
 					ref: 'text',
 					defaultValue: item.text,
 					onKeyDown: this.handleKey,
 					autoFocus: true
 				}),
-				React.DOM.div(
-					{className:'editor-buttons'},
+				React.DOM.div({
+						className: 'editor-buttons'
+					},
 					React.DOM.div({
 						className: 'mdi mdi-content-save',
 						title: 'Save changes. (Unfocus the editor will save.)',

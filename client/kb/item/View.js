@@ -24,7 +24,8 @@ package('kb.item', function(exports) {
 
 			if (ev.dataTransfer.setDragImage) {
 				var off = mouseOffset(ev);
-				ev.dataTransfer.setDragImage(this.getDOMNode(), off.x, off.y);
+				var viewnode = ReactDOM.findDOMNode(this);
+				ev.dataTransfer.setDragImage(viewnode, off.x, off.y);
 			}
 
 			var data = {

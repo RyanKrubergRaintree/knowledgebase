@@ -4,6 +4,7 @@
   "globals": {
     "ga": true,
     "React": true,
+    "ReactDOM": true,
     "kb": true,
     "JSON": true,
     "console": true,

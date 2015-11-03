@@ -13,11 +13,10 @@ package('kb.app', function(exports) {
 	app.Crumbs = new kb.Crumbs(app.Lineup);
 
 	function initialize(mountNode) {
-		React.initializeTouchEvents(true);
 		var site = React.createElement(kb.Site, {
 			Lineup: app.Lineup
 		});
-		React.render(site, mountNode);
+		ReactDOM.render(site, mountNode);
 
 		app.Crumbs.initLineup(KBHomePage);
 		document.onclick = function(ev) {

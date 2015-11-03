@@ -181,7 +181,7 @@ package('kb.Page', function(exports) {
 			if (drop.node !== null) {
 				getClassList(drop.node).add('drop-' + drop.rel);
 			} else {
-				var story = this.refs.story.getDOMNode();
+				var story = this.refs.story;
 				getClassList(story).add('drop-' + drop.rel);
 			}
 		},

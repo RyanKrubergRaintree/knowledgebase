@@ -2,7 +2,8 @@
 <head>
 	{{ template "head.html" . }}
 
-	<script src="/assets/js/react.js"></script>
+	<script src="/assets/js/react.js?{{Site.Version}}"></script>
+	<script src="/assets/js/react-dom.js?{{Site.Version}}"></script>
 
 	<script>
 	var KBUser = "{{User.Name}}";

@@ -63,7 +63,7 @@ package('kb.Lineup', function(exports) {
 		},
 		resized: function() {
 			this.setState({
-				width: this.getDOMNode().clientWidth
+				width: ReactDOM.findDOMNode(this).clientWidth
 			});
 		},
 		componentDidMount: function() {
@@ -71,7 +71,7 @@ package('kb.Lineup', function(exports) {
 			window.onresize = this.resized;
 
 			this.setState({
-				width: this.getDOMNode().clientWidth
+				width: ReactDOM.findDOMNode(this).clientWidth
 			});
 		},
 		componentWillReceiveProps: function(nextprops) {

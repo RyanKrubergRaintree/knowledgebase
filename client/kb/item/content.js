@@ -244,7 +244,7 @@ package('kb.item.content', function(exports) {
 		render: function() {
 			var item = this.props.item;
 
-			if (item.text === "") {
+			if (item.text === '') {
 				return React.DOM.div({
 						className: 'item-content content-separator'
 					},
@@ -256,18 +256,22 @@ package('kb.item.content', function(exports) {
 				},
 				React.DOM.table({
 						style: {
-							width: "100%"
+							width: '100%'
 						}
 					},
-					React.DOM.td(null, React.DOM.hr(null)),
-					React.DOM.td({
-						style: {
-							width: "1px",
-							padding: "0 10px",
-							whiteSpace: "nowrap"
-						}
-					}, this.props.item.text),
-					React.DOM.td(null, React.DOM.hr(null))
+					React.DOM.tbody(null,
+						React.DOM.tr(null,
+							React.DOM.td(null, React.DOM.hr(null)),
+							React.DOM.td({
+								style: {
+									width: '1px',
+									padding: '0 10px',
+									whiteSpace: 'nowrap'
+								}
+							}, this.props.item.text),
+							React.DOM.td(null, React.DOM.hr(null))
+						)
+					)
 				)
 			);
 		}

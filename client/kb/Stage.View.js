@@ -136,7 +136,7 @@ package('kb.Stage', function(exports) {
 
 		titleChanged: function() {
 			this.setState({
-				title: this.refs.title.getDOMNode().value
+				title: this.refs.title.value
 			});
 		},
 
@@ -217,9 +217,11 @@ package('kb.Stage', function(exports) {
 		},
 		activate: function(ev) {
 			if (typeof ev === 'undefined') {
-				kb.util.SmoothScroll.to(this.getDOMNode());
+				var node = ReactDOM.findDOMNode(this);
+				kb.util.SmoothScroll.to(node);
 			} else if (!ev.defaultPrevented) {
-				kb.util.SmoothScroll.to(this.getDOMNode());
+				var node = ReactDOM.findDOMNode(this);
+				kb.util.SmoothScroll.to(node);
 			}
 		},
 
