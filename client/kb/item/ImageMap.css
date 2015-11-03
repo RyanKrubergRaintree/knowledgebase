@@ -9,11 +9,6 @@
 .content-image-map .area {
 	position: absolute;
 
-	border: 1px dashed #00f;
+	outline: 1px dashed #00f;
 	cursor: pointer;
-}
-
-.content-image-map .area:hover {
-	background: rgba(0,0,255,0.1);
-	border: 1px solid #00f;
 }

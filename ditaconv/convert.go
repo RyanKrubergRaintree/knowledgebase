@@ -103,6 +103,8 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 				href, internal = conv.convertLinkURL(a.Value)
 			}
 			start.Attr[i].Value = href
+		} else if a.Name.Local == "id" {
+			start.Attr[i].Name.Local = "data-ditaid"
 		}
 	}
 

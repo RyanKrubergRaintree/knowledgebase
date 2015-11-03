@@ -51,6 +51,15 @@ func New(id string, image string, size Point, areas []Area) kb.Item {
 	}
 }
 
+func extractID(href string) string {
+	href = strings.TrimPrefix(href, "#")
+	i := strings.LastIndexByte(href, '/')
+	if i < 0 {
+		return href
+	}
+	return href[i+1:]
+}
+
 func FromXML(m *XML) (kb.Item, error) {
 	var err error
 	areas := []Area{}
@@ -72,7 +81,7 @@ func FromXML(m *XML) (kb.Item, error) {
 			}
 
 			areas = append(areas, Area{
-				Id:  area.XRef.Href,
+				Id:  extractID(area.XRef.Href),
 				Alt: area.XRef.Alt,
 				Min: Point{x0, y0},
 				Max: Point{x1, y1},

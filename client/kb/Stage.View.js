@@ -250,13 +250,28 @@ package('kb.Stage', function(exports) {
 				);
 			}
 
+			var style = '';
+			if (stage.selection.highlighted !== '') {
+				style += '[data-ditaid="' + stage.selection.highlighted + '"] {' +
+					'outline: 1px dashed #aaf !important;' +
+					'background: rgba(0,0,255,0.1);' +
+					'}';
+			}
+			if (stage.selection.selected !== '') {
+				style += '[data-ditaid="' + stage.selection.selected + '"] {' +
+					'outline: 2px solid #88f !important;' +
+					'background: rgba(0,0,255,0.1);' +
+					'}';
+			}
+
 			return React.DOM.div({
 					className: 'stage',
 					onClick: this.activate,
-					'data-id': stage.id,
+					'data-ditaid': stage.id,
 
 					style: this.props.style
 				},
+				React.DOM.style({}, style),
 				React.createElement(StageButtons, {
 					stage: this.props.stage,
 					isWide: stage.wide,
