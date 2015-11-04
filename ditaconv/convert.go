@@ -104,7 +104,10 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 			}
 			start.Attr[i].Value = href
 		} else if a.Name.Local == "id" {
-			start.Attr[i].Name.Local = "data-ditaid"
+			// id-s must be unique on a single web-page...
+			// hence we convert it to "data-id", so that we can open same page
+			// multiple times
+			start.Attr[i].Name.Local = "data-id"
 		}
 	}
 

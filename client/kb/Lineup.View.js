@@ -30,13 +30,13 @@ package('kb.Lineup', function(exports) {
 
 			var style = '';
 			if (state.highlighted !== '') {
-				style += '[data-ditaid="' + state.highlighted + '"] {' +
+				style += '[data-id="' + state.highlighted + '"] {' +
 					'outline: 1px dashed #aaf !important;' +
 					'background: rgba(0,0,255,0.1);' +
 					'}';
 			}
 			if (state.selected !== '') {
-				style += '[data-ditaid="' + state.selected + '"] {' +
+				style += '[data-id="' + state.selected + '"] {' +
 					'outline: 2px solid #88f !important;' +
 					'background: rgba(0,0,255,0.1);' +
 					'}';
