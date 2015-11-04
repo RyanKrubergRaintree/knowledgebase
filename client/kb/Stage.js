@@ -97,10 +97,11 @@ package('kb', function(exports) {
 				stage: this
 			});
 		},
-		changed: function() {
+		changed: function(loaded) {
 			this.notifier.emit({
 				type: 'changed',
-				stage: this
+				stage: this,
+				loaded: loaded === true
 			});
 		},
 		urlChanged: function() {
@@ -173,7 +174,7 @@ package('kb', function(exports) {
 			this.patches_.push(op);
 			this.nextPatch_();
 
-			this.changed();
+			this.changed(true);
 		},
 		nextPatch_: function() {
 			if (this.patching_) {
@@ -222,7 +223,7 @@ package('kb', function(exports) {
 			}
 
 			this.state = 'loading';
-			this.changed();
+			this.changed(false);
 
 			var xhr = new XMLHttpRequest();
 			xhr.onreadystatechange = bindready(xhr, this.pullDone_, this);
@@ -234,7 +235,7 @@ package('kb', function(exports) {
 		},
 		pullDone_: function(xhr) {
 			if (!this.updateStatus_(xhr)) {
-				this.changed();
+				this.changed(true);
 				return;
 			}
 
@@ -250,7 +251,7 @@ package('kb', function(exports) {
 
 			this.page = page;
 			this.state = 'loaded';
-			this.changed();
+			this.changed(true);
 
 			var niceurl = kb.convert.URLToReadable(this.url);
 			kb.TrackPageView(niceurl, this.page.title);
@@ -260,7 +261,7 @@ package('kb', function(exports) {
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
 			this.lastError = '';
-			this.changed();
+			this.changed(false);
 		},
 
 		create: function() {
@@ -289,7 +290,7 @@ package('kb', function(exports) {
 				}]
 			}));
 
-			this.changed();
+			this.changed(false);
 		},
 		createDone_: function(xhr) {
 			if (!this.updateStatus_(xhr)) {
@@ -305,7 +306,7 @@ package('kb', function(exports) {
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
 			this.lastError = '';
-			this.changed();
+			this.changed(false);
 		},
 
 		destroy: function() {
@@ -324,7 +325,7 @@ package('kb', function(exports) {
 		},
 		destroyDone_: function(ev) {
 			this.updateStatus_(ev.target);
-			this.changed();
+			this.changed(false);
 			this.pull();
 		},
 		destroyError_: function( /* ev */ ) {
@@ -332,7 +333,7 @@ package('kb', function(exports) {
 			this.lastStatus = 'failed';
 			this.lastStatusText = '';
 			this.lastError = '';
-			this.changed();
+			this.changed(false);
 		}
 	};
 });

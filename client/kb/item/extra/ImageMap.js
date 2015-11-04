@@ -6,22 +6,24 @@ package('kb.item.content', function(exports) {
 	exports['image-map'] = React.createClass({
 		displayName: 'ImageMap',
 		areaHoverStart: function(ev) {
-			var id = GetDataAttribute(ev.target, 'id');
+			var id = GetDataAttribute(ev.target, 'focusid');
 			kb.app.CurrentSelection.highlight(id);
 		},
 		areaHoverEnd: function(ev) {
-			var id = GetDataAttribute(ev.target, 'id');
+			var id = GetDataAttribute(ev.target, 'focusid');
 			kb.app.CurrentSelection.unhighlight(id);
 		},
 		areaSelect: function(ev) {
-			var id = GetDataAttribute(ev.target, 'id');
+			var id = GetDataAttribute(ev.target, 'focusid');
 			kb.app.CurrentSelection.toggleSelect(id);
 		},
 		render: function() {
 			var item = this.props.item;
+			var stage = this.props.stage;
 			var size = item.size;
 			var self = this;
 
+			var loc = kb.convert.URLToLocation(stage.link);
 			return React.DOM.div({
 					className: 'item-image-map content-image-map'
 				},
@@ -34,9 +36,9 @@ package('kb.item.content', function(exports) {
 						}
 					},
 					item.areas.map(function(area, index) {
-						return React.DOM.div({
+						return React.DOM.a({
 							key: index,
-							'data-id': area.id,
+							'data-focusid': area.id,
 							className: 'area',
 							style: {
 								left: area.min.x + 'px',
@@ -45,6 +47,9 @@ package('kb.item.content', function(exports) {
 								height: area.max.y - area.min.y + 'px'
 							},
 							title: area.alt,
+
+							href: loc.path + '#' + area.id,
+							'data-link': loc.path + '#' + area.id,
 
 							onMouseEnter: self.areaHoverStart,
 							onMouseLeave: self.areaHoverEnd,

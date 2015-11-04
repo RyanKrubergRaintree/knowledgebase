@@ -4,9 +4,10 @@ package('kb.item', function(exports) {
 	depends('Editor.js');
 
 	depends('content.js');
-	depends('SimpleForm.js');
-	depends('DITAIndex.js');
-	depends('ImageMap.js');
+
+	depends('extra/SimpleForm.js');
+	depends('extra/DITAIndex.js');
+	depends('extra/ImageMap.js');
 
 	exports.DropCanceled = null;
 	exports.View = React.createClass({

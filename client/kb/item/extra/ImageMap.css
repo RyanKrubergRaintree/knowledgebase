@@ -7,8 +7,11 @@
 }
 
 .content-image-map .area {
+	display: block;
 	position: absolute;
 
 	outline: 1px dashed #00f;
 	cursor: pointer;
+
+	text-decoration: none;
 }

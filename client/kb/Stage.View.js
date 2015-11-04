@@ -224,7 +224,6 @@ package('kb.Stage', function(exports) {
 				kb.util.SmoothScroll.to(node);
 			}
 		},
-
 		render: function() {
 			var stage = this.props.stage;
 			if (stage.creating) {
@@ -273,9 +272,37 @@ package('kb.Stage', function(exports) {
 			);
 		},
 
+		getInitialState: function() {
+			return {
+				autoFocus: false,
+				autoFocused: false
+			};
+		},
 		// bindings to Stage
-		changed: function() {
+		changed: function(ev) {
+			if (ev.loaded) {
+				this.setState({
+					autoFocus: true
+				});
+			}
 			this.forceUpdate();
+		},
+		componentDidUpdate: function() {
+			if (!this.state.autoFocused && this.state.autoFocus) {
+				this.setState({
+					autoFocused: true,
+					autoFocus: false
+				});
+
+				var loc = kb.convert.URLToLocation(this.props.stage.link);
+				if (loc.fragment !== '') {
+					var node = ReactDOM.findDOMNode(this);
+					var el = node.querySelector('[data-id="' + loc.fragment + '"]');
+					if (el) {
+						el.scrollIntoView();
+					}
+				}
+			}
 		},
 		widthChanged: function() {
 			this.props.onWidthChanged();

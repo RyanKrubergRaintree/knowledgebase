@@ -30,13 +30,19 @@ package('kb.Lineup', function(exports) {
 
 			var style = '';
 			if (state.highlighted !== '') {
-				style += '[data-id="' + state.highlighted + '"] {' +
+				var id = state.highlighted;
+				style += '[data-id="' + id + '"], ' +
+					'[data-focusid="' + id + '"]' +
+					'{' +
 					'outline: 1px dashed #aaf !important;' +
 					'background: rgba(0,0,255,0.1);' +
 					'}';
 			}
 			if (state.selected !== '') {
-				style += '[data-id="' + state.selected + '"] {' +
+				var id = state.selected;
+				style += '[data-id="' + id + '"], ' +
+					'[data-focusid="' + id + '"]' +
+					'{' +
 					'outline: 2px solid #88f !important;' +
 					'background: rgba(0,0,255,0.1);' +
 					'}';
