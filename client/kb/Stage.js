@@ -252,7 +252,8 @@ package('kb', function(exports) {
 			this.state = 'loaded';
 			this.changed();
 
-			kb.TrackPageView(this.url, this.page.title);
+			var niceurl = kb.convert.URLToReadable(this.url);
+			kb.TrackPageView(niceurl, this.page.title);
 		},
 		pullError_: function( /* ev */ ) {
 			this.state = 'failed';
