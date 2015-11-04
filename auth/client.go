@@ -8,6 +8,8 @@ import (
 	"path"
 	"strings"
 
+	"github.com/gorilla/sessions"
+
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/facebook"
@@ -135,16 +137,16 @@ func Register(appkey string, url string, authPrefix string, clients map[string]C
 	}
 	authPath = authPrefix
 
-	if appkey != "" {
-		gothic.AppKey = appkey
-	} else {
+	if appkey == "" {
 		var key [32]byte
 		_, err := rand.Read(key[:])
 		if err != nil {
 			panic(err)
 		}
-		gothic.AppKey = fmt.Sprintf("%64x", key)
+		appkey = fmt.Sprintf("%64x", key)
 	}
+
+	gothic.Store = sessions.NewCookieStore([]byte(appkey))
 
 	cb := func(provider string) string {
 		return url + path.Join(authPath, "callback", provider)
