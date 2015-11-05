@@ -194,7 +194,7 @@ package('kb', function(exports) {
 			var link = link || ref.link;
 			var title = target.innerText;
 
-			if (ev.button === 1) {
+			if (ev.ctrlKey) {
 				this.open({
 					url: url,
 					link: link,
