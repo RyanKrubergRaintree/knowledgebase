@@ -28,34 +28,40 @@ package('kb.item.content', function(exports) {
 					className: 'item-image-map content-image-map'
 				},
 				React.DOM.div({
-						className: 'content-image-map image',
 						style: {
-							width: size.x,
-							height: size.y,
-							background: 'url("' + item.image + '")'
+							position: 'relative'
 						}
 					},
-					item.areas.map(function(area, index) {
-						return React.DOM.a({
-							key: index,
-							'data-focusid': area.id,
-							className: 'area',
+					React.DOM.image({
+						src: item.image
+					}),
+					React.DOM.div({
+							className: 'overlay',
 							style: {
-								left: area.min.x + 'px',
-								top: area.min.y + 'px',
-								width: area.max.x - area.min.x + 'px',
-								height: area.max.y - area.min.y + 'px'
-							},
-							title: area.alt,
+								maxWidth: size.x + 'px'
+							}
+						},
+						item.areas.map(function(area, index) {
+							return React.DOM.a({
+								key: index,
+								'data-focusid': area.id,
+								className: 'area',
+								style: {
+									left: (area.min.x * 100 / size.x) + '%',
+									top: (area.min.y * 100 / size.y) + '%',
+									width: ((area.max.x - area.min.x) * 100 / size.x) + '%',
+									height: ((area.max.y - area.min.y) * 100 / size.y) + '%'
+								},
+								title: area.alt,
 
-							href: loc.path + '#' + area.id,
-							'data-link': loc.path + '#' + area.id,
+								href: loc.path + '#' + area.id,
+								'data-link': loc.path + '#' + area.id,
 
-							onMouseEnter: self.areaHoverStart,
-							onMouseLeave: self.areaHoverEnd,
-							onMouseDown: self.areaSelect
-						});
-					})
+								onMouseEnter: self.areaHoverStart,
+								onMouseLeave: self.areaHoverEnd,
+								onMouseDown: self.areaSelect
+							});
+						}))
 				)
 			);
 		}

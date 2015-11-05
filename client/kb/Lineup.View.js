@@ -35,7 +35,7 @@ package('kb.Lineup', function(exports) {
 					'[data-focusid="' + id + '"]' +
 					'{' +
 					'outline: 1px dashed #aaf !important;' +
-					'background: rgba(0,0,255,0.1);' +
+					'background: rgba(0,0,255,0.1) !important;' +
 					'}';
 			}
 			if (state.selected !== '') {
@@ -44,7 +44,7 @@ package('kb.Lineup', function(exports) {
 					'[data-focusid="' + id + '"]' +
 					'{' +
 					'outline: 2px solid #88f !important;' +
-					'background: rgba(0,0,255,0.1);' +
+					'background: rgba(0,0,255,0.1) !important;' +
 					'}';
 			}
 
