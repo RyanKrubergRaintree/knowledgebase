@@ -34,6 +34,8 @@ func NewHTMLRules() *xmlconv.Rules {
 			"steps-unordered": "ul",
 			"steps":           "ol",
 			"step":            "li",
+			"substeps":        "ol",
+			"substep":         "li",
 
 			"i":     "em",
 			"lines": "pre",
@@ -62,8 +64,6 @@ func NewHTMLRules() *xmlconv.Rules {
 
 			// divs
 			"context":    "div",
-			"substeps":   "div",
-			"substep":    "div",
 			"result":     "div",
 			"stepresult": "div",
 			"stepxmp":    "div",
