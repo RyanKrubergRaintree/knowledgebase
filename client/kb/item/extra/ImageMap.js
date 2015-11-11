@@ -28,9 +28,7 @@ package('kb.item.content', function(exports) {
 					className: 'item-image-map content-image-map'
 				},
 				React.DOM.div({
-						style: {
-							position: 'relative'
-						}
+						className: 'container'
 					},
 					React.DOM.image({
 						src: item.image
@@ -62,7 +60,10 @@ package('kb.item.content', function(exports) {
 								onMouseDown: self.areaSelect
 							});
 						}))
-				)
+				),
+				React.DOM.p({
+					className: 'tip'
+				}, 'Click any highlighted region for details.')
 			);
 		}
 	});

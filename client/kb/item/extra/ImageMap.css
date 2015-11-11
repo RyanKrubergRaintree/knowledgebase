@@ -1,5 +1,15 @@
 .content-image-map {
 	padding: 8px 0;
+}
+
+.content-image-map .tip {
+	color: #888;
+	font-size: 80%;
+	font-style: italic;
+}
+
+.content-image-map .container {
+	position: relative;
 	font-size: 0;
 }
 
