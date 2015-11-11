@@ -13,7 +13,9 @@ func isBodyTag(tag string) bool { return strings.Contains(tag, "body") }
 // whether to process each child as separate item
 func shouldUnwrap(name xml.Name) bool {
 	switch name.Local {
-	case "section":
+	case "section",
+		"example",
+		"sectiondiv":
 		return true
 	}
 	return false
@@ -59,7 +61,6 @@ func NewHTMLRules() *xmlconv.Rules {
 			"uicontrol": "span",
 
 			// divs
-			"example":    "div",
 			"context":    "div",
 			"substeps":   "div",
 			"substep":    "div",
