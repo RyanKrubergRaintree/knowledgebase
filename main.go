@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -105,7 +104,8 @@ func main() {
 	}
 
 	clientServer := client.NewServer(info, *clientdir, *development)
-	http.Handle("/client/", clientServer)
+	http.Handle("/client/",
+		http.StripPrefix("/client", clientServer))
 	http.Handle("/favicon.ico", clientServer)
 
 	// Load database
@@ -120,25 +120,14 @@ func main() {
 	}
 	log.Println("DB Initialization complete.")
 
-	// protect server with authentication
-	url := "http://" + *domain
-	auth.Register(os.Getenv("APPKEY"), url, "/system/auth", auth.ClientsFromEnv())
-
-	sec := auth.New()
-	sec.Alternate["guest"] = auth.NewDB(db)
-	if caskey := os.Getenv("CASKEY"); caskey != "" {
-		data, err := base64.StdEncoding.DecodeString(caskey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		sec.Alternate["community"] = auth.NewCAS("community", data)
-	}
+	// start auth server
+	ruleset := MustLoadRules(*rules)
+	authServer := auth.NewServer(ruleset, db)
+	http.Handle("/auth/",
+		http.StripPrefix("/auth", authServer))
 
 	// create server
-	server := kb.NewServer(sec, db)
-
-	ruleset := MustLoadRules(*rules)
-	server.Rules = ruleset
+	server := kb.NewServer(authServer, db)
 
 	// add systems
 	server.AddModule(admin.New(server))

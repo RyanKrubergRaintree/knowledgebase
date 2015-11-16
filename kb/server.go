@@ -11,29 +11,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Auth interface {
+	Verify(w http.ResponseWriter, r *http.Request) (User, error)
+}
+
 type Module interface {
 	Info() Group
 	Pages() []PageEntry
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
-type Rules interface {
-	Login(user User, db Database) error
-}
-
-type AuthLogin struct{ URL, Name, Icon string }
-type Auth interface {
-	Logins() []AuthLogin
-
-	Start(w http.ResponseWriter, r *http.Request)
-	Finish(w http.ResponseWriter, r *http.Request) (User, error)
-}
-
 type Server struct {
 	Auth Auth
 	Database
-	Rules Rules
-
 	Modules map[Slug]Module
 }
 
@@ -41,8 +31,7 @@ func NewServer(auth Auth, database Database) *Server {
 	return &Server{
 		Auth:     auth,
 		Database: database,
-
-		Modules: make(map[Slug]Module),
+		Modules:  make(map[Slug]Module),
 	}
 }
 
@@ -56,31 +45,10 @@ func (server *Server) AddModule(module Module) {
 	server.Modules[slug] = module
 }
 
-func (server *Server) finishLogin(w http.ResponseWriter, r *http.Request) {
-	user, err := server.Auth.Finish(w, r)
-	if err != nil {
-		log.Println(err)
-		http.Redirect(w, r, "/system/auth/forbidden", http.StatusFound)
-		return
-	}
-
-	if server.Rules != nil {
-		err = server.Rules.Login(user, server.Database)
-		if err != nil {
-			log.Println(err)
-			http.Redirect(w, r, "/system/auth/forbidden", http.StatusFound)
-			return
-		}
-	}
-
-	server.Sessions().SaveUser(w, r, user)
-	http.Redirect(w, r, "/", http.StatusFound)
-}
-
 func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool) {
-	user, err := server.Sessions().GetUser(w, r)
+	user, err := server.Auth.Verify(w, r)
 	if err != nil {
-		server.Sessions().ClearUser(w, r)
+		http.Error(w, "Unauthorized request!", http.StatusUnauthorized)
 		return User{}, false
 	}
 	return user, true

@@ -3,7 +3,6 @@ package kb
 import (
 	"encoding/gob"
 	"errors"
-	"net/http"
 )
 
 var (
@@ -20,7 +19,6 @@ var (
 )
 
 type Database interface {
-	Sessions() Sessions
 	Context(user Slug) Context
 }
 
@@ -35,12 +33,6 @@ type Context interface {
 	Pages(group Slug) Pages
 
 	GuestLogin() GuestLogin
-}
-
-type Sessions interface {
-	SaveUser(w http.ResponseWriter, r *http.Request, user User) error
-	GetUser(w http.ResponseWriter, r *http.Request) (User, error)
-	ClearUser(w http.ResponseWriter, r *http.Request) error
 }
 
 type Rights string

@@ -36,13 +36,13 @@ func NewServer(info Info, dir string, development bool) *Server {
 		Info: info,
 
 		bootstrap: filepath.Join(dir, "index.html"),
-		assets: http.StripPrefix("/client/assets/",
+		assets: http.StripPrefix("/assets/",
 			http.FileServer(http.Dir(filepath.Join(dir, "assets")))),
 		//TODO fix this
 		client: livepkg.NewServer(
-			http.Dir(filepath.Join(dir, "..")),
+			http.Dir(dir),
 			development,
-			"/client/boot.js",
+			"/boot.js",
 		),
 	}
 }
@@ -52,7 +52,7 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 		template.FuncMap{
 			"Site": func() Info { return server.Info },
 		},
-	).ParseGlob(filepath.Join("client", "index.html"))
+	).ParseGlob(server.bootstrap)
 
 	if err != nil {
 		log.Printf("Error parsing templates: %s", err)
@@ -69,14 +69,12 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.URL.Path == "/favicon.ico":
-		http.Redirect(w, r, "/client/assets/ico/favicon.ico", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/assets/ico/favicon.ico", http.StatusMovedPermanently)
 	case r.URL.Path == "/":
 		server.index(w, r)
-	case strings.HasPrefix(r.URL.Path, "/client/assets/"):
+	case strings.HasPrefix(r.URL.Path, "/assets/"):
 		server.assets.ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/client/"):
-		server.client.ServeHTTP(w, r)
 	default:
-		http.Error(w, "Page not found.", http.StatusNotFound)
+		server.client.ServeHTTP(w, r)
 	}
 }
