@@ -3,10 +3,8 @@ package kb
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -23,17 +21,6 @@ type Rules interface {
 	Login(user User, db Database) error
 }
 
-type ServerInfo struct {
-	Domain string
-
-	ShortTitle string
-	Title      string
-	Company    string
-
-	TrackingID string
-	Version    string
-}
-
 type AuthLogin struct{ URL, Name, Icon string }
 type Auth interface {
 	Logins() []AuthLogin
@@ -43,9 +30,6 @@ type Auth interface {
 }
 
 type Server struct {
-	ServerInfo
-	TemplatesDir string
-
 	Auth Auth
 	Database
 	Rules Rules
@@ -53,11 +37,8 @@ type Server struct {
 	Modules map[Slug]Module
 }
 
-func NewServer(info ServerInfo, auth Auth, database Database) *Server {
+func NewServer(auth Auth, database Database) *Server {
 	return &Server{
-		ServerInfo:   info,
-		TemplatesDir: filepath.Join("client", "templates"),
-
 		Auth:     auth,
 		Database: database,
 
@@ -97,49 +78,17 @@ func (server *Server) finishLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool) {
-	if strings.HasPrefix(r.URL.Path, "/system/auth/") {
-		switch r.URL.Path {
-		case "/system/auth/login":
-			server.Sessions().ClearUser(w, r)
-			server.Present(w, r, "login.html", map[string]interface{}{
-				"Logins": server.Auth.Logins(),
-			})
-		case "/system/auth/forbidden":
-			server.Sessions().ClearUser(w, r)
-			server.Present(w, r, "forbidden.html", nil)
-		case "/system/auth/logout":
-			server.Sessions().ClearUser(w, r)
-			http.Redirect(w, r, "/", http.StatusFound)
-		default:
-			if strings.HasPrefix(r.URL.Path, "/system/auth/provider/") {
-				server.Auth.Start(w, r)
-			} else if strings.HasPrefix(r.URL.Path, "/system/auth/callback/") {
-				server.finishLogin(w, r)
-			} else {
-				http.NotFound(w, r)
-			}
-		}
-		return User{}, false
-	}
-
 	user, err := server.Sessions().GetUser(w, r)
 	if err != nil {
 		server.Sessions().ClearUser(w, r)
-		http.Redirect(w, r, "/system/auth/login", http.StatusFound)
 		return User{}, false
 	}
-
 	return user, true
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	user, ok := server.login(w, r)
 	if !ok {
-		return
-	}
-
-	if r.URL.Path == "/" {
-		server.Present(w, r, "index.html", nil)
 		return
 	}
 
@@ -345,30 +294,6 @@ func (server *Server) IndexContext(w http.ResponseWriter, r *http.Request) (Cont
 		return nil, nil, false
 	}
 	return context, context.Index(context.ActiveUserID()), true
-}
-
-func (server *Server) Present(w http.ResponseWriter, r *http.Request, tname string, data interface{}) {
-	//TODO: this can be cached
-	ts, err := template.New("").Funcs(
-		template.FuncMap{
-			"Site": func() ServerInfo { return server.ServerInfo },
-			"User": func() User {
-				user, _ := server.Sessions().GetUser(w, r)
-				return user
-			},
-		},
-	).ParseGlob(filepath.Join(server.TemplatesDir, "*.html"))
-
-	if err != nil {
-		log.Printf("Error parsing templates: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := ts.ExecuteTemplate(w, tname, data); err != nil {
-		log.Printf("Error executing template: %s", err)
-		return
-	}
 }
 
 func WriteResult(w http.ResponseWriter, err error) {

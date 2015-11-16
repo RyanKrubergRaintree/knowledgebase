@@ -32,7 +32,8 @@ package('kb', function(exports) {
 						'10.2.100',
 						'9.4'
 					],
-					selected: DocumentCookies.getItem('filter') || '10.2.600'
+					//TODO: fix
+					selected: '10.2.600'
 				}
 			};
 		},

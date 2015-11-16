@@ -9,14 +9,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
 
-	"github.com/raintreeinc/livepkg"
-
 	"github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/client"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 
@@ -96,13 +94,19 @@ func main() {
 	log.Printf("Starting with database %s\n", *database)
 	log.Printf("Starting %s on %s\n", *domain, *addr)
 
-	// Serve static files
-	http.Handle("/assets/", http.StripPrefix("/assets/",
-		http.FileServer(http.Dir(filepath.Join(*clientdir, "assets")))))
+	info := client.Info{
+		Domain:     *domain,
+		ShortTitle: "KB",
+		Title:      "Knowledge Base",
+		Company:    "Raintree Systems Inc.",
 
-	// Serve client
-	client := livepkg.NewServer(http.Dir(*clientdir), *development, "/kb/app.js")
-	http.Handle("/kb/", client)
+		TrackingID: os.Getenv("TRACKING_ID"),
+		Version:    time.Now().Format("20060102150405"),
+	}
+
+	clientServer := client.NewServer(info, *clientdir, *development)
+	http.Handle("/client/", clientServer)
+	http.Handle("/favicon.ico", clientServer)
 
 	// Load database
 	db, err := pgdb.New(*database)
@@ -131,17 +135,7 @@ func main() {
 	}
 
 	// create server
-	server := kb.NewServer(kb.ServerInfo{
-		Domain:     *domain,
-		ShortTitle: "KB",
-		Title:      "Knowledge Base",
-		Company:    "Raintree Systems Inc.",
-
-		TrackingID: os.Getenv("TRACKING_ID"),
-		Version:    time.Now().Format("20060102150405"),
-	}, sec, db)
-
-	server.TemplatesDir = filepath.Join(*clientdir, "templates")
+	server := kb.NewServer(sec, db)
 
 	ruleset := MustLoadRules(*rules)
 	server.Rules = ruleset
@@ -164,16 +158,17 @@ func main() {
 		server.AddModule(dita.New("DITA", *ditamap, server))
 	}
 
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(*clientdir, "assets", "ico", "favicon.ico"))
-	})
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ishttps := r.Header.Get("X-Forwarded-Proto") == "https" || r.URL.Scheme == "https"
 		if *redirecthttps && !ishttps {
 			r.URL.Scheme = "https"
 			r.URL.Host = *domain
 			http.Redirect(w, r, r.URL.String(), http.StatusMovedPermanently)
+			return
+		}
+
+		if r.URL.Path == "/" {
+			clientServer.ServeHTTP(w, r)
 			return
 		}
 		server.ServeHTTP(w, r)
