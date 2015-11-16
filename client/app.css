@@ -138,7 +138,7 @@
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
 .page-loading {
-	background: url("/assets/img/spinner.gif") center center no-repeat;
+	background: url("/client/assets/img/spinner.gif") center center no-repeat;
 	height: 100px;
 	animation: fadeIn ease-in 0.5s;
 }

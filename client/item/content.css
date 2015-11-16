@@ -42,7 +42,7 @@
 
 	cursor: move;
 
-	background-image: url("/kb/item/drag.png");
+	background-image: url("/client/item/drag.png");
 	background-repeat: no-repeat repeat;
 	background-position: center right;
 }

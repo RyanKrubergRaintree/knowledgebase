@@ -78,7 +78,7 @@ h4 { font-size: 1.1em; }
 
 	z-index: -1;
 
-	background: url("/assets/img/background.png") center bottom no-repeat;
+	background: url("/client/assets/img/background.png") center bottom no-repeat;
 }
 
 table.tight {

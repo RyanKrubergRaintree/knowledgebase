@@ -1,6 +1,9 @@
 package('kb.app', function(exports) {
 	'use strict';
 
+	window.KBUser = "Egon Elbre";
+	window.KBHomePage = "Community=Welcome";
+
 	depends('app.css');
 
 	depends('Crumbs.js');

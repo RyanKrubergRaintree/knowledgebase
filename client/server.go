@@ -39,7 +39,11 @@ func NewServer(info Info, dir string, development bool) *Server {
 		assets: http.StripPrefix("/client/assets/",
 			http.FileServer(http.Dir(filepath.Join(dir, "assets")))),
 		//TODO fix this
-		client: livepkg.NewServer(http.Dir(dir), development, "/app.js"),
+		client: livepkg.NewServer(
+			http.Dir(filepath.Join(dir, "..")),
+			development,
+			"/client/app.js",
+		),
 	}
 }
 
