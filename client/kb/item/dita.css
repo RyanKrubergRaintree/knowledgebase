@@ -51,3 +51,6 @@
 *[data-dita="menucascade"] span:last-of-type:after {
 	content: '';
 }
+*[data-dita="step"][importance="optional"]:before {
+	content: '(Optional) ';
+}
