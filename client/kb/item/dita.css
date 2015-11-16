@@ -7,6 +7,10 @@
 	content: 'Tip: ';
 	font-weight: bold;
 }
+*[data-dita="note"][type="caution"]:before {
+	content: 'Caution! ';
+	font-weight: bold;
+}
 *[data-dita="info"] {}
 *[data-dita="keystroke"] {
 	font-weight: bold;
