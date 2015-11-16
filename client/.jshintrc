@@ -15,7 +15,7 @@
     "GetDataAttribute": true,
 
     "TestCase": true,
-    "getClassList": true,
+    "getClassList": true
   },
   "globalstrict": true,
   "quotmark": "double",
