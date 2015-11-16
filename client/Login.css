@@ -1,0 +1,36 @@
+#login #header {
+	text-align: center;
+	line-height: 46px;
+}
+
+#content > .modal {
+	max-width: 463px;
+	min-height: 50%;
+	margin: 30px auto;
+}
+
+
+#login .button {
+    cursor: pointer;
+
+	display: block;
+	padding: .5em 1em;
+    border-radius: 4px;
+    font-size: 1.2em;
+
+ 	color: #333;
+ 	border: 1px solid #f1f1f1;
+    text-decoration: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: rgba(0,0,0,0);
+
+    transition:
+    	background 0.2s ease-in-out,
+    	box-shadow 0.2s ease-in-out
+    ;
+}
+
+#login .button:hover {
+	background: rgba(0,0,0,0.01);
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+}

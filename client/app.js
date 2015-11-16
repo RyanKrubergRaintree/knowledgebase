@@ -31,7 +31,7 @@ package("kb.app", function(exports) {
 		};
 	}
 
-	initialize(document.getElementById("site"));
+	// initialize(document.getElementById("site"));
 
 	// closing of the last page
 	document.onkeydown = function(ev) {

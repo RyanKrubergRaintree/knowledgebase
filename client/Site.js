@@ -244,17 +244,6 @@ package("kb", function(exports) {
 
 	exports.Site = React.createClass({
 		displayName: "Site",
-
-		update: function() {
-			this.forceUpdate();
-		},
-		componentDidMount: function() {
-			if (typeof Reloader !== "undefined") {
-				Reloader.onchange = this.update;
-			}
-		},
-		componentWillUnmount: function() {},
-
 		render: function() {
 			return React.DOM.div({},
 				React.createElement(Header, this.props),

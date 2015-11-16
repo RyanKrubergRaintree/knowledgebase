@@ -42,7 +42,7 @@ func NewServer(info Info, dir string, development bool) *Server {
 		client: livepkg.NewServer(
 			http.Dir(filepath.Join(dir, "..")),
 			development,
-			"/client/app.js",
+			"/client/boot.js",
 		),
 	}
 }
