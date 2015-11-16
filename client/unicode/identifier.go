@@ -28,8 +28,8 @@ func main() {
 
 	fmt.Fprintf(&buf, "// DO NOT MODIFY\n")
 	fmt.Fprintf(&buf, "// THIS IS A GENERATED FILE\n\n")
-	fmt.Fprintf(&buf, "package('kb.unicode', function(exports){\n")
-	fmt.Fprintf(&buf, "\t'use strict';\n\n")
+	fmt.Fprintf(&buf, "package(\"kb.unicode\", function(exports){\n")
+	fmt.Fprintf(&buf, "\t\"use strict\";\n\n")
 	fmt.Fprintf(&buf, "\texports.IsIdent = IsIdent;\n")
 	fmt.Fprintf(&buf, "\tfunction IsIdent(v){\n")
 	fmt.Fprintf(&buf, "\t\tvar r = v.charCodeAt(0);\n")

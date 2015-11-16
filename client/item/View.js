@@ -1,17 +1,17 @@
-package('kb.item', function(exports) {
-	'use strict';
+package("kb.item", function(exports) {
+	"use strict";
 
-	depends('Editor.js');
+	depends("Editor.js");
 
-	depends('content.js');
+	depends("content.js");
 
-	depends('extra/SimpleForm.js');
-	depends('extra/DITAIndex.js');
-	depends('extra/ImageMap.js');
+	depends("extra/SimpleForm.js");
+	depends("extra/DITAIndex.js");
+	depends("extra/ImageMap.js");
 
 	exports.DropCanceled = null;
 	exports.View = React.createClass({
-		displayName: 'Item',
+		displayName: "Item",
 
 		dragStart: function(ev, node, item) {
 			kb.item.DropCanceled = false;
@@ -19,9 +19,9 @@ package('kb.item', function(exports) {
 				item = this.props.item;
 
 			if (stage.canModify()) {
-				ev.dataTransfer.effectAllowed = 'all';
+				ev.dataTransfer.effectAllowed = "all";
 			} else {
-				ev.dataTransfer.effectAllowed = 'copy';
+				ev.dataTransfer.effectAllowed = "copy";
 			}
 
 			if (ev.dataTransfer.setDragImage) {
@@ -36,7 +36,7 @@ package('kb.item', function(exports) {
 				url: stage.url,
 				text: stage.page.synopsis
 			};
-			ev.dataTransfer.setData('Text', JSON.stringify(data));
+			ev.dataTransfer.setData("Text", JSON.stringify(data));
 
 			function mouseOffset(ev) {
 				ev = ev.nativeEvent || ev;
@@ -55,9 +55,9 @@ package('kb.item', function(exports) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if (ev.dataTransfer.dropEffect === 'move') {
+			if (ev.dataTransfer.dropEffect === "move") {
 				stage.patch({
-					type: 'remove',
+					type: "remove",
 					id: item.id
 				});
 			}
@@ -81,24 +81,24 @@ package('kb.item', function(exports) {
 				item = this.props.item;
 
 			var view = kb.item.content[item.type] || kb.item.content.Unknown;
-			var editingClass = '';
+			var editingClass = "";
 			var isEditing = false;
 			if (stage.editing.item(item.id)) {
 				view = kb.item.Editor;
-				editingClass = ' item-editing';
+				editingClass = " item-editing";
 				isEditing = true;
 			}
 
 			return React.DOM.div({
-					className: 'item' + editingClass,
+					className: "item" + editingClass,
 					onDoubleClick: stage.canModify() ? this.startEditing : null,
-					'data-id': item.id
+					"data-id": item.id
 				}, !isEditing ? React.DOM.a({
-					className: 'item-drag',
-					title: 'Move or copy item.',
-					draggable: 'true',
+					className: "item-drag",
+					title: "Move or copy item.",
+					draggable: "true",
 
-					href: '#',
+					href: "#",
 					onClick: function(ev) {
 						ev = ev || window.event;
 						ev.preventDefault();

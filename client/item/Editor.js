@@ -1,13 +1,13 @@
-package('kb.item', function(exports) {
-	'use strict';
+package("kb.item", function(exports) {
+	"use strict";
 
 	exports.Editor = React.createClass({
 		blur: function(ev) {
 			var self = this;
 			var container = ReactDOM.findDOMNode(this);
 			if (ev.relatedTarget === null) {
-				// HACK-FIX: Firefox doesn't have relatedTarget
-				// use a delayed commit if we don't know the related target
+				// HACK-FIX: Firefox doesn"t have relatedTarget
+				// use a delayed commit if we don"t know the related target
 				// that way any menu action can complete, before the commit
 				window.setTimeout(function() {
 					self.commit();
@@ -28,11 +28,11 @@ package('kb.item', function(exports) {
 			}
 
 			var text = this.refs.text.value;
-			if ((text === '') &&
-				((item.type === 'paragraph') || (item.type === 'html'))) {
+			if ((text === "") &&
+				((item.type === "paragraph") || (item.type === "html"))) {
 				stage.patch({
 					id: item.id,
-					type: 'remove'
+					type: "remove"
 				});
 				return;
 			}
@@ -42,7 +42,7 @@ package('kb.item', function(exports) {
 				next.text = text;
 				stage.patch({
 					id: next.id,
-					type: 'edit',
+					type: "edit",
 					item: next
 				});
 			}
@@ -54,10 +54,10 @@ package('kb.item', function(exports) {
 
 			try {
 				var actual = stage.page.itemById(item.id);
-				if (actual && (actual.type === 'paragraph') && (actual.text === '')) {
+				if (actual && (actual.type === "paragraph") && (actual.text === "")) {
 					stage.patch({
 						id: actual.id,
-						type: 'remove'
+						type: "remove"
 					});
 				}
 			} catch (ex) {}
@@ -71,7 +71,7 @@ package('kb.item', function(exports) {
 				item = this.props.item;
 
 			stage.patch({
-				type: 'remove',
+				type: "remove",
 				id: item.id
 			});
 
@@ -96,7 +96,7 @@ package('kb.item', function(exports) {
 				var pre = node.value.substr(0, node.selectionStart),
 					post = node.value.substr(node.selectionStart);
 
-				if (pre === '') {
+				if (pre === "") {
 					ev.preventDefault();
 					return;
 				}
@@ -108,18 +108,18 @@ package('kb.item', function(exports) {
 				}
 
 				var continueWith = {
-					'paragraph': 'paragraph',
-					'html': 'html'
+					"paragraph": "paragraph",
+					"html": "html"
 				};
 
 				var adding = {
-					type: continueWith[item.type] || 'paragraph',
+					type: continueWith[item.type] || "paragraph",
 					id: GenerateID(),
 					text: post
 				};
 
 				stage.patch({
-					type: 'add',
+					type: "add",
 					id: adding.id,
 					after: item.id,
 					item: adding
@@ -132,37 +132,37 @@ package('kb.item', function(exports) {
 		render: function() {
 			var item = this.props.item;
 			return React.DOM.div({
-					className: 'item-content content-editor',
+					className: "item-content content-editor",
 					onBlur: this.blur
 				},
 				React.DOM.div({
-					className: 'item-type'
+					className: "item-type"
 				}, item.type),
 				React.DOM.textarea({
-					ref: 'text',
+					ref: "text",
 					defaultValue: item.text,
 					onKeyDown: this.handleKey,
 					autoFocus: true
 				}),
 				React.DOM.div({
-						className: 'editor-buttons'
+						className: "editor-buttons"
 					},
 					React.DOM.div({
-						className: 'mdi mdi-content-save',
-						title: 'Save changes. (Unfocus the editor will save.)',
-						tabIndex: '1',
+						className: "mdi mdi-content-save",
+						title: "Save changes. (Unfocus the editor will save.)",
+						tabIndex: "1",
 						onClick: this.commit
 					}),
 					React.DOM.div({
-						className: 'mdi mdi-backup-restore',
-						title: 'Cancel any modifications. (Pressing escape will cancel changes.)',
-						tabIndex: '2',
+						className: "mdi mdi-backup-restore",
+						title: "Cancel any modifications. (Pressing escape will cancel changes.)",
+						tabIndex: "2",
 						onClick: this.stopEditing
 					}),
 					React.DOM.div({
-						className: 'item-delete mdi mdi-delete',
-						title: 'Delete this item.',
-						tabIndex: '3',
+						className: "item-delete mdi mdi-delete",
+						title: "Delete this item.",
+						tabIndex: "3",
 						onClick: this.remove
 					})
 				)

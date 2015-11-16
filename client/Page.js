@@ -1,15 +1,15 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
 	// Page corresponds to the knowledgebase page structure
 	exports.Page = Page;
 
 	function Page(data) {
 		data = data || {};
-		this.owner = data.owner || '';
-		this.slug = data.slug || '';
-		this.title = data.title || '';
-		this.synopsis = data.synopsis || '';
+		this.owner = data.owner || "";
+		this.slug = data.slug || "";
+		this.title = data.title || "";
+		this.synopsis = data.synopsis || "";
 		this.story = data.story || [];
 		this.journal = data.journal || [];
 		this.version = data.version || 0;
@@ -28,7 +28,7 @@ package('kb', function(exports) {
 					return i;
 				}
 			}
-			throw new Error('Item "' + id + '" does not exist.');
+			throw new Error("Item \"" + id + "\" does not exist.");
 		},
 
 		itemById: function(id) {
@@ -44,7 +44,7 @@ package('kb', function(exports) {
 				this.modified = (new Date()).valueOf();
 				return;
 			}
-			throw new Error('Unknown operation "' + op.type + '"');
+			throw new Error("Unknown operation \"" + op.type + "\"");
 		}
 	};
 

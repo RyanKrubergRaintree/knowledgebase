@@ -1,11 +1,11 @@
-package('kb.Lineup', function(exports) {
-	'use strict';
+package("kb.Lineup", function(exports) {
+	"use strict";
 
-	depends('Lineup.js');
-	depends('Stage.View.js');
+	depends("Lineup.js");
+	depends("Stage.View.js");
 
 	var SelectionStyle = React.createClass({
-		displayName: 'SelectionStyle',
+		displayName: "SelectionStyle",
 		getInitialState: function() {
 			return {
 				selected: this.props.CurrentSelection.selected,
@@ -19,7 +19,7 @@ package('kb.Lineup', function(exports) {
 			});
 		},
 		componentDidMount: function() {
-			this.props.CurrentSelection.on('changed', this.update, this);
+			this.props.CurrentSelection.on("changed", this.update, this);
 		},
 		componentWillUnmount: function() {
 			this.props.CurrentSelection.remove(this);
@@ -28,26 +28,26 @@ package('kb.Lineup', function(exports) {
 		render: function() {
 			var state = this.state;
 
-			var style = '';
-			if (state.highlighted !== '') {
+			var style = "";
+			if (state.highlighted !== "") {
 				var id = state.highlighted;
-				style += '[data-id="' + id + '"], ' +
-					'[data-focusid="' + id + '"]' +
-					'{' +
-					'outline: 1px dashed #aaf !important;' +
-					'background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;' +
-					'background: rgba(0,0,255,0.1) !important;' +
-					'}';
+				style += "[data-id=\"" + id + "\"], " +
+					"[data-focusid=\"" + id + "\"]" +
+					"{" +
+					"outline: 1px dashed #aaf !important;" +
+					"background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;" +
+					"background: rgba(0,0,255,0.1) !important;" +
+					"}";
 			}
-			if (state.selected !== '') {
+			if (state.selected !== "") {
 				var id = state.selected;
-				style += '[data-id="' + id + '"], ' +
-					'[data-focusid="' + id + '"]' +
-					'{' +
-					'outline: 2px solid #88f !important;' +
-					'background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;' +
-					'background: rgba(0,0,255,0.1) !important;' +
-					'}';
+				style += "[data-id=\"" + id + "\"], " +
+					"[data-focusid=\"" + id + "\"]" +
+					"{" +
+					"outline: 2px solid #88f !important;" +
+					"background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;" +
+					"background: rgba(0,0,255,0.1) !important;" +
+					"}";
 			}
 
 			return React.DOM.style({
@@ -60,7 +60,7 @@ package('kb.Lineup', function(exports) {
 	});
 
 	exports.View = React.createClass({
-		displayName: 'Lineup',
+		displayName: "Lineup",
 
 		getInitialState: function() {
 			return {
@@ -90,15 +90,15 @@ package('kb.Lineup', function(exports) {
 
 			var left = 0;
 			return React.DOM.div({
-					className: 'lineup'
+					className: "lineup"
 				},
 				React.createElement(SelectionStyle, this.props),
 				this.props.Lineup.stages.map(function(stage) {
 					var width = stage.wide ? wide : normal;
 					var r = React.createElement(kb.Stage.View, {
 						style: {
-							width: width + 'px',
-							left: left + 'px'
+							width: width + "px",
+							left: left + "px"
 						},
 						onWidthChanged: self.onStageWidthChanged,
 						key: stage.id,
@@ -123,7 +123,7 @@ package('kb.Lineup', function(exports) {
 			});
 		},
 		componentDidMount: function() {
-			this.props.Lineup.on('changed', this.changed, this);
+			this.props.Lineup.on("changed", this.changed, this);
 			window.onresize = this.resized;
 
 			this.setState({
@@ -134,7 +134,7 @@ package('kb.Lineup', function(exports) {
 		componentWillReceiveProps: function(nextprops) {
 			if (this.props.Lineup !== nextprops.Lineup) {
 				this.props.Lineup.remove(this);
-				nextprops.Lineup.on('changed', this.changed, this);
+				nextprops.Lineup.on("changed", this.changed, this);
 			}
 		},
 		componentWillUnmount: function() {

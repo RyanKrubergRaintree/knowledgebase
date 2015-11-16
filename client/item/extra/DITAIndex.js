@@ -1,10 +1,10 @@
-package('kb.item.content', function(exports) {
-	'use strict';
+package("kb.item.content", function(exports) {
+	"use strict";
 
-	depends('DITAIndex.css');
+	depends("DITAIndex.css");
 
 	var Item = React.createClass({
-		displayName: 'DITAIndexItem',
+		displayName: "DITAIndexItem",
 		getInitialState: function() {
 			return {
 				expanded: false
@@ -29,19 +29,19 @@ package('kb.item.content', function(exports) {
 			var children = null;
 
 			if (item.children.length > 0) {
-				var icon = (expanded ? 'mdi-minus' : 'mdi-plus');
+				var icon = (expanded ? "mdi-minus" : "mdi-plus");
 				if (item.active || item.activechild) {
-					icon += '-circle-outline';
+					icon += "-circle-outline";
 				}
 
 				toggle = React.DOM.span({
-					className: 'dita-index-toggle mdi ' + icon,
+					className: "dita-index-toggle mdi " + icon,
 					onClick: this.toggle
 				});
 
 				if (expanded || item.activechild) {
 					children = React.DOM.div({
-						className: 'dita-index-children'
+						className: "dita-index-children"
 					}, item.children.map(function(item, i) {
 						return React.createElement(Item, {
 							key: i,
@@ -52,22 +52,22 @@ package('kb.item.content', function(exports) {
 			}
 
 			var link = null;
-			if (item.slug === '') {
+			if (item.slug === "") {
 				link = React.DOM.span({
-					className: 'dita-index-title ' + (item.active ? 'dita-index-title-active' : ''),
+					className: "dita-index-title " + (item.active ? "dita-index-title-active" : ""),
 					onClick: this.open
 				}, item.title);
 			} else {
 				link = React.DOM.a({
-					className: 'dita-index-title ' + (item.active ? 'dita-index-title-active' : ''),
+					className: "dita-index-title " + (item.active ? "dita-index-title-active" : ""),
 					href: item.slug,
-					'data-link': item.slug,
+					"data-link": item.slug,
 					onClick: this.open
 				}, item.title);
 			}
 
 			return React.DOM.div({
-					className: 'dita-index-item'
+					className: "dita-index-item"
 				},
 				toggle,
 				link,
@@ -81,7 +81,7 @@ package('kb.item.content', function(exports) {
 		var isactive = {};
 		for (var i = 0; i < stages.length; i++) {
 			var stage = stages[i];
-			if (stage.page.slug !== '') {
+			if (stage.page.slug !== "") {
 				isactive[stage.page.slug] = true;
 			}
 		}
@@ -90,7 +90,7 @@ package('kb.item.content', function(exports) {
 			var n = {
 				title: item.title,
 				slug: item.slug,
-				active: isactive[item.slug] || isactive['/' + item.slug],
+				active: isactive[item.slug] || isactive["/" + item.slug],
 				activechild: false,
 				children: []
 			};
@@ -108,8 +108,8 @@ package('kb.item.content', function(exports) {
 		return mknode(root);
 	}
 
-	exports['dita-index'] = React.createClass({
-		displayName: 'DITAIndex',
+	exports["dita-index"] = React.createClass({
+		displayName: "DITAIndex",
 		getInitialState: function() {
 			return {
 				root: build(this.props.item.root, kb.app.Lineup.stages)
@@ -121,7 +121,7 @@ package('kb.item.content', function(exports) {
 			});
 		},
 		componentDidMount: function() {
-			kb.app.Lineup.on('changed', this.activeChanged, this);
+			kb.app.Lineup.on("changed", this.activeChanged, this);
 		},
 		componentWillUnmount: function() {
 			kb.app.Lineup.remove(this);
@@ -129,13 +129,13 @@ package('kb.item.content', function(exports) {
 		render: function() {
 			if (this.props.item === null) {
 				return React.DOM.div({
-					className: 'item-content content-dita-index'
-				}, 'No index available.');
+					className: "item-content content-dita-index"
+				}, "No index available.");
 			}
 
 			var root = this.state.root;
 			return React.DOM.div({
-					className: 'item-content content-dita-index'
+					className: "item-content content-dita-index"
 				},
 				root.children.map(function(item, i) {
 					return React.createElement(Item, {

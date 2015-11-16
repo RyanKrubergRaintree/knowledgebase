@@ -1,13 +1,13 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
-	depends('util/Notifier.js');
+	depends("util/Notifier.js");
 
 	exports.Selection = Selection;
 
 	function Selection() {
-		this.highlighted = '';
-		this.selected = '';
+		this.highlighted = "";
+		this.selected = "";
 
 		this.notifier = new kb.util.Notifier();
 		this.notifier.mixto(this);
@@ -16,7 +16,7 @@ package('kb', function(exports) {
 	Selection.prototype = {
 		changed: function() {
 			this.notifier.emit({
-				type: 'changed',
+				type: "changed",
 				highlighted: this.highlighted,
 				selected: this.selected
 			});
@@ -27,7 +27,7 @@ package('kb', function(exports) {
 		},
 		unselect: function(id) {
 			if (this.selected === id) {
-				this.selected = '';
+				this.selected = "";
 				this.changed();
 			}
 		},
@@ -35,7 +35,7 @@ package('kb', function(exports) {
 			if (this.selected !== id) {
 				this.selected = id;
 			} else {
-				this.selected = '';
+				this.selected = "";
 			}
 			this.changed();
 		},
@@ -45,7 +45,7 @@ package('kb', function(exports) {
 		},
 		unhighlight: function(id) {
 			if (this.highlighted === id) {
-				this.highlighted = '';
+				this.highlighted = "";
 				this.changed();
 			}
 		}

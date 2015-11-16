@@ -1,15 +1,15 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
-	depends('Convert.js');
+	depends("Convert.js");
 	var rxCode = /[=><;{}\[\]]/;
 
 	function getImage(dataTransfer) {
 		var acceptedImages = {
-			'image/png': true,
-			'image/jpeg': true
+			"image/png": true,
+			"image/jpeg": true
 		};
-		if (typeof dataTransfer.files === 'undefined') {
+		if (typeof dataTransfer.files === "undefined") {
 			return null;
 		}
 		for (var i = 0; i < dataTransfer.files.length; i += 1) {
@@ -27,7 +27,7 @@ package('kb', function(exports) {
 
 		var image = new Image();
 		image.onload = function() {
-			var canvas = document.createElement('canvas');
+			var canvas = document.createElement("canvas");
 			if (image.height > MaxHeight) {
 				image.width *= MaxHeight / image.height;
 				image.height = MaxHeight;
@@ -40,7 +40,7 @@ package('kb', function(exports) {
 			canvas.width = image.width;
 			canvas.height = image.height;
 
-			var ctx = canvas.getContext('2d');
+			var ctx = canvas.getContext("2d");
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.drawImage(image, 0, 0, image.width, image.height);
 
@@ -54,9 +54,9 @@ package('kb', function(exports) {
 		if (image) {
 			var item = {
 				id: GenerateID(),
-				type: 'image',
-				text: '',
-				url: ''
+				type: "image",
+				text: "",
+				url: ""
 			};
 
 			// do delayed loading
@@ -64,12 +64,12 @@ package('kb', function(exports) {
 			reader.onload = function(ev) {
 				resizeImage(ev.target.result, function(data) {
 					stage.patch({
-						type: 'edit',
+						type: "edit",
 						id: item.id,
 						item: {
 							id: item.id,
-							type: 'image',
-							text: '',
+							type: "image",
+							text: "",
 							url: data
 						}
 					});
@@ -80,20 +80,20 @@ package('kb', function(exports) {
 		}
 
 		try {
-			var html = dataTransfer.getData('text/html');
-			var href = dataTransfer.getData('text/uri-list');
+			var html = dataTransfer.getData("text/html");
+			var href = dataTransfer.getData("text/uri-list");
 
 			if (href) {
 				if (html) {
 					var rxTags = /<[^>]+>/g;
-					html = html.replace(rxTags, '');
+					html = html.replace(rxTags, "");
 				} else {
 					html = kb.convert.URLToReadable(href);
 				}
 
 				return {
 					id: GenerateID(),
-					type: 'reference',
+					type: "reference",
 					title: html,
 					url: href
 				};
@@ -102,30 +102,30 @@ package('kb', function(exports) {
 			// this getData may fail in IE
 		}
 		try {
-			var text = dataTransfer.getData('text/plain');
-			if (text === '') {
-				text = dataTransfer.getData('Text');
+			var text = dataTransfer.getData("text/plain");
+			if (text === "") {
+				text = dataTransfer.getData("Text");
 			}
 		} catch (ex) {
-			text = dataTransfer.getData('Text');
+			text = dataTransfer.getData("Text");
 		}
 		if (text) {
 			if (text.match(rxCode)) {
 				return {
 					id: GenerateID(),
-					type: 'code',
+					type: "code",
 					text: text
 				};
 			}
 
 			return {
 				id: GenerateID(),
-				type: 'paragraph',
+				type: "paragraph",
 				text: text
 			};
 		}
 
-		console.log('Unhandled drop item:', JSON.parse(JSON.stringify(dataTransfer)));
+		console.log("Unhandled drop item:", JSON.parse(JSON.stringify(dataTransfer)));
 	}
 
 	exports.DropData = DropData;
@@ -134,7 +134,7 @@ package('kb', function(exports) {
 		var item = createItem(stage, dataTransfer);
 		if (item) {
 			stage.patch({
-				type: 'add',
+				type: "add",
 				after: after,
 				id: item.id,
 				item: item

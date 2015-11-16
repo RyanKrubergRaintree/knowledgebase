@@ -18,7 +18,7 @@
     "getClassList": true,
   },
   "globalstrict": true,
-  "quotmark": "single",
+  "quotmark": "double",
   "undef": true,
   "unused": true,
 

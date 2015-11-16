@@ -1,14 +1,14 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
-	depends('site.css');
-	depends('Lineup.View.js');
+	depends("site.css");
+	depends("Lineup.View.js");
 
 	var HeaderMenu = React.createClass({
-		displayName: 'HeaderMenu',
+		displayName: "HeaderMenu",
 		render: function() {
 			return React.DOM.div({
-					className: 'header-menu'
+					className: "header-menu"
 				},
 				this.props.items.map(function(item) {
 					return React.DOM.a(item, item.caption);
@@ -23,17 +23,17 @@ package('kb', function(exports) {
 			return {
 				filter: {
 					options: [
-						'All',
-						'10.2.600',
-						'10.2.500',
-						'10.2.400',
-						'10.2.300',
-						'10.2.200',
-						'10.2.100',
-						'9.4'
+						"All",
+						"10.2.600",
+						"10.2.500",
+						"10.2.400",
+						"10.2.300",
+						"10.2.200",
+						"10.2.100",
+						"9.4"
 					],
 					//TODO: fix
-					selected: '10.2.600'
+					selected: "10.2.600"
 				}
 			};
 		},
@@ -44,15 +44,15 @@ package('kb', function(exports) {
 				this.lastStageId = undefined;
 			}
 
-			var param = 'q=' + query;
+			var param = "q=" + query;
 			var filter = this.refs.filter.value;
-			if (filter !== 'All') {
-				param += '&filter=' + filter;
+			if (filter !== "All") {
+				param += "&filter=" + filter;
 			}
 
 			this.lastStageId = Lineup.open({
-				url: '/search=search?' + param,
-				title: '"' + query + '"',
+				url: "/search=search?" + param,
+				title: "\"" + query + "\"",
 				insteadOf: this.lastStageId
 			});
 			ev.preventDefault();
@@ -82,13 +82,13 @@ package('kb', function(exports) {
 				return;
 			}
 
-			var stages = document.querySelectorAll('.stage');
+			var stages = document.querySelectorAll(".stage");
 			if (stages.length === 0) {
 				return;
 			}
 
 			var stage = stages[stages.length - 1];
-			var middle = stage.querySelector('.stage-scroll');
+			var middle = stage.querySelector(".stage-scroll");
 
 			switch (ev.keyCode) {
 				case 33: // pageup
@@ -102,17 +102,17 @@ package('kb', function(exports) {
 		render: function() {
 			var filter = this.state.filter;
 			return React.DOM.form({
-					className: 'search',
+					className: "search",
 					onSubmit: this.search
 				},
 				React.DOM.input({
-					ref: 'query',
-					placeholder: 'Search...',
+					ref: "query",
+					placeholder: "Search...",
 					onKeyDown: this.keyDown
 				}),
 				React.DOM.select({
-						className: 'search-filter',
-						ref: 'filter',
+						className: "search-filter",
+						ref: "filter",
 						defaultValue: filter.selected
 					},
 					filter.options.map(function(item) {
@@ -123,8 +123,8 @@ package('kb', function(exports) {
 					})
 				),
 				React.DOM.button({
-					className: 'search-icon mdi mdi-magnify',
-					type: 'submit',
+					className: "search-icon mdi mdi-magnify",
+					type: "submit",
 					tabIndex: -1
 				})
 			);
@@ -135,27 +135,27 @@ package('kb', function(exports) {
 		render: function() {
 			var infostyle = {
 				style: {
-					fontSize: 'smaller'
+					fontSize: "smaller"
 				}
 			};
 
 			var username = this.props.User;
-			if (username.indexOf('=') >= 0) {
-				var tokens = username.split('=');
+			if (username.indexOf("=") >= 0) {
+				var tokens = username.split("=");
 				return React.DOM.div({
-						className: 'background-info'
+						className: "background-info"
 					},
-					React.DOM.div(infostyle, 'logged in as:'),
+					React.DOM.div(infostyle, "logged in as:"),
 					React.DOM.div({}, tokens[1]),
-					React.DOM.div(infostyle, 'customer:'),
+					React.DOM.div(infostyle, "customer:"),
 					React.DOM.div({}, tokens[0])
 				);
 			}
 
 			return React.DOM.div({
-					className: 'background-info'
+					className: "background-info"
 				},
-				React.DOM.div(infostyle, 'logged in as:'),
+				React.DOM.div(infostyle, "logged in as:"),
 				React.DOM.div({}, username)
 			);
 		}
@@ -176,52 +176,52 @@ package('kb', function(exports) {
 
 			var lineup = this.props.Lineup;
 			lineup.open({
-				url: '',
-				link: '',
-				title: ''
+				url: "",
+				link: "",
+				title: ""
 			});
 		},
 		logout: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			window.location.pathname = '/system/auth/logout';
+			window.location.pathname = "/system/auth/logout";
 		},
-		displayName: 'Header',
+		displayName: "Header",
 		render: function() {
 			return React.DOM.div({
-					id: 'header'
+					id: "header"
 				},
 				React.DOM.a({
-					className: 'button home mdi mdi-home',
-					href: '#',
-					title: 'Home',
+					className: "button home mdi mdi-home",
+					href: "#",
+					title: "Home",
 					onClick: this.openHome
 				}),
 				React.createElement(Search, this.props),
 				React.createElement(HeaderMenu, {
 					items: [{
-						key: 'new-page',
-						href: '#',
+						key: "new-page",
+						href: "#",
 						onClick: this.createNewPage,
-						caption: 'New Page'
+						caption: "New Page"
 					}, {
-						key: 'index',
-						href: '/help=index',
-						caption: 'Index'
+						key: "index",
+						href: "/help=index",
+						caption: "Index"
 					}, {
-						key: 'recent-changes',
-						href: '/page=recent-changes',
-						caption: 'Recent Changes'
+						key: "recent-changes",
+						href: "/page=recent-changes",
+						caption: "Recent Changes"
 					}, {
-						key: 'user',
-						href: '/user=current',
-						caption: 'User'
+						key: "user",
+						href: "/user=current",
+						caption: "User"
 					}, {
-						key: 'logout',
-						href: '#',
+						key: "logout",
+						href: "#",
 						onClick: this.logout,
-						caption: 'Logout'
+						caption: "Logout"
 					}]
 				})
 			);
@@ -229,10 +229,10 @@ package('kb', function(exports) {
 	});
 
 	var Content = React.createClass({
-		displayName: 'Content',
+		displayName: "Content",
 		render: function() {
 			return React.DOM.div({
-					id: 'content'
+					id: "content"
 				},
 				React.createElement(LoginInfo, {
 					User: KBUser
@@ -243,13 +243,13 @@ package('kb', function(exports) {
 	});
 
 	exports.Site = React.createClass({
-		displayName: 'Site',
+		displayName: "Site",
 
 		update: function() {
 			this.forceUpdate();
 		},
 		componentDidMount: function() {
-			if (typeof Reloader !== 'undefined') {
+			if (typeof Reloader !== "undefined") {
 				Reloader.onchange = this.update;
 			}
 		},

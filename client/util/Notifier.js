@@ -1,34 +1,35 @@
-package('kb.util', function(exports){
-	'use strict';
+package("kb.util", function(exports) {
+	"use strict";
 
 	exports.Notifier = Notifier;
-	function Notifier(){
+
+	function Notifier() {
 		this.listeners = [];
 	}
 
 	Notifier.prototype = {
-		mixto: function(obj){
+		mixto: function(obj) {
 			var self = this;
-			obj.on = function(event, handler, recv){
+			obj.on = function(event, handler, recv) {
 				self.on(event, handler, recv);
 			};
-			obj.off = function(event, handler, recv){
+			obj.off = function(event, handler, recv) {
 				self.off(event, handler, recv);
 			};
-			obj.remove = function(recv){
+			obj.remove = function(recv) {
 				self.remove(recv);
 			};
 		},
-		on: function(event, handler, recv){
+		on: function(event, handler, recv) {
 			this.listeners.push({
 				event: event,
 				handler: handler,
 				recv: recv
 			});
 		},
-		off: function(event, handler, recv){
+		off: function(event, handler, recv) {
 			this.listeners = this.listeners.filter(
-				function(listener){
+				function(listener) {
 					return !(
 						(listener.event === event) &&
 						(listener.handler === handler) &&
@@ -37,22 +38,22 @@ package('kb.util', function(exports){
 				}
 			);
 		},
-		remove: function(recv){
+		remove: function(recv) {
 			this.listeners = this.listeners.filter(
-				function(listener){
+				function(listener) {
 					return listener.recv !== recv;
 				}
 			);
 		},
-		emit: function(event){
+		emit: function(event) {
 			var self = this;
-			window.setTimeout(function(){
+			window.setTimeout(function() {
 				self.handle(event);
 			}, 0);
 		},
-		handle: function(event){
-			this.listeners.map(function(listener){
-				if(listener.event === event.type){
+		handle: function(event) {
+			this.listeners.map(function(listener) {
+				if (listener.event === event.type) {
 					listener.handler.call(listener.recv, event);
 				}
 			});

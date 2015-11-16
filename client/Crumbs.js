@@ -1,29 +1,29 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
-	depends('Lineup.js');
-	depends('Convert.js');
-	depends('Stage.js');
+	depends("Lineup.js");
+	depends("Convert.js");
+	depends("Stage.js");
 
 	// converts to
 	// #┃ref1┃ref2┃ref3
 	function toHash(stages) {
-		return '#' + stages.map(kb.convert.ReferenceToLink).join('|');
+		return "#" + stages.map(kb.convert.ReferenceToLink).join("|");
 	}
 
 	// converts from
 	// #┃ref1┃ref2┃ref3
 	function fromHash(hash) {
-		// IE doesn't have the first #
-		if (hash[0] === '#') {
+		// IE doesn"t have the first #
+		if (hash[0] === "#") {
 			hash = hash.substr(1);
 		} else {
 			hash = hash.substr(0);
 		}
 
 		var stages = [];
-		hash.split('|').map(function(link) {
-			if (link.trim() === '') {
+		hash.split("|").map(function(link) {
+			if (link.trim() === "") {
 				return;
 			}
 			stages.push(new kb.Stage(kb.convert.LinkToReference(link)));
@@ -35,9 +35,9 @@ package('kb', function(exports) {
 
 	function Crumbs(lineup) {
 		this.lineup_ = lineup;
-		this.navigatingTo_ = '';
+		this.navigatingTo_ = "";
 
-		this.lineup_.on('changed', this.lineupChanged, this);
+		this.lineup_.on("changed", this.lineupChanged, this);
 		var self = this;
 		window.onhashchange = function( /*ev*/ ) {
 			if (window.location.hash !== self.navigatingTo_) {
@@ -53,7 +53,7 @@ package('kb', function(exports) {
 		},
 		initLineup: function(defaultPage) {
 			var hash = window.location.hash;
-			if ((hash === '') || (hash === '#')) {
+			if ((hash === "") || (hash === "#")) {
 				this.lineup_.openLink(defaultPage);
 			} else {
 				this.lineup_.updateRefs(fromHash(window.location.hash));

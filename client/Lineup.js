@@ -1,9 +1,9 @@
-package('kb', function(exports) {
-	'use strict';
+package("kb", function(exports) {
+	"use strict";
 
-	depends('util/Notifier.js');
-	depends('Convert.js');
-	depends('Stage.js');
+	depends("util/Notifier.js");
+	depends("Convert.js");
+	depends("Stage.js");
 
 	exports.Lineup = Lineup;
 
@@ -16,7 +16,7 @@ package('kb', function(exports) {
 	Lineup.prototype = {
 		changed: function() {
 			this.notifier.emit({
-				type: 'changed',
+				type: "changed",
 				lineup: this
 			});
 		},
@@ -30,7 +30,7 @@ package('kb', function(exports) {
 			return undefined;
 		},
 		indexOf_: function(id) {
-			if (typeof id === 'undefined') {
+			if (typeof id === "undefined") {
 				return -1;
 			}
 			for (var i = 0; i < this.stages.length; i += 1) {
@@ -42,7 +42,7 @@ package('kb', function(exports) {
 		},
 
 		trim_: function(id) {
-			if (typeof id === 'undefined') {
+			if (typeof id === "undefined") {
 				return;
 			}
 			var i = this.indexOf_(id);
@@ -92,8 +92,8 @@ package('kb', function(exports) {
 				this.stages.push(stage);
 			}
 
-			stage.on('closed', this.handleClose, this);
-			stage.on('urlChanged', this.handleURLChanged, this);
+			stage.on("closed", this.handleClose, this);
+			stage.on("urlChanged", this.handleURLChanged, this);
 			this.changed();
 			return stage.id;
 		},
@@ -120,8 +120,8 @@ package('kb', function(exports) {
 		addListeners: function() {
 			var self = this;
 			this.stages.map(function(stage) {
-				stage.on('closed', self.handleClose, self);
-				stage.on('urlChanged', self.handleURLChanged, self);
+				stage.on("closed", self.handleClose, self);
+				stage.on("urlChanged", self.handleURLChanged, self);
 			});
 		},
 
@@ -161,8 +161,8 @@ package('kb', function(exports) {
 				if (el === null) {
 					return null;
 				}
-				if (getClassList(el).contains('stage')) {
-					var id = GetDataAttribute(el, 'id');
+				if (getClassList(el).contains("stage")) {
+					var id = GetDataAttribute(el, "id");
 					return this.stageById(id);
 				}
 				el = el.parentElement;
@@ -183,14 +183,14 @@ package('kb', function(exports) {
 			if (stage) {
 				var locFrom = kb.convert.URLToLocation(stage.url);
 				var locTo = kb.convert.URLToLocation(url);
-				if (locFrom.host === '') {
+				if (locFrom.host === "") {
 					url = locTo.path;
 				} else {
-					url = '//' + locFrom.host + locTo.path;
+					url = "//" + locFrom.host + locTo.path;
 				}
 			}
 
-			var link = GetDataAttribute(target, 'link');
+			var link = GetDataAttribute(target, "link");
 			var link = link || ref.link;
 			var title = target.innerText;
 
@@ -212,22 +212,22 @@ package('kb', function(exports) {
 
 		handleClickLink: function(ev) {
 			var t = ev.target;
-			if (t.nodeName !== 'A') {
+			if (t.nodeName !== "A") {
 				return;
 			}
-			if (getClassList(t).contains('external-link')) {
+			if (getClassList(t).contains("external-link")) {
 				return;
 			}
 			if ((t.onclick != null) || (t.onmousedown != null) || (t.onmouseup != null)) {
 				return;
 			}
 
-			var href = t.attributes['href'];
-			if (typeof href === 'undefined') {
+			var href = t.attributes["href"];
+			if (typeof href === "undefined") {
 				return;
 			}
 			var path = href.value;
-			if ((path === '') || (path === '/') || (path === '#')) {
+			if ((path === "") || (path === "/") || (path === "#")) {
 				return;
 			}
 

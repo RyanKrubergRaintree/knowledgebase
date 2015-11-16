@@ -1,15 +1,15 @@
-package('kb.app', function(exports) {
-	'use strict';
+package("kb.app", function(exports) {
+	"use strict";
 
 	window.KBUser = "Egon Elbre";
 	window.KBHomePage = "Community=Welcome";
 
-	depends('app.css');
+	depends("app.css");
 
-	depends('Crumbs.js');
-	depends('Lineup.js');
-	depends('Site.js');
-	depends('Selection.js');
+	depends("Crumbs.js");
+	depends("Lineup.js");
+	depends("Site.js");
+	depends("Selection.js");
 
 	var app = exports;
 
@@ -31,7 +31,7 @@ package('kb.app', function(exports) {
 		};
 	}
 
-	initialize(document.getElementById('site'));
+	initialize(document.getElementById("site"));
 
 	// closing of the last page
 	document.onkeydown = function(ev) {
@@ -39,9 +39,9 @@ package('kb.app', function(exports) {
 
 		function elementIsEditable(elem) {
 			return elem && (
-				((elem.nodeName === 'INPUT') && (elem.type === 'text')) ||
-				(elem.nodeName === 'TEXTAREA') ||
-				(elem.contentEditable === 'true')
+				((elem.nodeName === "INPUT") && (elem.type === "text")) ||
+				(elem.nodeName === "TEXTAREA") ||
+				(elem.contentEditable === "true")
 			);
 		}
 

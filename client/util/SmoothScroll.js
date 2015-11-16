@@ -1,13 +1,13 @@
-package('kb.util', function(exports){
-	'use strict';
+package("kb.util", function(exports) {
+	"use strict";
 
 	var timer = null,
 		speed = 0.09;
 
 	// returns true, if no additional movement is necessary
-	function scrollTowards(target){
-		if((typeof target === 'undefined') ||
-			(target === null) || (target.parentNode === null)){
+	function scrollTowards(target) {
+		if ((typeof target === "undefined") ||
+			(target === null) || (target.parentNode === null)) {
 			return true;
 		}
 
@@ -24,8 +24,8 @@ package('kb.util', function(exports){
 		if (overTop || overBottom) {
 			newTop = target.offsetTop - parent.offsetTop - parent.clientHeight / 2 + target.clientHeight / 2;
 		}
-		parent.scrollTop = (speed*newTop + (1 - speed)*parent.scrollTop);
-		if(Math.abs(parent.scrollTop - newTop) < 2){
+		parent.scrollTop = (speed * newTop + (1 - speed) * parent.scrollTop);
+		if (Math.abs(parent.scrollTop - newTop) < 2) {
 			parent.scrollTop = newTop;
 		}
 
@@ -33,20 +33,20 @@ package('kb.util', function(exports){
 		if (overLeft || overRight) {
 			newLeft = target.offsetLeft - parent.offsetLeft - parent.clientWidth / 2 + target.clientWidth / 2;
 		}
-		parent.scrollLeft = (speed*newLeft + (1 - speed)*parent.scrollLeft);
-		if(Math.abs(parent.scrollLeft - newLeft) < 2){
+		parent.scrollLeft = (speed * newLeft + (1 - speed) * parent.scrollLeft);
+		if (Math.abs(parent.scrollLeft - newLeft) < 2) {
 			parent.scrollLeft = newLeft;
 		}
 
-		if((parent.scrollTop === prevTop) && (parent.scrollLeft === prevLeft)){
+		if ((parent.scrollTop === prevTop) && (parent.scrollLeft === prevLeft)) {
 			return true;
 		}
 		return (parent.scrollTop === newTop) && (parent.scrollLeft === newLeft);
 	}
 
-	function cancel(){
-		if(timer){
-			if(window.requestAnimationFrame){
+	function cancel() {
+		if (timer) {
+			if (window.requestAnimationFrame) {
 				window.cancelAnimationFrame(timer);
 			} else {
 				window.clearTimeout(timer);
@@ -55,19 +55,24 @@ package('kb.util', function(exports){
 		}
 	}
 
-	function to(target){
+	function to(target) {
 		cancel();
-		if(scrollTowards(target)){
+		if (scrollTowards(target)) {
 			return;
 		}
 
-		if(window.requestAnimationFrame){
-			timer = window.requestAnimationFrame(function(){ to(target); });
+		if (window.requestAnimationFrame) {
+			timer = window.requestAnimationFrame(function() {
+				to(target);
+			});
 		} else {
-			timer = window.setTimeout(function(){ to(target); }, 15);
+			timer = window.setTimeout(function() {
+				to(target);
+			}, 15);
 		}
 	}
 
-	exports.SmoothScroll = { to: to };
+	exports.SmoothScroll = {
+		to: to
+	};
 });
-

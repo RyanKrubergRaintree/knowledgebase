@@ -1,14 +1,14 @@
-package('kb.item.content', function(exports) {
-	'use strict';
+package("kb.item.content", function(exports) {
+	"use strict";
 
-	depends('SimpleForm.css');
+	depends("SimpleForm.css");
 
-	exports['simple-form'] = React.createClass({
-		displayName: 'SimpleForm',
+	exports["simple-form"] = React.createClass({
+		displayName: "SimpleForm",
 		getInitialState: function() {
 			return {
-				error: '',
-				message: ''
+				error: "",
+				message: ""
 			};
 		},
 
@@ -20,32 +20,32 @@ package('kb.item.content', function(exports) {
 
 			if (xhr.status !== 200) {
 				this.setState({
-					message: '',
+					message: "",
 					error: xhr.responseText
 				});
 				return;
 			}
-			var message = 'done';
-			if (xhr.responseText !== '') {
+			var message = "done";
+			if (xhr.responseText !== "") {
 				message = xhr.responseText;
 			}
 			this.setState({
 				message: message,
-				error: ''
+				error: ""
 			});
 			this.props.stage.refresh();
 		},
 		errored: function() {
 			this.setState({
-				message: '',
-				error: 'Unknown error.'
+				message: "",
+				error: "Unknown error."
 			});
 		},
 
 		click: function(ev) {
 			this.setState({
-				error: '',
-				message: 'processing...'
+				error: "",
+				message: "processing..."
 			});
 
 			var url = this.props.item.url;
@@ -54,9 +54,9 @@ package('kb.item.content', function(exports) {
 			xhr.onreadystatechange = this.done;
 			xhr.onerror = this.errored;
 
-			xhr.open('POST', url, true);
+			xhr.open("POST", url, true);
 
-			xhr.setRequestHeader('action', GetDataAttribute(ev.currentTarget, 'action'));
+			xhr.setRequestHeader("action", GetDataAttribute(ev.currentTarget, "action"));
 
 			var data = new FormData();
 			var items = this.props.item.items || [];
@@ -64,7 +64,7 @@ package('kb.item.content', function(exports) {
 			items.map(function(item) {
 				var id = item.id || item.label;
 				var node = self.refs[id];
-				if (typeof node !== 'undefined') {
+				if (typeof node !== "undefined") {
 					var value = node.value;
 					data.append(id, value);
 				}
@@ -81,34 +81,34 @@ package('kb.item.content', function(exports) {
 
 			var items = item.items || [];
 			return React.DOM.form({
-					className: 'item-content content-simple-form',
+					className: "item-content content-simple-form",
 					onSubmit: function(ev) {
 						ev.preventDefault();
 					}
 				},
 				item.text ? React.DOM.p({}, item.text) : null,
-				message !== '' ? React.DOM.p({
-					className: 'message'
+				message !== "" ? React.DOM.p({
+					className: "message"
 				}, message) : null,
-				error !== '' ? React.DOM.p({
-					className: 'error'
+				error !== "" ? React.DOM.p({
+					className: "error"
 				}, error) : null,
 				items.map(function(item, i) {
 					switch (item.type) {
-						case 'field':
+						case "field":
 							return React.DOM.input({
 								key: i,
 								ref: item.id || item.label,
 								name: item.id || item.label,
 								placeholder: item.label
 							});
-						case 'button':
+						case "button":
 							return React.DOM.button({
 								key: i,
-								'data-action': item.action,
+								"data-action": item.action,
 								onClick: self.click
 							}, item.caption);
-						case 'option':
+						case "option":
 							return React.DOM.select({
 								key: i,
 								ref: item.id,
