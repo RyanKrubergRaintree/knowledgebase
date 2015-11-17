@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/auth/provider"
 	"github.com/raintreeinc/knowledgebase/client"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
@@ -125,6 +127,24 @@ func main() {
 	authServer := auth.NewServer(ruleset, db)
 	http.Handle("/auth/",
 		http.StripPrefix("/auth", authServer))
+
+	if key := os.Getenv("GPLUS_KEY"); key != "" {
+		authServer.Provider["google"] = &provider.Google{
+			ClientID: key,
+			// Add clientSecrete
+		}
+	}
+	if caskey := os.Getenv("CASKEY"); caskey != "" {
+		key, err := base64.StdEncoding.DecodeString(caskey)
+		if err != nil {
+			log.Fatal(err)
+		}
+		authServer.Provider["community"] = &provider.CAS{
+			Provider: "community",
+			Key:      key,
+		}
+	}
+	authServer.Provider["guest"] = db.Context("admin").GuestLogin()
 
 	// create server
 	server := kb.NewServer(authServer, db)

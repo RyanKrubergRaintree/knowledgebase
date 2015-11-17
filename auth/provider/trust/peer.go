@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"errors"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -18,9 +17,8 @@ var (
 )
 
 var (
-	PeerNotTrusted    = errors.New("Peer is not trusted.")
-	RequestNotTrusted = errors.New("Request is not trusted.")
-	TimeSkewed        = errors.New("Time is skewed.")
+	ErrUnauthorized = errors.New("Invalid authorization header.")
+	ErrTimeSkewed   = errors.New("Time is skewed.")
 )
 
 const timeLayout = time.RFC3339
@@ -32,15 +30,14 @@ type Peer struct {
 }
 
 // Sign signs the request from id.
-// After calling this function request mustn't be further modified.
-func (peer Peer) Sign(id string, req *http.Request) error {
+func (peer Peer) Sign(id string) (string, error) {
 	ts := time.Now().Format(timeLayout)
 	nonce, err := generateNonce()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	mac := Sign(SerializeParams(id, ts, nonce, req), peer.Key)
+	mac := Sign(SerializeValues(id, ts, nonce), peer.Key)
 
 	v := url.Values{}
 	v.Set("id", id)
@@ -48,50 +45,48 @@ func (peer Peer) Sign(id string, req *http.Request) error {
 	v.Set("nonce", nonce)
 	v.Set("mac", string(mac))
 
-	req.Header.Set("Authorization", "KB "+v.Encode())
-	return nil
+	return "KB " + v.Encode(), nil
 }
 
 // Verify authenticates whether the request is trusted.
-func (peer Peer) Verify(req *http.Request) (id string, err error) {
+func (peer Peer) Verify(auth string) (id string, err error) {
 	now := time.Now()
 
-	auth := req.Header.Get("Authorization")
 	if auth == "" || !strings.HasPrefix(auth, "KB ") {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
 	if len(auth) > MaxAuthorizationSize {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
 	v, err := url.ParseQuery(auth[3:])
 	if err != nil {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
 	id, ts, nonce, mac := v.Get("id"), v.Get("ts"), v.Get("nonce"), v.Get("mac")
 
 	if id == "" || ts == "" || nonce == "" {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
 	sentAt, err := time.Parse(timeLayout, ts)
 	if err != nil {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 	skew := now.Sub(sentAt)
 	if skew > MaxRequestSkew || -skew > MaxRequestSkew {
-		return "", TimeSkewed
+		return "", ErrTimeSkewed
 	}
 
 	if err := nonceHistory.Record(nonce, now); err != nil {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
-	expected := Sign(SerializeParams(id, ts, nonce, req), peer.Key)
+	expected := Sign(SerializeValues(id, ts, nonce), peer.Key)
 	if !hmac.Equal(expected, []byte(mac)) {
-		return "", RequestNotTrusted
+		return "", ErrUnauthorized
 	}
 
 	return id, nil
@@ -101,13 +96,6 @@ func Sign(serialized, key []byte) []byte {
 	m := hmac.New(sha1.New, key)
 	m.Write(serialized)
 	return m.Sum(nil)
-}
-
-func SerializeParams(id, ts, nonce string, req *http.Request) []byte {
-	return SerializeValues(
-		id, ts, nonce,
-		req.Host, req.URL.Path,
-	)
 }
 
 func SerializeValues(values ...string) []byte {
