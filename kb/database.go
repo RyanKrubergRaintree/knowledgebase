@@ -131,15 +131,15 @@ type Index interface {
 func init() { gob.Register(User{}) }
 
 type User struct {
-	ID        Slug
-	Email     string
-	Name      string
-	Company   string
-	Admin     bool
-	MaxAccess Rights
+	ID        Slug   `json:"id"`
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	Company   string `json:"company"`
+	Admin     bool   `json:"admin"`
+	MaxAccess Rights `json:"-"`
 
-	AuthID       string
-	AuthProvider string
+	AuthID       string `json:"-"`
+	AuthProvider string `json:"-"`
 }
 
 type Group struct {
