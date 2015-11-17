@@ -33,7 +33,6 @@ import (
 
 // TODO: add
 //  https://github.com/unrolled/secure
-//  https://github.com/justinas/nosurf
 
 var (
 	addr     = flag.String("listen", ":80", "http server `address`")
@@ -125,13 +124,13 @@ func main() {
 	// start auth server
 	ruleset := MustLoadRules(*rules)
 	authServer := auth.NewServer(ruleset, db)
-	http.Handle("/auth/",
-		http.StripPrefix("/auth", authServer))
+	http.Handle("/system/auth/",
+		http.StripPrefix("/system/auth", authServer))
 
 	if key := os.Getenv("GPLUS_KEY"); key != "" {
 		authServer.Provider["google"] = &provider.Google{
-			ClientID: key,
-			// Add clientSecrete
+			ClientID:     key,
+			ClientSecret: os.Getenv("GPLUS_SECRET"),
 		}
 	}
 	if caskey := os.Getenv("CASKEY"); caskey != "" {

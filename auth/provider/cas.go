@@ -27,7 +27,6 @@ func (conf *CAS) Verify(params, code string) (kb.User, error) {
 	user := p.Get("user")
 	company := p.Get("company")
 	companyid := p.Get("companyid")
-
 	if company+"="+user != id {
 		return kb.User{}, errors.New("invalid id provided")
 	}

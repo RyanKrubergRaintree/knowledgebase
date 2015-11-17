@@ -12,7 +12,8 @@ import (
 )
 
 type Google struct {
-	ClientID string
+	ClientID     string
+	ClientSecret string
 }
 
 func (conf *Google) Verify(user, code string) (kb.User, error) {
