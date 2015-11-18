@@ -1,35 +1,33 @@
 package("kb.boot", function(exports) {
 	"use strict";
 
+	depends("Session.js");
+
 	depends("app.css");
 	depends("Login.css");
 
 	var Guest = React.createClass({
-		getInitialState: function() {
-			return {
-				processing: false,
-				failure: false
-			};
-		},
+
 		login: function(ev) {
 			ev.preventDefault();
 
-			var username = this.refs.username.value;
-			var password = this.refs.password.value;
-
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = this.change;
-			xhr.onerror = this.error;
-			xhr.open("POST", "/system/auth/guest");
-
 			var form = new FormData();
-			form.append("user", username);
-			form.append("code", password);
+			form.append("user", this.refs.username.value);
+			form.append("code", this.refs.password.value);
 
-			xhr.send(form);
+			kb.Session.fetch({
+				url: this.props.url,
+				ondone: this.change,
+				onerror: this.error,
+				body: form
+			});
 		},
-		change: function(ev) {
-			console.log(ev);
+		change: function(response) {
+			if (!response.ok) {
+				this.props.onFailure(response.text);
+				return;
+			}
+			this.props.onSuccess(response.json);
 		},
 		error: function(ev) {
 			console.log(ev);
@@ -69,7 +67,8 @@ package("kb.boot", function(exports) {
 							tabIndex: 2
 						}))
 					)
-				)));
+				))
+			);
 		}
 	});
 
@@ -83,7 +82,27 @@ package("kb.boot", function(exports) {
 	});
 
 	exports.Login = React.createClass({
+		getInitialState: function() {
+			return {
+				error: ""
+			};
+		},
+		loginFailed: function(message) {
+			this.setState({
+				error: message
+			});
+		},
 		render: function() {
+			var failure = null;
+			if (this.state.error !== "") {
+				failure = new React.DOM.div({
+						className: "login-failed"
+					},
+					React.DOM.h2(null, "Login failed"),
+					React.DOM.p(null, this.state.error)
+				);
+			}
+
 			return React.DOM.div({
 					id: "login"
 				},
@@ -95,12 +114,20 @@ package("kb.boot", function(exports) {
 				}, React.DOM.div({
 						className: "modal"
 					},
+
+					failure,
+
 					React.DOM.h2(null, "Customer Login:"),
 					React.createElement(Guest, {
-						url: "/system/auth/guest"
+						url: "/system/auth/guest",
+						onSuccess: this.props.onSuccess,
+						onFailure: this.loginFailed
 					}),
 					React.DOM.h2(null, "Employee Login:"),
-					React.createElement(Google)
+					React.createElement(Google, {
+						onSuccess: this.props.onSuccess,
+						onFailure: this.loginFailed
+					})
 				))
 			);
 		}

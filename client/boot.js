@@ -3,6 +3,7 @@ package("kb.boot", function(exports) {
 
 	depends("app.css");
 	depends("Login.js");
+	depends("Session.js");
 
 	var Bootstrap = React.createClass({
 		componentDidMount: function() {
@@ -17,25 +18,27 @@ package("kb.boot", function(exports) {
 
 		getInitialState: function() {
 			return {
-				context: {
-					user: "Egon Elbre",
-					home: "Community=Welcome",
-					token: null
-				}
+				session: null
 			};
 		},
 
-		loggedIn: function(user) {
-
+		loggedIn: function(session) {
+			this.setState({
+				session: new kb.Session(session)
+			});
 		},
 		render: function() {
-			var context = this.state.context;
-			if (context.token === null) {
+			var session = this.state.session;
+			if (session === null) {
 				return React.createElement(kb.boot.Login, {
-					onLoggedIn: this.loggedIn
+					onSuccess: this.loggedIn
 				});
 			}
-			return React.DOM.div({}, "SITE");
+
+			return React.DOM.div({},
+				"Logged in as: ",
+				JSON.stringify(session)
+			);
 		}
 	});
 

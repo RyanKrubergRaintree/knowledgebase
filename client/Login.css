@@ -33,3 +33,9 @@
 	background: rgba(0,0,0,0.01);
 	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
 }
+
+#login .login-failed {
+    background: #faa;
+    padding: .5em 1em;
+    margin-top: 1em;
+}
