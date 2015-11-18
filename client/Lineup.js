@@ -126,7 +126,13 @@ package("kb", function(exports) {
 			});
 		},
 
-		updateRefs: function(nextstages) {
+		updateRefs: function(refs) {
+			var self = this;
+			this.updateStages(refs.map(function(ref) {
+				return new kb.Stage(self.session_, ref);
+			}));
+		},
+		updateStages: function(nextstages) {
 			this.removeListeners();
 
 			var stages = this.stages.slice();

@@ -1,19 +1,17 @@
 package("kb", function(exports) {
 	"use strict";
 
-	depends("Lineup.js");
 	depends("Convert.js");
-	depends("Stage.js");
 
 	// converts to
 	// #┃ref1┃ref2┃ref3
-	function toHash(stages) {
+	function stagesToHash(stages) {
 		return "#" + stages.map(kb.convert.ReferenceToLink).join("|");
 	}
 
 	// converts from
 	// #┃ref1┃ref2┃ref3
-	function fromHash(hash) {
+	function hashToRefs(hash) {
 		// IE doesn"t have the first #
 		if (hash[0] === "#") {
 			hash = hash.substr(1);
@@ -21,14 +19,14 @@ package("kb", function(exports) {
 			hash = hash.substr(0);
 		}
 
-		var stages = [];
+		var refs = [];
 		hash.split("|").map(function(link) {
 			if (link.trim() === "") {
 				return;
 			}
-			stages.push(new kb.Stage(null, kb.convert.LinkToReference(link)));
+			refs.push(kb.convert.LinkToReference(link));
 		});
-		return stages;
+		return refs;
 	}
 
 	exports.Crumbs = Crumbs;
@@ -44,14 +42,14 @@ package("kb", function(exports) {
 			if ((hash === "") || (hash === "#")) {
 				this.lineup_.openLink(defaultPage);
 			} else {
-				this.lineup_.updateRefs(fromHash(window.location.hash));
+				this.lineup_.updateRefs(hashToRefs(window.location.hash));
 			}
 			this.lineup_.on("changed", this.lineupChanged, this);
 
 			var self = this;
 			window.onhashchange = function( /*ev*/ ) {
 				if (window.location.hash !== self.navigatingTo_) {
-					self.lineup_.updateRefs(fromHash(window.location.hash));
+					self.lineup_.updateRefs(hashToRefs(window.location.hash));
 				}
 			};
 		},
@@ -61,7 +59,7 @@ package("kb", function(exports) {
 		},
 
 		lineupChanged: function( /*ev*/ ) {
-			this.navigatingTo_ = toHash(this.lineup_.stages);
+			this.navigatingTo_ = stagesToHash(this.lineup_.stages);
 			window.location.hash = this.navigatingTo_;
 		}
 	};
