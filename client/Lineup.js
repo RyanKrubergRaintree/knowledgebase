@@ -7,10 +7,11 @@ package("kb", function(exports) {
 
 	exports.Lineup = Lineup;
 
-	function Lineup() {
+	function Lineup(session) {
 		this.stages = [];
 		this.notifier = new kb.util.Notifier();
 		this.notifier.mixto(this);
+		this.session_ = session;
 	}
 
 	Lineup.prototype = {
@@ -82,7 +83,7 @@ package("kb", function(exports) {
 		// insteadOf, optional
 		open: function(props) {
 			this.trim_(props.after);
-			var stage = new kb.Stage(props);
+			var stage = new kb.Stage(this.session_, props);
 
 			var i = this.indexOf_(props.insteadOf);
 			if (i >= 0) {

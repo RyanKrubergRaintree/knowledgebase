@@ -32,8 +32,7 @@ package("kb", function(exports) {
 						"10.2.100",
 						"9.4"
 					],
-					//TODO: fix
-					selected: "10.2.600"
+					selected: this.props.Session.branch
 				}
 			};
 		},
@@ -139,7 +138,7 @@ package("kb", function(exports) {
 				}
 			};
 
-			var username = this.props.User;
+			var username = this.props.username;
 			if (username.indexOf("=") >= 0) {
 				var tokens = username.split("=");
 				return React.DOM.div({
@@ -168,7 +167,7 @@ package("kb", function(exports) {
 
 			var lineup = this.props.Lineup;
 			lineup.clear();
-			lineup.openLink(KBHomePage);
+			lineup.openLink(this.props.Session.home);
 		},
 		createNewPage: function(ev) {
 			ev.preventDefault();
@@ -235,7 +234,7 @@ package("kb", function(exports) {
 					id: "content"
 				},
 				React.createElement(LoginInfo, {
-					User: KBUser
+					username: this.props.Session.user.name
 				}),
 				React.createElement(kb.Lineup.View, this.props)
 			);
@@ -245,7 +244,7 @@ package("kb", function(exports) {
 	exports.Site = React.createClass({
 		displayName: "Site",
 		render: function() {
-			return React.DOM.div({},
+			return React.DOM.div(null,
 				React.createElement(Header, this.props),
 				React.createElement(Content, this.props)
 			);

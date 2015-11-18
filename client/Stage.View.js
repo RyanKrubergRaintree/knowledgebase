@@ -86,6 +86,9 @@ package("kb.Stage", function(exports) {
 
 	var NewPage = React.createClass({
 		displayName: "NewPage",
+		contextTypes: {
+			Session: React.PropTypes.object
+		},
 		tryCreate: function(ev) {
 			var stage = this.props.stage;
 
@@ -105,9 +108,9 @@ package("kb.Stage", function(exports) {
 			};
 		},
 
-		groupsReceived: function(xhr) {
-			if (xhr.status === 200) {
-				var info = JSON.parse(xhr.responseText);
+		groupsReceived: function(response) {
+			if (response.ok) {
+				var info = response.json;
 				this.setState({
 					groups: info.groups || []
 				});
@@ -115,17 +118,14 @@ package("kb.Stage", function(exports) {
 		},
 
 		componentDidMount: function() {
-			var xhr = new XMLHttpRequest();
-			var self = this;
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState !== 4) {
-					return;
+			this.context.Session.fetch({
+				method: "GET",
+				url: "/user=editor-groups",
+				ondone: this.groupsReceived,
+				headers: {
+					"Accept": "application/json"
 				}
-				self.groupsReceived(xhr);
-			};
-			xhr.open("GET", "/user=editor-groups", true);
-			xhr.setRequestHeader("Accept", "application/json");
-			xhr.send();
+			});
 		},
 
 		ownerChanged: function(ev) {

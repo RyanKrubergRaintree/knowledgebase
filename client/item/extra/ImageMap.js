@@ -5,17 +5,20 @@ package("kb.item.content", function(exports) {
 
 	exports["image-map"] = React.createClass({
 		displayName: "ImageMap",
+		contextTypes: {
+			CurrentSelection: React.PropTypes.object
+		},
 		areaHoverStart: function(ev) {
 			var id = GetDataAttribute(ev.target, "focusid");
-			kb.app.CurrentSelection.highlight(id);
+			this.context.CurrentSelection.highlight(id);
 		},
 		areaHoverEnd: function(ev) {
 			var id = GetDataAttribute(ev.target, "focusid");
-			kb.app.CurrentSelection.unhighlight(id);
+			this.context.CurrentSelection.unhighlight(id);
 		},
 		areaSelect: function(ev) {
 			var id = GetDataAttribute(ev.target, "focusid");
-			kb.app.CurrentSelection.toggleSelect(id);
+			this.context.CurrentSelection.toggleSelect(id);
 		},
 		render: function() {
 			var item = this.props.item;

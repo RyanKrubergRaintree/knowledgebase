@@ -110,21 +110,24 @@ package("kb.item.content", function(exports) {
 
 	exports["dita-index"] = React.createClass({
 		displayName: "DITAIndex",
+		contextTypes: {
+			Lineup: React.PropTypes.object
+		},
 		getInitialState: function() {
 			return {
-				root: build(this.props.item.root, kb.app.Lineup.stages)
+				root: build(this.props.item.root, this.context.Lineup.stages)
 			};
 		},
-		activeChanged: function(ev) {
+		activeChanged: function() {
 			this.setState({
-				root: build(this.props.item.root, ev.lineup.stages)
+				root: build(this.props.item.root, this.context.Lineup.stages)
 			});
 		},
 		componentDidMount: function() {
-			kb.app.Lineup.on("changed", this.activeChanged, this);
+			this.context.Lineup.on("changed", this.activeChanged, this);
 		},
 		componentWillUnmount: function() {
-			kb.app.Lineup.remove(this);
+			this.context.Lineup.remove(this);
 		},
 		render: function() {
 			if (this.props.item === null) {

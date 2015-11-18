@@ -2,14 +2,13 @@ package("kb.boot", function(exports) {
 	"use strict";
 
 	depends("Session.js");
-
-	depends("app.css");
 	depends("Login.css");
 
 	var Guest = React.createClass({
 
 		login: function(ev) {
 			ev.preventDefault();
+			ev.stopPropagation();
 
 			var form = new FormData();
 			form.append("user", this.refs.username.value);

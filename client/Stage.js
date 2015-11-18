@@ -7,10 +7,6 @@ package("kb", function(exports) {
 
 	depends("util/ParseJSON.js");
 
-	function success(xhr) {
-		return (200 <= xhr.status) && (xhr.status < 300);
-	}
-
 	function bindready(xhr, fn, self) {
 		return function() {
 			if (xhr.readyState !== 4) {
@@ -59,7 +55,8 @@ package("kb", function(exports) {
 	// Stage represents a staging area where modifications/loading are done.
 	exports.Stage = Stage;
 
-	function Stage(ref, page) {
+	function Stage(session, ref, page) {
+		this.session_ = session;
 		this.id = GenerateID();
 
 		this.creating = (ref.url === null) || (ref.url === "");
@@ -136,19 +133,18 @@ package("kb", function(exports) {
 			return this.allowed.indexOf("DELETE") >= 0;
 		},
 
-		updateStatus_: function(xhr) {
-			var allowed = xhr.getResponseHeader("Allow");
+		updateStatus_: function(response) {
+			var allowed = response.xhr.getResponseHeader("Allow");
 			if (typeof allowed === "string") {
 				this.allowed = allowed.split(",").map(function(v) {
 					return v.trim();
 				});
 			}
 
-			var ok = success(xhr);
 			this.state = "loaded";
-			if (!ok) {
+			if (!response.ok) {
 				this.state = "error";
-				if (xhr.status === 404) {
+				if (response.xhr.status === 404) {
 					this.state = "not-found";
 					if (this.canCreate()) {
 						this.creating = true;
@@ -156,11 +152,11 @@ package("kb", function(exports) {
 				}
 			}
 
-			this.lastStatus = xhr.status;
-			this.lastStatusText = xhr.statusText;
-			this.lastError = xhr.responseText;
+			this.lastStatus = response.status;
+			this.lastStatusText = response.statusText;
+			this.lastError = response.text;
 
-			return ok;
+			return response.ok;
 		},
 
 		patch: function(op) {
@@ -183,23 +179,23 @@ package("kb", function(exports) {
 			var patch = this.patches_.shift();
 			if (patch) {
 				this.patching_ = true;
-
-				var xhr = new XMLHttpRequest();
-				xhr.onreadystatechange = bindready(xhr, this.patchDone_, this);
-				xhr.onerror = this.patchError_.bind(this);
-
-				xhr.open("POST", this.url, true);
-
-				xhr.setRequestHeader("Accept", "application/json");
-				xhr.setRequestHeader("Content-Type", "application/json");
-
-				xhr.send(JSON.stringify(patch));
+				this.session_.fetch({
+					method: "POST",
+					url: this.url,
+					ondone: this.patchDone_.bind(this),
+					onerror: this.patchError_.bind(this),
+					headers: {
+						"Accept": "application/json",
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(patch)
+				});
 			}
 		},
-		patchDone_: function(xhr) {
+		patchDone_: function(response) {
 			this.patching_ = false;
 
-			if (!this.updateStatus_(xhr)) {
+			if (!this.updateStatus_(response)) {
 				//TODO: don"t drop changes in case of errors
 				this.patches_ = [];
 				this.patching_ = false;
@@ -225,29 +221,29 @@ package("kb", function(exports) {
 			this.state = "loading";
 			this.changed(false);
 
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = bindready(xhr, this.pullDone_, this);
-			xhr.onerror = this.pullError_.bind(this);
-
-			xhr.open("GET", this.url, true);
-			xhr.setRequestHeader("Accept", "application/json");
-			xhr.send();
+			this.session_.fetch({
+				method: "GET",
+				url: this.url,
+				ondone: this.pullDone_.bind(this),
+				onerror: this.pullError_.bind(this),
+				headers: {
+					"Accept": "application/json"
+				}
+			});
 		},
-		pullDone_: function(xhr) {
-			if (!this.updateStatus_(xhr)) {
+		pullDone_: function(response) {
+			if (!this.updateStatus_(response)) {
 				this.changed(true);
 				return;
 			}
 
-			var data = kb.util.ParseJSON(xhr.responseText),
+			var data = kb.util.ParseJSON(response.text),
 				page = new kb.Page(data);
-			if (xhr.responseURL) {
-				if (this.url !== xhr.responseURL) {
-					this.url = xhr.responseURL;
-					this.urlChanged();
-				}
-			}
 
+			if (this.url !== response.url) {
+				this.url = response.url;
+				this.urlChanged();
+			}
 
 			this.page = page;
 			this.state = "loaded";
@@ -271,24 +267,27 @@ package("kb", function(exports) {
 			this.url = "/" + this.link;
 			this.urlChanged();
 
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = bindready(xhr, this.createDone_, this);
-			xhr.onerror = this.createError_.bind(this);
-
-			xhr.open("PUT", this.url, true);
-			xhr.setRequestHeader("Accept", "application/json");
-			xhr.setRequestHeader("Content-Type", "application/json");
-			xhr.send(JSON.stringify({
-				title: this.title,
-				slug: this.link,
-				story: [{
-					id: GenerateID(),
-					type: "tags"
-				}, {
-					id: GenerateID(),
-					type: "factory"
-				}]
-			}));
+			this.session_.fetch({
+				method: "PUT",
+				url: this.url,
+				ondone: this.createDone_.bind(this),
+				onerror: this.createError_.bind(this),
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					title: this.title,
+					slug: this.link,
+					story: [{
+						id: GenerateID(),
+						type: "tags"
+					}, {
+						id: GenerateID(),
+						type: "factory"
+					}]
+				})
+			});
 
 			this.changed(false);
 		},
@@ -314,17 +313,15 @@ package("kb", function(exports) {
 				return;
 			}
 
-			var xhr = new XMLHttpRequest();
-			xhr.open("DELETE", this.url, true);
-
-			xhr.onreadystatechange = bindready(xhr, this.destroyDone_, this);
-			xhr.onerror = this.destroyError_.bind(this);
-
-			xhr.send();
-			return xhr;
+			this.session_.fetch({
+				method: "DELETE",
+				url: this.url,
+				ondone: this.destroyDone_.bind(this),
+				onerror: this.destroyError_.bind(this)
+			});
 		},
-		destroyDone_: function(ev) {
-			this.updateStatus_(ev.target);
+		destroyDone_: function(response) {
+			this.updateStatus_(response);
 			this.changed(false);
 			this.pull();
 		},

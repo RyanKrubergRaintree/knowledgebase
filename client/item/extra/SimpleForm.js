@@ -5,6 +5,9 @@ package("kb.item.content", function(exports) {
 
 	exports["simple-form"] = React.createClass({
 		displayName: "SimpleForm",
+		contextTypes: {
+			Session: React.PropTypes.object
+		},
 		getInitialState: function() {
 			return {
 				error: "",
@@ -48,17 +51,7 @@ package("kb.item.content", function(exports) {
 				message: "processing..."
 			});
 
-			var url = this.props.item.url;
-
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = this.done;
-			xhr.onerror = this.errored;
-
-			xhr.open("POST", url, true);
-
-			xhr.setRequestHeader("action", GetDataAttribute(ev.currentTarget, "action"));
-
-			var data = new FormData();
+			var form = new FormData();
 			var items = this.props.item.items || [];
 			var self = this;
 			items.map(function(item) {
@@ -66,10 +59,20 @@ package("kb.item.content", function(exports) {
 				var node = self.refs[id];
 				if (typeof node !== "undefined") {
 					var value = node.value;
-					data.append(id, value);
+					form.append(id, value);
 				}
 			});
-			xhr.send(data);
+
+			this.context.Session.fetch({
+				method: "POST",
+				url: this.props.item.url,
+				headers: {
+					"action": GetDataAttribute(ev.currentTarget, "action")
+				},
+				ondone: this.done,
+				onerror: this.errored,
+				body: form
+			});
 		},
 
 		render: function() {

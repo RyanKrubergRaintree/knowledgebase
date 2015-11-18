@@ -12,6 +12,7 @@ package("kb", function(exports) {
 			company: "",
 			admin: false
 		};
+		this.home = "Community=Welcome";
 		this.branch = context.branch || "10.2.600";
 		this.token = context.token || null;
 	}
@@ -44,11 +45,13 @@ package("kb", function(exports) {
 					return;
 				}
 
-				//TODO: add session expiring logic
+				//TODO: add authentication failure error
+
 				opts.ondone({
 					get json() {
 						return JSON.parse(xhr.responseText);
 					},
+					url: xhr.responseURL || opts.url,
 					status: xhr.status,
 					ok: xhr.status === 200,
 					statusText: xhr.statusText,

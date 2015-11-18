@@ -26,7 +26,7 @@ package("kb", function(exports) {
 			if (link.trim() === "") {
 				return;
 			}
-			stages.push(new kb.Stage(kb.convert.LinkToReference(link)));
+			stages.push(new kb.Stage(null, kb.convert.LinkToReference(link)));
 		});
 		return stages;
 	}
@@ -36,28 +36,33 @@ package("kb", function(exports) {
 	function Crumbs(lineup) {
 		this.lineup_ = lineup;
 		this.navigatingTo_ = "";
-
-		this.lineup_.on("changed", this.lineupChanged, this);
-		var self = this;
-		window.onhashchange = function( /*ev*/ ) {
-			if (window.location.hash !== self.navigatingTo_) {
-				self.lineup_.updateRefs(fromHash(window.location.hash));
-			}
-		};
 	}
 
 	Crumbs.prototype = {
-		lineupChanged: function( /*ev*/ ) {
-			this.navigatingTo_ = toHash(this.lineup_.stages);
-			window.location.hash = this.navigatingTo_;
-		},
-		initLineup: function(defaultPage) {
+		attach: function(defaultPage) {
 			var hash = window.location.hash;
 			if ((hash === "") || (hash === "#")) {
 				this.lineup_.openLink(defaultPage);
 			} else {
 				this.lineup_.updateRefs(fromHash(window.location.hash));
 			}
+			this.lineup_.on("changed", this.lineupChanged, this);
+
+			var self = this;
+			window.onhashchange = function( /*ev*/ ) {
+				if (window.location.hash !== self.navigatingTo_) {
+					self.lineup_.updateRefs(fromHash(window.location.hash));
+				}
+			};
+		},
+		detach: function() {
+			window.onhashchange = null;
+			this.lineup_.remove(this);
+		},
+
+		lineupChanged: function( /*ev*/ ) {
+			this.navigatingTo_ = toHash(this.lineup_.stages);
+			window.location.hash = this.navigatingTo_;
 		}
 	};
 });
