@@ -26,7 +26,7 @@ type Server struct {
 	DB       kb.Database
 	Provider map[string]Provider
 
-	sessions *session.Store
+	Sessions *session.Store
 }
 
 func NewServer(rules Rules, db kb.Database) *Server {
@@ -34,27 +34,65 @@ func NewServer(rules Rules, db kb.Database) *Server {
 		Rules:    rules,
 		DB:       db,
 		Provider: make(map[string]Provider),
-		sessions: session.NewStore(time.Hour),
+		Sessions: session.NewStore(time.Hour),
 	}
+}
+
+func (server *Server) params(w http.ResponseWriter, r *http.Request) (kb.User, session.Token, error) {
+	token, err := session.TokenFromString(r.Header.Get("X-Auth-Token"))
+	if err != nil {
+		return kb.User{}, session.ZeroToken, ErrUnauthorized
+	}
+
+	user, ok := server.Sessions.Load(token)
+	if !ok {
+		return kb.User{}, token, ErrUnauthorized
+	}
+
+	return user, token, nil
 }
 
 func (server *Server) Verify(w http.ResponseWriter, r *http.Request) (kb.User, error) {
-	token, err := session.TokenFromString(r.Header.Get("X-Auth-Token"))
+	user, _, err := server.params(w, r)
+	return user, err
+}
+
+type SessionInfo struct {
+	Token string  `json:"token"`
+	User  kb.User `json:"user"`
+}
+
+func (server *Server) info(w http.ResponseWriter, r *http.Request) {
+	tokstring := r.FormValue("token")
+	if tokstring == "" {
+		tokstring = r.Header.Get("X-Auth-Token")
+	}
+	token, err := session.TokenFromString(tokstring)
 	if err != nil {
-		return kb.User{}, ErrUnauthorized
+		http.Error(w, "Invalid token: "+err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	user, ok := server.sessions.Load(token)
+	user, ok := server.Sessions.Load(token)
 	if !ok {
-		return kb.User{}, ErrUnauthorized
+		http.Error(w, "Session expired.", http.StatusUnauthorized)
+		return
 	}
 
-	return user, nil
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&SessionInfo{
+		Token: token.String(),
+		User:  user,
+	})
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	providername := strings.TrimPrefix(r.URL.Path, "/")
+	if strings.HasPrefix(r.URL.Path, "/info") {
+		server.info(w, r)
+		return
+	}
 
+	providername := strings.TrimPrefix(r.URL.Path, "/")
 	provider, ok := server.Provider[providername]
 	if !ok {
 		http.Error(w, "Unknown authorization provider: "+providername, http.StatusNotFound)
@@ -74,20 +112,15 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := server.sessions.New(user)
+	token, err := server.Sessions.New(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	var result struct {
-		Token string  `json:"token"`
-		User  kb.User `json:"user"`
-	}
-
-	result.Token = token.String()
-	result.User = user
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&result)
+	json.NewEncoder(w).Encode(&SessionInfo{
+		Token: token.String(),
+		User:  user,
+	})
 }
