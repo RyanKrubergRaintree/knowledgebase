@@ -13,6 +13,12 @@ type CAS struct {
 	Key      []byte
 }
 
+func (conf *CAS) Info() map[string]string {
+	return map[string]string{
+		"kind": "cas",
+	}
+}
+
 func (conf *CAS) Verify(params, code string) (kb.User, error) {
 	id, err := trust.Peer{conf.Key}.Verify(code)
 	if err != nil {

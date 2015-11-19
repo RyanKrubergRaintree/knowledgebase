@@ -52,7 +52,8 @@ package("kb.boot", function(exports) {
 			if (session === null) {
 				return React.createElement(kb.boot.Login, {
 					onSuccess: this.loggedIn,
-					initialError: this.state.sessionError
+					initialError: this.state.sessionError,
+					providers: window.LoginProviders
 				});
 			}
 

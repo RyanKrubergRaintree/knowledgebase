@@ -16,6 +16,13 @@ type Google struct {
 	ClientSecret string
 }
 
+func (conf *Google) Info() map[string]string {
+	return map[string]string{
+		"kind":     "google",
+		"clientID": conf.ClientID,
+	}
+}
+
 func (conf *Google) Verify(user, code string) (kb.User, error) {
 	//TODO: verify that token is valid
 	token := code

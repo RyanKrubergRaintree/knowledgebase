@@ -4,8 +4,7 @@ package("kb.boot", function(exports) {
 	depends("Session.js");
 	depends("Login.css");
 
-	var Guest = React.createClass({
-
+	var LoginForm = React.createClass({
 		login: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -80,6 +79,19 @@ package("kb.boot", function(exports) {
 		}
 	});
 
+	var loginViews = {
+		"form": LoginForm,
+		"google": Google
+	};
+
+	//TODO: move this logic to server conf
+	var loginTitle = {
+		"guest": "Customer Login:",
+		"google": "Employee Login:"
+	};
+
+	var order = ["guest", "google"];
+
 	exports.Login = React.createClass({
 		getInitialState: function() {
 			return {
@@ -102,6 +114,33 @@ package("kb.boot", function(exports) {
 				);
 			}
 
+			var self = this;
+			var providers = this.props.providers;
+			var logins = [];
+			order.forEach(function(name) {
+				if (!providers.hasOwnProperty(name)) {
+					return;
+				}
+
+				var params = providers[name];
+				var clazz = loginViews[params.kind];
+				if (typeof clazz === "undefined" || clazz === null) {
+					return;
+				}
+
+				logins.push(React.DOM.h2({
+					key: "header-" + name
+				}, loginTitle[name]));
+
+				logins.push(React.createElement(clazz, {
+					key: name,
+					url: "/system/auth/" + name,
+					params: params,
+					onSuccess: self.props.onSuccess,
+					onFailure: self.loginFailed
+				}));
+			});
+
 			return React.DOM.div({
 					id: "login"
 				},
@@ -115,18 +154,7 @@ package("kb.boot", function(exports) {
 					},
 
 					failure,
-
-					React.DOM.h2(null, "Customer Login:"),
-					React.createElement(Guest, {
-						url: "/system/auth/guest",
-						onSuccess: this.props.onSuccess,
-						onFailure: this.loginFailed
-					}),
-					React.DOM.h2(null, "Employee Login:"),
-					React.createElement(Google, {
-						onSuccess: this.props.onSuccess,
-						onFailure: this.loginFailed
-					})
+					logins
 				))
 			);
 		}

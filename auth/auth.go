@@ -14,6 +14,7 @@ import (
 var ErrUnauthorized = errors.New("Unauthorized")
 
 type Provider interface {
+	Info() map[string]string
 	Verify(user, pass string) (kb.User, error)
 }
 

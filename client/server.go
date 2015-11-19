@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/raintreeinc/livepkg"
 
-	// "github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/auth"
 )
 
 type Info struct {
@@ -25,15 +26,17 @@ type Info struct {
 
 type Server struct {
 	Info
+	Login *auth.Server
 
 	bootstrap string
 	assets    http.Handler
 	client    http.Handler
 }
 
-func NewServer(info Info, dir string, development bool) *Server {
+func NewServer(info Info, login *auth.Server, dir string, development bool) *Server {
 	return &Server{
-		Info: info,
+		Info:  info,
+		Login: login,
 
 		bootstrap: filepath.Join(dir, "index.html"),
 		assets: http.StripPrefix("/assets/",
@@ -51,6 +54,15 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Site": func() Info { return server.Info },
+			"LoginProviders": func() template.JS {
+				info := map[string]interface{}{}
+				for name, provider := range server.Login.Provider {
+					info[name] = provider.Info()
+				}
+
+				data, _ := json.Marshal(info)
+				return template.JS(data)
+			},
 		},
 	).ParseGlob(server.bootstrap)
 

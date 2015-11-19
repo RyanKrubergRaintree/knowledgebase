@@ -44,6 +44,12 @@ func (db GuestLogin) Add(name, email, password string) error {
 	return err
 }
 
+func (db GuestLogin) Info() map[string]string {
+	return map[string]string{
+		"kind": "form",
+	}
+}
+
 func (db GuestLogin) Verify(name, password string) (kb.User, error) {
 	var salt, expect []byte
 	var email, authID string

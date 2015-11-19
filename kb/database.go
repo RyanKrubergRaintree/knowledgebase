@@ -78,6 +78,8 @@ type Access interface {
 
 type GuestLogin interface {
 	Add(name, email, password string) error
+	// implement auth.Provider
+	Info() map[string]string
 	Verify(name, password string) (User, error)
 }
 

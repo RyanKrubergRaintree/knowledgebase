@@ -6,12 +6,15 @@
 
 	<!-- styles -->
 	<link rel="stylesheet" type="text/css" href="/client/assets/css/materialdesignicons.css" async>
+	<link href='/client/assets/roboto/all.css' rel='stylesheet' type='text/css' async>
 
 	<script src="/client/assets/js/es5.js"></script>
 	<script src="/client/assets/js/dom.js"></script>
 	<script src="/client/assets/js/global.js?{{Site.Version}}"></script>
+	<script src="/client/assets/js/react.js?{{Site.Version}}"></script>
+	<script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
 
-	<link href='/client/assets/roboto/all.css' rel='stylesheet' type='text/css' async>
+	<script src="https://apis.google.com/js/platform.js"></script>
 
 	<!-- icons -->
 	<link rel="icon" type="image/png" href="/client/assets/ico/24.png" sizes="24x24">
@@ -22,14 +25,13 @@
 	<link rel="icon" type="image/png" href="/client/assets/ico/512.png" sizes="512x512">
 
 	<link rel="shortcut icon" href="/client/assets/ico/favicon.ico">
-
-	<script src="/client/assets/js/react.js?{{Site.Version}}"></script>
-	<script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
 </head>
 <body>
 	<div id="boot"></div>
 </body>
-
+<script>
+window.LoginProviders = {{ LoginProviders }};
+</script>
 <link rel="stylesheet" href="/client/~pkg.css?{{Site.Version}}">
 <script src="/client/~pkg.js?{{Site.Version}}"></script>
 

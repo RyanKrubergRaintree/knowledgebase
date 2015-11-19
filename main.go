@@ -94,21 +94,6 @@ func main() {
 	log.Printf("Starting with database %s\n", *database)
 	log.Printf("Starting %s on %s\n", *domain, *addr)
 
-	info := client.Info{
-		Domain:     *domain,
-		ShortTitle: "KB",
-		Title:      "Knowledge Base",
-		Company:    "Raintree Systems Inc.",
-
-		TrackingID: os.Getenv("TRACKING_ID"),
-		Version:    time.Now().Format("20060102150405"),
-	}
-
-	clientServer := client.NewServer(info, *clientdir, *development)
-	http.Handle("/client/",
-		http.StripPrefix("/client", clientServer))
-	http.Handle("/favicon.ico", clientServer)
-
 	// Load database
 	db, err := pgdb.New(*database)
 	if err != nil {
@@ -144,6 +129,21 @@ func main() {
 		}
 	}
 	authServer.Provider["guest"] = db.Context("admin").GuestLogin()
+
+	info := client.Info{
+		Domain:     *domain,
+		ShortTitle: "KB",
+		Title:      "Knowledge Base",
+		Company:    "Raintree Systems Inc.",
+
+		TrackingID: os.Getenv("TRACKING_ID"),
+		Version:    time.Now().Format("20060102150405"),
+	}
+
+	clientServer := client.NewServer(info, authServer, *clientdir, *development)
+	http.Handle("/client/",
+		http.StripPrefix("/client", clientServer))
+	http.Handle("/favicon.ico", clientServer)
 
 	// create server
 	server := kb.NewServer(authServer, db)
