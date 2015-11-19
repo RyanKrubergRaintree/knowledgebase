@@ -60,7 +60,7 @@ func (conf *Google) Verify(user, code string) (kb.User, error) {
 
 	if result.EmailVerified != "true" ||
 		result.Audience != conf.ClientID ||
-		result.Name != user {
+		result.Email != user {
 		return kb.User{}, errors.New("Invalid token")
 	}
 

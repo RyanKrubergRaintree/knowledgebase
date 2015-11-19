@@ -27,8 +27,8 @@ package("kb.boot", function(exports) {
 			}
 			this.props.onSuccess(response.json);
 		},
-		error: function(ev) {
-			console.log(ev);
+		error: function(err) {
+			this.props.onFailure(err);
 		},
 		render: function() {
 			return React.DOM.form({
@@ -71,11 +71,64 @@ package("kb.boot", function(exports) {
 	});
 
 	var Google = React.createClass({
+		logout: function() {
+			if (gapi.auth2) {
+				var auth = gapi.auth2.getAuthInstance();
+				if (auth) {
+					try {
+						auth.signOut();
+					} catch (ex) {}
+				}
+			}
+		},
+		backendLoginResult: function(response) {
+			if (!response.ok) {
+				this.props.onFailure(response.text);
+				this.logout();
+				return;
+			}
+			this.props.onSuccess(response.json);
+		},
+		error: function(err) {
+			this.logout();
+			this.props.onFailure(err);
+		},
+
+		success: function(user) {
+			var profile = user.getBasicProfile();
+			var token = user.getAuthResponse().id_token;
+
+			var form = new FormData();
+			form.append("user", profile.getEmail());
+			form.append("code", token);
+
+			kb.Session.fetch({
+				url: this.props.url,
+				ondone: this.backendLoginResult,
+				onerror: this.error,
+				body: form
+			});
+		},
+		failure: function(error) {
+			this.props.onFailure(error.reason);
+		},
+
+		componentDidMount: function() {
+			gapi.signin2.render("google-signin", {
+				"scope": "profile",
+				onsuccess: this.success,
+				onfailure: this.failure
+			});
+		},
+		componentWillUnmount: function() {
+
+		},
 		render: function() {
-			return React.DOM.a({
-				className: "button",
-				href: "#"
-			}, "Google");
+			return React.DOM.div(null,
+				React.DOM.div({
+					id: "google-signin"
+				}, "")
+			);
 		}
 	});
 

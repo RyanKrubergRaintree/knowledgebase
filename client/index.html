@@ -15,6 +15,7 @@
 	<script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
 
 	<script src="https://apis.google.com/js/platform.js"></script>
+	<meta id="google-signin-clientid" name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
 
 	<!-- icons -->
 	<link rel="icon" type="image/png" href="/client/assets/ico/24.png" sizes="24x24">
@@ -31,6 +32,9 @@
 </body>
 <script>
 window.LoginProviders = {{ LoginProviders }};
+
+//TODO: review whether it works in non-dev mode
+document.getElementById("google-signin-clientid").content = window.LoginProviders.google.clientID;
 </script>
 <link rel="stylesheet" href="/client/~pkg.css?{{Site.Version}}">
 <script src="/client/~pkg.js?{{Site.Version}}"></script>

@@ -31,6 +31,15 @@ package("kb", function(exports) {
 				url: "/system/auth/logout"
 			});
 
+			if (gapi.auth2) {
+				var auth = gapi.auth2.getAuthInstance();
+				if (auth) {
+					try {
+						auth.signOut();
+					} catch (ex) {}
+				}
+			}
+
 			this.notifier_.emit({
 				type: "session-finished",
 				error: ""
