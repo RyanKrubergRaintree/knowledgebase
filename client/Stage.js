@@ -196,7 +196,7 @@ package("kb", function(exports) {
 			this.patching_ = false;
 
 			if (!this.updateStatus_(response)) {
-				//TODO: don"t drop changes in case of errors
+				//TODO: don't drop changes in case of errors
 				this.patches_ = [];
 				this.patching_ = false;
 				this.pull();

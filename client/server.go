@@ -38,7 +38,7 @@ func NewServer(info Info, dir string, development bool) *Server {
 		bootstrap: filepath.Join(dir, "index.html"),
 		assets: http.StripPrefix("/assets/",
 			http.FileServer(http.Dir(filepath.Join(dir, "assets")))),
-		//TODO fix this
+
 		client: livepkg.NewServer(
 			http.Dir(dir),
 			development,
