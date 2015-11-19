@@ -86,16 +86,34 @@ func (server *Server) info(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (server *Server) logout(w http.ResponseWriter, r *http.Request) {
+	tokstring := r.FormValue("token")
+	if tokstring == "" {
+		tokstring = r.Header.Get("X-Auth-Token")
+	}
+	token, err := session.TokenFromString(tokstring)
+	if err != nil {
+		http.Error(w, "Invalid token: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	server.Sessions.Delete(token)
+}
+
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/info") {
 		server.info(w, r)
+		return
+	}
+	if strings.HasPrefix(r.URL.Path, "/logout") {
+		server.logout(w, r)
 		return
 	}
 
 	providername := strings.TrimPrefix(r.URL.Path, "/")
 	provider, ok := server.Provider[providername]
 	if !ok {
-		http.Error(w, "Unknown authorization provider: "+providername, http.StatusNotFound)
+		http.Error(w, "Unknown authorization provider: "+providername, http.StatusBadRequest)
 		return
 	}
 
@@ -103,12 +121,12 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.FormValue("user"),
 		r.FormValue("code"))
 	if err != nil {
-		http.Error(w, "Unable to verify: "+err.Error(), http.StatusUnauthorized)
+		http.Error(w, "Unable to verify: "+err.Error(), http.StatusForbidden)
 		return
 	}
 
 	if err := server.Rules.Login(user, server.DB); err != nil {
-		http.Error(w, "Unknown user: "+err.Error(), http.StatusUnauthorized)
+		http.Error(w, "Unknown user: "+err.Error(), http.StatusForbidden)
 		return
 	}
 

@@ -102,3 +102,9 @@ func (store *Store) Load(token Token) (user kb.User, ok bool) {
 
 	return user, ok
 }
+
+func (store *Store) Delete(token Token) {
+	store.mu.Lock()
+	delete(store.entries, token)
+	store.mu.Unlock()
+}

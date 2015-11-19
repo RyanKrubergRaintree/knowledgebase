@@ -83,7 +83,7 @@ package("kb.boot", function(exports) {
 	exports.Login = React.createClass({
 		getInitialState: function() {
 			return {
-				error: ""
+				error: this.props.initialError
 			};
 		},
 		loginFailed: function(message) {

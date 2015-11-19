@@ -184,7 +184,7 @@ package("kb", function(exports) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			window.location.pathname = "/system/auth/logout";
+			this.props.Session.logout();
 		},
 		displayName: "Header",
 		render: function() {

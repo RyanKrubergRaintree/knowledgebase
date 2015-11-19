@@ -20,24 +20,39 @@ package("kb.boot", function(exports) {
 				};
 			}
 		},
-		componentWillUnmount: function() {},
+		componentWillUnmount: function() {
+			var session = this.state.Session;
+			if (session !== null) {
+				session.remove(this);
+			}
+		},
 
 		getInitialState: function() {
 			return {
-				Session: null
+				Session: null,
+				sessionError: ""
 			};
 		},
 
-		loggedIn: function(session) {
+		sessionFinished: function(ev) {
 			this.setState({
-				Session: new kb.Session(session)
+				Session: null,
+				sessionError: ev.error
+			});
+		},
+		loggedIn: function(sessionInfo) {
+			var session = new kb.Session(sessionInfo);
+			session.on("session-finished", this.sessionFinished, this);
+			this.setState({
+				Session: session
 			});
 		},
 		render: function() {
 			var session = this.state.Session;
 			if (session === null) {
 				return React.createElement(kb.boot.Login, {
-					onSuccess: this.loggedIn
+					onSuccess: this.loggedIn,
+					initialError: this.state.sessionError
 				});
 			}
 

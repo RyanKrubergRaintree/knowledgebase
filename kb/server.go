@@ -48,7 +48,9 @@ func (server *Server) AddModule(module Module) {
 func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool) {
 	user, err := server.Auth.Verify(w, r)
 	if err != nil {
-		http.Error(w, "Unauthorized request!", http.StatusUnauthorized)
+		w.Header().Add("WWW-Authenticate", "X-Auth-Token")
+		//TODO: serve correct error message
+		http.Error(w, "Session expired!", http.StatusUnauthorized)
 		return User{}, false
 	}
 	return user, true

@@ -1,9 +1,14 @@
 package("kb", function(exports) {
 	"use strict";
 
+	depends("util/Notifier.js");
+
 	exports.Session = Session;
 
 	function Session(context) {
+		this.notifier_ = new kb.util.Notifier();
+		this.notifier_.mixto(this);
+
 		context = context || {};
 		this.user = context.user || {
 			id: "",
@@ -21,6 +26,16 @@ package("kb", function(exports) {
 	};
 
 	Session.prototype = {
+		logout: function() {
+			this.fetch({
+				url: "/system/auth/logout"
+			});
+
+			this.notifier_.emit({
+				type: "session-finished",
+				error: ""
+			});
+		},
 		fetch: function(opts) {
 			if (typeof opts.url === "undefined") {
 				throw new Error("No url defined.");
@@ -39,15 +54,15 @@ package("kb", function(exports) {
 				throw new Error("Invalid method: " + opts.method);
 			}
 
+			var self = this;
+
 			var xhr = new XMLHttpRequest();
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState !== 4) {
 					return;
 				}
 
-				//TODO: add authentication failure error
-
-				opts.ondone({
+				var response = {
 					get json() {
 						return JSON.parse(xhr.responseText);
 					},
@@ -57,7 +72,17 @@ package("kb", function(exports) {
 					statusText: xhr.statusText,
 					text: xhr.responseText,
 					xhr: xhr
-				});
+				};
+
+				opts.ondone(response);
+
+				if (response.status === 401) {
+					self.notifier_.emit({
+						type: "session-finished",
+						error: response.text
+					});
+					return;
+				}
 			};
 
 			xhr.onerror = function(err) {
