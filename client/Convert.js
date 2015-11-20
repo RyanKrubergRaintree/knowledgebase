@@ -125,7 +125,7 @@ package("kb.convert", function(exports) {
 		return {
 			link: URLToReadable(link),
 			owner: owner,
-			url: "/" + TextToSlug(link),
+			url: URLToReadable(link),
 			title: LinkToTitle(link)
 		};
 	}
@@ -201,13 +201,30 @@ package("kb.convert", function(exports) {
 			path = "/" + path;
 		}
 
+		var fragment = matches[8] || "";
+		if (fragment === "#") {
+			fragment = "";
+		}
+
 		return {
 			scheme: matches[2] || "",
 			host: matches[4] || "",
 			path: path,
 
-			query: matches[7] || "",
-			fragment: matches[9] || ""
+			query: matches[6] || "",
+			fragment: fragment || ""
 		};
 	}
+
+	TestCase("URLToLocation", function(assert) {
+		function verify(url) {
+			var loc = URLToLocation(url);
+			assert.equal(loc.scheme, "");
+			assert.equal(loc.host, "");
+			assert.equal(loc.query, "?q=csdfa asdf&filter=10.2.600");
+			assert.equal(loc.fragment, "#alpha");
+		}
+		verify("/search=search?q=csdfa asdf&filter=10.2.600#alpha");
+		verify("search=search?q=csdfa asdf&filter=10.2.600#alpha");
+	});
 });

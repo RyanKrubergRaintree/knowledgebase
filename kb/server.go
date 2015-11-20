@@ -86,7 +86,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch rights {
 	case Blocked:
-		http.Error(w, "Not enough rights to view this content.", http.StatusUnauthorized)
+		http.Error(w, "Not enough rights to view this content.", http.StatusForbidden)
 		return
 	case Reader:
 		allowedMethods = []string{"GET"}
