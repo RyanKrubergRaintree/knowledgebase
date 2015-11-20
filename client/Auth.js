@@ -189,10 +189,14 @@ package("kb", function(exports) {
 			};
 
 			data.login = function() {
-				auth2.signIn().then(
-					null,
-					auth.loginError.bind(auth)
-				);
+				if (auth2.isSignedIn.get() == true) {
+					trylogin();
+				} else {
+					auth2.signIn().then(
+						null,
+						auth.loginError.bind(auth)
+					);
+				}
 			};
 
 			data.logout = function() {
