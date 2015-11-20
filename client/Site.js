@@ -244,7 +244,9 @@ package("kb", function(exports) {
 	exports.Site = React.createClass({
 		displayName: "Site",
 		render: function() {
-			return React.DOM.div(null,
+			return React.DOM.div({
+					key: this.props.Session.token
+				},
 				React.createElement(Header, this.props),
 				React.createElement(Content, this.props)
 			);
