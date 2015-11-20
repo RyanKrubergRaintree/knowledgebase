@@ -28,9 +28,9 @@ package("kb", function(exports) {
 	*/
 
 	depends("Session.js");
-	depends("Notifier.js");
+	depends("util/Notifier.js");
 
-	function Auth(providers) {
+	function Auth(providers, initialSessionInfo) {
 		this.notifier_ = new kb.util.Notifier();
 		this.notifier_.mixto(this);
 
@@ -38,6 +38,9 @@ package("kb", function(exports) {
 		this.providers = providers;
 
 		this.currentSession = null;
+		if (initialSessionInfo) {
+			this.currentSession = new kb.Session(initialSessionInfo);
+		}
 	}
 
 	Auth.prototype = {
@@ -52,7 +55,9 @@ package("kb", function(exports) {
 					self.notifier_.handle({
 						type: "loaded"
 					});
-					self.tryAutoLogin();
+					if (self.currentSession === null) {
+						self.tryAutoLogin();
+					}
 				}
 			}
 
@@ -74,23 +79,23 @@ package("kb", function(exports) {
 					type: "login-error",
 					message: response.text
 				});
-				this.logout(true);
+				this.logoutProviders();
 				return;
 			}
 
 			var session = new kb.Session(
 				response.json,
-				this.logout.bind(this)
+				this.logoutProviders.bind(this)
 			);
-			this.currentSession = session;
 
+			this.currentSession = session;
 			this.notifier_.handle({
 				type: "login-success",
 				session: session
 			});
 		},
 		loginError: function(error) {
-			this.logout();
+			this.logoutProviders();
 			this.notifier_.handle({
 				type: "login-error",
 				message: error
@@ -121,8 +126,16 @@ package("kb", function(exports) {
 			}
 		},
 
-		// logs out from provider sessions, not from the session
 		logout: function() {
+			if (this.currentSession) {
+				this.currentSession.logout();
+			} else {
+				this.logoutProviders();
+			}
+		},
+
+		// logs out from provider sessions, not from the session
+		logoutProviders: function() {
 			for (var name in this.providers) {
 				if (!this.providers.hasOwnProperty(name)) {
 					continue;
@@ -203,6 +216,6 @@ package("kb", function(exports) {
 		onloaded();
 	}
 
-	exports.Auth = new Auth(window.Provider);
+	exports.Auth = new Auth(window.Provider, window.InitialSession);
 	exports.Auth.init();
 });

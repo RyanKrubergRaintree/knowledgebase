@@ -62,6 +62,8 @@ func (server *Server) Verify(w http.ResponseWriter, r *http.Request) (kb.User, e
 type SessionInfo struct {
 	Token string  `json:"token"`
 	User  kb.User `json:"user"`
+
+	Param map[string]string `json:"param,omitempty"`
 }
 
 func (server *Server) info(w http.ResponseWriter, r *http.Request) {
@@ -102,6 +104,48 @@ func (server *Server) logout(w http.ResponseWriter, r *http.Request) {
 	server.Sessions.Delete(token)
 }
 
+func (server *Server) login(providername, username, pass string) (kb.User, session.Token, error) {
+	provider, ok := server.Provider[providername]
+	if !ok {
+		return kb.User{}, session.ZeroToken, ErrUnauthorized
+	}
+
+	user, err := provider.Verify(username, pass)
+	if err != nil {
+		return kb.User{}, session.ZeroToken, ErrUnauthorized
+	}
+
+	if err := server.Rules.Login(user, server.DB); err != nil {
+		return kb.User{}, session.ZeroToken, ErrUnauthorized
+	}
+
+	token, err := server.Sessions.New(user)
+	if err != nil {
+		return kb.User{}, session.ZeroToken, err
+	}
+
+	return user, token, nil
+}
+
+func (server *Server) InitialSession(r *http.Request) (*SessionInfo, bool) {
+	auth := r.Header.Get("Authorization")
+
+	args := strings.SplitN(auth, " ", 3)
+	if len(args) != 3 {
+		return nil, false
+	}
+
+	user, token, err := server.login(args[0], args[1], args[2])
+	if err != nil {
+		return nil, false
+	}
+
+	return &SessionInfo{
+		User:  user,
+		Token: token.String(),
+	}, true
+}
+
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/info") {
 		server.info(w, r)
@@ -113,27 +157,18 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	providername := strings.TrimPrefix(r.URL.Path, "/")
-	provider, ok := server.Provider[providername]
-	if !ok {
-		http.Error(w, "Unknown authorization provider: "+providername, http.StatusBadRequest)
-		return
-	}
-
-	user, err := provider.Verify(
+	user, token, err := server.login(
+		providername,
 		r.FormValue("user"),
-		r.FormValue("code"))
-	if err != nil {
-		http.Error(w, "Unable to verify: "+err.Error(), http.StatusForbidden)
-		return
-	}
+		r.FormValue("code"),
+	)
 
-	if err := server.Rules.Login(user, server.DB); err != nil {
-		http.Error(w, "Unknown user: "+err.Error(), http.StatusForbidden)
-		return
-	}
-
-	token, err := server.Sessions.New(user)
 	if err != nil {
+		if err == ErrUnauthorized {
+			http.Error(w, "Access denied.", http.StatusForbidden)
+			return
+		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

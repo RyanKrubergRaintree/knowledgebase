@@ -53,6 +53,9 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Site": func() Info { return server.Info },
+			"InitialSession": func() template.JS {
+				return "null"
+			},
 			"LoginProviders": func() interface{} {
 				return server.Login.Provider
 			},

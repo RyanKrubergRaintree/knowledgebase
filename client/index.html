@@ -27,7 +27,9 @@
 <body>
 	<div id="boot"></div>
 </body>
-
+<script>
+	window.InitialSession = {{InitialSession}};
+</script>
 <script>
 	window.Provider = {};
 	{{ range $name, $provider := LoginProviders }}
