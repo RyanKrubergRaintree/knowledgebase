@@ -9,14 +9,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"time"
 
-	"github.com/raintreeinc/livepkg"
-
 	"github.com/raintreeinc/knowledgebase/auth"
+	"github.com/raintreeinc/knowledgebase/auth/provider"
+	"github.com/raintreeinc/knowledgebase/client"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 
@@ -34,7 +33,6 @@ import (
 
 // TODO: add
 //  https://github.com/unrolled/secure
-//  https://github.com/justinas/nosurf
 
 var (
 	addr     = flag.String("listen", ":80", "http server `address`")
@@ -96,14 +94,6 @@ func main() {
 	log.Printf("Starting with database %s\n", *database)
 	log.Printf("Starting %s on %s\n", *domain, *addr)
 
-	// Serve static files
-	http.Handle("/assets/", http.StripPrefix("/assets/",
-		http.FileServer(http.Dir(filepath.Join(*clientdir, "assets")))))
-
-	// Serve client
-	client := livepkg.NewServer(http.Dir(*clientdir), *development, "/kb/app.js")
-	http.Handle("/kb/", client)
-
 	// Load database
 	db, err := pgdb.New(*database)
 	if err != nil {
@@ -116,22 +106,31 @@ func main() {
 	}
 	log.Println("DB Initialization complete.")
 
-	// protect server with authentication
-	url := "http://" + *domain
-	auth.Register(os.Getenv("APPKEY"), url, "/system/auth", auth.ClientsFromEnv())
+	// start auth server
+	ruleset := MustLoadRules(*rules)
+	authServer := auth.NewServer(ruleset, db)
+	http.Handle("/system/auth/",
+		http.StripPrefix("/system/auth", authServer))
 
-	sec := auth.New()
-	sec.Alternate["guest"] = auth.NewDB(db)
+	if key := os.Getenv("GPLUS_KEY"); key != "" {
+		authServer.Provider["google"] = &provider.Google{
+			ClientID:     key,
+			ClientSecret: os.Getenv("GPLUS_SECRET"),
+		}
+	}
 	if caskey := os.Getenv("CASKEY"); caskey != "" {
-		data, err := base64.StdEncoding.DecodeString(caskey)
+		key, err := base64.StdEncoding.DecodeString(caskey)
 		if err != nil {
 			log.Fatal(err)
 		}
-		sec.Alternate["community"] = auth.NewCAS("community", data)
+		authServer.Provider["community"] = &provider.CAS{
+			Provider: "community",
+			Key:      key,
+		}
 	}
+	authServer.Provider["guest"] = db.Context("admin").GuestLogin()
 
-	// create server
-	server := kb.NewServer(kb.ServerInfo{
+	info := client.Info{
 		Domain:     *domain,
 		ShortTitle: "KB",
 		Title:      "Knowledge Base",
@@ -139,12 +138,15 @@ func main() {
 
 		TrackingID: os.Getenv("TRACKING_ID"),
 		Version:    time.Now().Format("20060102150405"),
-	}, sec, db)
+	}
 
-	server.TemplatesDir = filepath.Join(*clientdir, "templates")
+	clientServer := client.NewServer(info, authServer, *clientdir, *development)
+	http.Handle("/client/",
+		http.StripPrefix("/client", clientServer))
+	http.Handle("/favicon.ico", clientServer)
 
-	ruleset := MustLoadRules(*rules)
-	server.Rules = ruleset
+	// create server
+	server := kb.NewServer(authServer, db)
 
 	// add systems
 	server.AddModule(admin.New(server))
@@ -164,16 +166,17 @@ func main() {
 		server.AddModule(dita.New("DITA", *ditamap, server))
 	}
 
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(*clientdir, "assets", "ico", "favicon.ico"))
-	})
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ishttps := r.Header.Get("X-Forwarded-Proto") == "https" || r.URL.Scheme == "https"
 		if *redirecthttps && !ishttps {
 			r.URL.Scheme = "https"
 			r.URL.Host = *domain
 			http.Redirect(w, r, r.URL.String(), http.StatusMovedPermanently)
+			return
+		}
+
+		if r.URL.Path == "/" {
+			clientServer.ServeHTTP(w, r)
 			return
 		}
 		server.ServeHTTP(w, r)

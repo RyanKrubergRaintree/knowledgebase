@@ -11,19 +11,14 @@
     "depends": true,
     "package": true,
 
-    "KBHomePage": true,
-    "KBUser": true,
-
     "GenerateID": true,
     "GetDataAttribute": true,
 
     "TestCase": true,
-    "getClassList": true,
-
-    "DocumentCookies": true
+    "getClassList": true
   },
   "globalstrict": true,
-  "quotmark": "single",
+  "quotmark": "double",
   "undef": true,
   "unused": true,
 

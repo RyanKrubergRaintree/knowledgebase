@@ -18,7 +18,6 @@ var _ kb.Database = &Database{}
 
 type Database struct {
 	*sql.DB
-	sessions *Sessions
 }
 
 func New(params string) (*Database, error) {
@@ -27,10 +26,7 @@ func New(params string) (*Database, error) {
 		return nil, fmt.Errorf("failed to open database: %s", err)
 	}
 
-	db := &Database{
-		DB:       sdb,
-		sessions: NewSessions(),
-	}
+	db := &Database{DB: sdb}
 	return db, nil
 }
 
@@ -43,8 +39,6 @@ func (db Access) BoolQuery(q string, args ...interface{}) bool {
 	}
 	return err == nil
 }
-
-func (db Database) Sessions() kb.Sessions { return db.sessions }
 
 func (db Database) Context(user kb.Slug) kb.Context { return Context{db, user} }
 

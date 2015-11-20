@@ -3,7 +3,7 @@ package kb
 import (
 	"encoding/gob"
 	"errors"
-	"net/http"
+	"html/template"
 )
 
 var (
@@ -20,7 +20,6 @@ var (
 )
 
 type Database interface {
-	Sessions() Sessions
 	Context(user Slug) Context
 }
 
@@ -35,12 +34,6 @@ type Context interface {
 	Pages(group Slug) Pages
 
 	GuestLogin() GuestLogin
-}
-
-type Sessions interface {
-	SaveUser(w http.ResponseWriter, r *http.Request, user User) error
-	GetUser(w http.ResponseWriter, r *http.Request) (User, error)
-	ClearUser(w http.ResponseWriter, r *http.Request) error
 }
 
 type Rights string
@@ -86,6 +79,8 @@ type Access interface {
 
 type GuestLogin interface {
 	Add(name, email, password string) error
+	// implement auth.Provider
+	Boot() template.HTML
 	Verify(name, password string) (User, error)
 }
 
@@ -139,15 +134,15 @@ type Index interface {
 func init() { gob.Register(User{}) }
 
 type User struct {
-	ID        Slug
-	Email     string
-	Name      string
-	Company   string
-	Admin     bool
-	MaxAccess Rights
+	ID        Slug   `json:"id"`
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	Company   string `json:"company"`
+	Admin     bool   `json:"admin"`
+	MaxAccess Rights `json:"-"`
 
-	AuthID       string
-	AuthProvider string
+	AuthID       string `json:"-"`
+	AuthProvider string `json:"-"`
 }
 
 type Group struct {
