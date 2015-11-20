@@ -67,6 +67,7 @@ package("kb.boot", function(exports) {
 			}
 
 			return React.createElement(Application, {
+				key: session.token,
 				Session: session
 			});
 		}
