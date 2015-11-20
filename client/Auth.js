@@ -1,6 +1,32 @@
 package("kb", function(exports) {
 	"use strict";
 
+	/*
+		Authentication bootup looks like:
+
+		index.html sets up
+
+		window.Provider = {
+			community: {type: "*provider.CAS" },
+			google: {type: "*provider.Google" },
+			guest: {type: "pgdb.GuestLogin" }
+		};
+
+		kb.Auth.init extends these providers with login/logout
+
+		when everything has been loaded, it will invoke "loaded" event
+
+		it will tryAutoLogin to different providers, if possible
+		if any of them succeeds it will invoke
+			"login-success"
+
+		to login with a particular provider you can call:
+		window.Provider.guest.login("username", "password");
+
+		if you were already logged in, it will replace the current session,
+		however it will not logout from the other session.
+	*/
+
 	depends("Session.js");
 	depends("Notifier.js");
 

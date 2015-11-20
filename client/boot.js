@@ -3,9 +3,8 @@ package("kb.boot", function(exports) {
 
 	depends("boot.css");
 
-	depends("Login.js");
 	depends("Auth.js");
-	depends("Session.js");
+	depends("Login.js");
 
 	depends("Crumbs.js");
 	depends("Lineup.js");
