@@ -5,7 +5,7 @@ package("kb", function(exports) {
 
 	exports.Session = Session;
 
-	function Session(context) {
+	function Session(context, logoutProvider) {
 		this.notifier_ = new kb.util.Notifier();
 		this.notifier_.mixto(this);
 
@@ -20,6 +20,8 @@ package("kb", function(exports) {
 		this.home = "Community=Welcome";
 		this.branch = context.branch || "10.2.600";
 		this.token = context.token || null;
+
+		this.logoutProvider_ = logoutProvider;
 	}
 	Session.fetch = function(opts) {
 		(new Session()).fetch(opts);
@@ -31,15 +33,7 @@ package("kb", function(exports) {
 				url: "/system/auth/logout"
 			});
 
-			if (gapi.auth2) {
-				var auth = gapi.auth2.getAuthInstance();
-				if (auth) {
-					try {
-						auth.signOut();
-					} catch (ex) {}
-				}
-			}
-
+			this.logoutProvider_();
 			this.notifier_.emit({
 				type: "session-finished",
 				error: ""

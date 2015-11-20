@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	"html/template"
 	"net/http"
 	"strings"
 	"time"
@@ -14,7 +15,7 @@ import (
 var ErrUnauthorized = errors.New("Unauthorized")
 
 type Provider interface {
-	Info() map[string]string
+	Boot() template.HTML
 	Verify(user, pass string) (kb.User, error)
 }
 

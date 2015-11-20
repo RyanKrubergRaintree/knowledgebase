@@ -3,6 +3,7 @@ package kb
 import (
 	"encoding/gob"
 	"errors"
+	"html/template"
 )
 
 var (
@@ -79,7 +80,7 @@ type Access interface {
 type GuestLogin interface {
 	Add(name, email, password string) error
 	// implement auth.Provider
-	Info() map[string]string
+	Boot() template.HTML
 	Verify(name, password string) (User, error)
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,11 +17,12 @@ type Google struct {
 	ClientSecret string
 }
 
-func (conf *Google) Info() map[string]string {
-	return map[string]string{
-		"kind":     "google",
-		"clientID": conf.ClientID,
-	}
+func (conf *Google) Boot() template.HTML {
+	var head string
+	head += `<script src="https://apis.google.com/js/platform.js"></script>`
+	head += `<meta name="google-signin-client_id" content="` +
+		template.JSEscapeString(conf.ClientID) + `">`
+	return template.HTML(head)
 }
 
 func (conf *Google) Verify(user, code string) (kb.User, error) {

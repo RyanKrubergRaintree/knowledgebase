@@ -1,7 +1,7 @@
 package("kb.boot", function(exports) {
 	"use strict";
 
-	depends("Session.js");
+	depends("Auth.js");
 	depends("Login.css");
 
 	var LoginForm = React.createClass({
@@ -9,26 +9,10 @@ package("kb.boot", function(exports) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			var form = new FormData();
-			form.append("user", this.refs.username.value);
-			form.append("code", this.refs.password.value);
-
-			kb.Session.fetch({
-				url: this.props.url,
-				ondone: this.change,
-				onerror: this.error,
-				body: form
-			});
-		},
-		change: function(response) {
-			if (!response.ok) {
-				this.props.onFailure(response.text);
-				return;
-			}
-			this.props.onSuccess(response.json);
-		},
-		error: function(err) {
-			this.props.onFailure(err);
+			this.props.provider.login(
+				this.refs.username.value,
+				this.refs.password.value
+			);
 		},
 		render: function() {
 			return React.DOM.form({
@@ -70,71 +54,21 @@ package("kb.boot", function(exports) {
 		}
 	});
 
-	var Google = React.createClass({
-		logout: function() {
-			if (gapi.auth2) {
-				var auth = gapi.auth2.getAuthInstance();
-				if (auth) {
-					try {
-						auth.signOut();
-					} catch (ex) {}
-				}
-			}
-		},
-		backendLoginResult: function(response) {
-			if (!response.ok) {
-				this.props.onFailure(response.text);
-				this.logout();
-				return;
-			}
-			this.props.onSuccess(response.json);
-		},
-		error: function(err) {
-			this.logout();
-			this.props.onFailure(err);
-		},
-
-		success: function(user) {
-			var profile = user.getBasicProfile();
-			var token = user.getAuthResponse().id_token;
-
-			var form = new FormData();
-			form.append("user", profile.getEmail());
-			form.append("code", token);
-
-			kb.Session.fetch({
-				url: this.props.url,
-				ondone: this.backendLoginResult,
-				onerror: this.error,
-				body: form
-			});
-		},
-		failure: function(error) {
-			this.props.onFailure(error.reason);
-		},
-
-		componentDidMount: function() {
-			gapi.signin2.render("google-signin", {
-				"scope": "profile",
-				onsuccess: this.success,
-				onfailure: this.failure
-			});
-		},
-		componentWillUnmount: function() {
-
+	var LoginButton = React.createClass({
+		click: function() {
+			this.props.provider.login();
 		},
 		render: function() {
-			return React.DOM.div(null,
-				React.DOM.div({
-					id: "google-signin"
-				}, "")
-			);
+			return React.DOM.div({
+				className: "button",
+				onClick: this.click
+			}, this.props.provider.title);
 		}
 	});
 
-	var loginViews = {
+	var loginView = {
 		"form": LoginForm,
-		"google": Google
+		"button": LoginButton
 	};
 
 	//TODO: move this logic to server conf
@@ -143,17 +77,33 @@ package("kb.boot", function(exports) {
 		"google": "Employee Login:"
 	};
 
-	var order = ["guest", "google"];
-
 	exports.Login = React.createClass({
 		getInitialState: function() {
 			return {
+				authLoaded: false,
 				error: this.props.initialError
 			};
 		},
-		loginFailed: function(message) {
+		loaded: function() {
 			this.setState({
-				error: message
+				authLoaded: true
+			});
+		},
+		componentDidMount: function() {
+			if (kb.Auth.loaded) {
+				this.loaded();
+			} else {
+				kb.Auth.on("loaded", this.loaded, this);
+			}
+
+			kb.Auth.on("login-error", this.updateError, this);
+		},
+		componentWillUnmount: function() {
+			kb.Auth.remove(this);
+		},
+		updateError: function(event) {
+			this.setState({
+				error: event.message
 			});
 		},
 		render: function() {
@@ -167,32 +117,31 @@ package("kb.boot", function(exports) {
 				);
 			}
 
-			var self = this;
-			var providers = this.props.providers;
 			var logins = [];
-			order.forEach(function(name) {
-				if (!providers.hasOwnProperty(name)) {
-					return;
+			if (this.state.authLoaded) {
+				var providers = kb.Auth.providers;
+				for (var name in providers) {
+					if (!providers.hasOwnProperty(name)) {
+						continue;
+					}
+
+					var provider = providers[name];
+					var view = loginView[provider.view];
+					if (typeof view === "undefined" || view === null) {
+						continue;
+					}
+
+					logins.push(React.DOM.h2({
+						key: "header-" + name
+					}, loginTitle[name]));
+
+					logins.push(React.createElement(view, {
+						key: name,
+						name: name,
+						provider: provider
+					}));
 				}
-
-				var params = providers[name];
-				var clazz = loginViews[params.kind];
-				if (typeof clazz === "undefined" || clazz === null) {
-					return;
-				}
-
-				logins.push(React.DOM.h2({
-					key: "header-" + name
-				}, loginTitle[name]));
-
-				logins.push(React.createElement(clazz, {
-					key: name,
-					url: "/system/auth/" + name,
-					params: params,
-					onSuccess: self.props.onSuccess,
-					onFailure: self.loginFailed
-				}));
-			});
+			}
 
 			return React.DOM.div({
 					id: "login"

@@ -1,7 +1,6 @@
 package client
 
 import (
-	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -54,14 +53,8 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Site": func() Info { return server.Info },
-			"LoginProviders": func() template.JS {
-				info := map[string]interface{}{}
-				for name, provider := range server.Login.Provider {
-					info[name] = provider.Info()
-				}
-
-				data, _ := json.Marshal(info)
-				return template.JS(data)
+			"LoginProviders": func() interface{} {
+				return server.Login.Provider
 			},
 		},
 	).ParseGlob(server.bootstrap)

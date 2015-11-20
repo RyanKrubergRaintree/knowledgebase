@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"html/template"
 
 	"github.com/raintreeinc/knowledgebase/kb"
 
@@ -44,12 +45,7 @@ func (db GuestLogin) Add(name, email, password string) error {
 	return err
 }
 
-func (db GuestLogin) Info() map[string]string {
-	return map[string]string{
-		"kind": "form",
-	}
-}
-
+func (db GuestLogin) Boot() template.HTML { return "" }
 func (db GuestLogin) Verify(name, password string) (kb.User, error) {
 	var salt, expect []byte
 	var email, authID string

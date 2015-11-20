@@ -2,6 +2,7 @@ package provider
 
 import (
 	"errors"
+	"html/template"
 	"net/url"
 
 	"github.com/raintreeinc/knowledgebase/auth/provider/trust"
@@ -13,11 +14,7 @@ type CAS struct {
 	Key      []byte
 }
 
-func (conf *CAS) Info() map[string]string {
-	return map[string]string{
-		"kind": "cas",
-	}
-}
+func (conf *CAS) Boot() template.HTML { return "" }
 
 func (conf *CAS) Verify(params, code string) (kb.User, error) {
 	id, err := trust.Peer{conf.Key}.Verify(code)

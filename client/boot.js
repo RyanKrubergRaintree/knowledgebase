@@ -4,6 +4,7 @@ package("kb.boot", function(exports) {
 	depends("boot.css");
 
 	depends("Login.js");
+	depends("Auth.js");
 	depends("Session.js");
 
 	depends("Crumbs.js");
@@ -19,8 +20,11 @@ package("kb.boot", function(exports) {
 					self.forceUpdate();
 				};
 			}
+
+			kb.Auth.on("login-success", this.loginSuccess, this);
 		},
 		componentWillUnmount: function() {
+			kb.Auth.remove(this);
 			var session = this.state.Session;
 			if (session !== null) {
 				session.remove(this);
@@ -33,15 +37,14 @@ package("kb.boot", function(exports) {
 				sessionError: ""
 			};
 		},
-
 		sessionFinished: function(ev) {
 			this.setState({
 				Session: null,
 				sessionError: ev.error
 			});
 		},
-		loggedIn: function(sessionInfo) {
-			var session = new kb.Session(sessionInfo);
+		loginSuccess: function(event) {
+			var session = event.session;
 			session.on("session-finished", this.sessionFinished, this);
 			this.setState({
 				Session: session
@@ -51,7 +54,6 @@ package("kb.boot", function(exports) {
 			var session = this.state.Session;
 			if (session === null) {
 				return React.createElement(kb.boot.Login, {
-					onSuccess: this.loggedIn,
 					initialError: this.state.sessionError,
 					providers: window.LoginProviders
 				});
