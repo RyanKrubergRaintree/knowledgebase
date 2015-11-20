@@ -39,7 +39,7 @@ package("kb", function(exports) {
 
 		this.currentSession = null;
 		if (initialSessionInfo) {
-			this.currentSession = new kb.Session(initialSessionInfo);
+			this.currentSession = new kb.Session(initialSessionInfo, function() {});
 		}
 	}
 

@@ -5,7 +5,6 @@ import (
 	"crypto/sha1"
 	"errors"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -17,7 +16,7 @@ var (
 )
 
 var (
-	ErrUnauthorized = errors.New("Invalid authorization header.")
+	ErrUnauthorized = errors.New("Invalid key.")
 	ErrTimeSkewed   = errors.New("Time is skewed.")
 )
 
@@ -52,15 +51,11 @@ func (peer Peer) Sign(id string) (string, error) {
 func (peer Peer) Verify(auth string) (id string, err error) {
 	now := time.Now()
 
-	if auth == "" || !strings.HasPrefix(auth, "KB ") {
-		return "", ErrUnauthorized
-	}
-
 	if len(auth) > MaxAuthorizationSize {
 		return "", ErrUnauthorized
 	}
 
-	v, err := url.ParseQuery(auth[3:])
+	v, err := url.ParseQuery(auth)
 	if err != nil {
 		return "", ErrUnauthorized
 	}

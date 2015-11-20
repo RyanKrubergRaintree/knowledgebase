@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -112,15 +113,18 @@ func (server *Server) login(providername, username, pass string) (kb.User, sessi
 
 	user, err := provider.Verify(username, pass)
 	if err != nil {
+		log.Println("Verification failed:", err.Error())
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
 	if err := server.Rules.Login(user, server.DB); err != nil {
+		log.Println("Login failed:", err.Error())
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
 	token, err := server.Sessions.New(user)
 	if err != nil {
+		log.Println("Session failed:", err.Error())
 		return kb.User{}, session.ZeroToken, err
 	}
 

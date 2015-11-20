@@ -17,8 +17,10 @@ package("kb", function(exports) {
 			company: "",
 			admin: false
 		};
-		this.home = "Community=Welcome";
-		this.branch = context.branch || "10.2.600";
+
+		var params = context.params || {};
+		this.home = params.home || "Community=Welcome";
+		this.branch = params.branch || "10.2.600";
 		this.token = context.token || null;
 
 		this.logoutProvider_ = logoutProvider;
