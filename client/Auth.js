@@ -10,6 +10,8 @@ package("kb", function(exports) {
 
 		this.loaded = false;
 		this.providers = providers;
+
+		this.currentSession = null;
 	}
 
 	Auth.prototype = {
@@ -32,9 +34,12 @@ package("kb", function(exports) {
 				if (!this.providers.hasOwnProperty(name)) {
 					continue;
 				}
+				toload++;
 				var data = this.providers[name];
 				initializer[data.type](this, name, data, loaded);
 			}
+
+			loaded();
 		},
 
 		loginSuccess: function(response) {
@@ -51,6 +56,7 @@ package("kb", function(exports) {
 				response.json,
 				this.logout.bind(this)
 			);
+			this.currentSession = session;
 
 			this.notifier_.handle({
 				type: "login-success",
@@ -78,7 +84,15 @@ package("kb", function(exports) {
 			});
 		},
 		tryAutoLogin: function() {
-
+			for (var name in this.providers) {
+				if (!this.providers.hasOwnProperty(name)) {
+					continue;
+				}
+				var provider = this.providers[name];
+				if (provider.autologin) {
+					provider.autologin();
+				}
+			}
 		},
 
 		// logs out from provider sessions, not from the session
@@ -105,6 +119,7 @@ package("kb", function(exports) {
 		data.login = function(user, code) {
 			auth.loginTo("/system/auth/" + name, user, code);
 		};
+
 		onloaded();
 	}
 
@@ -113,24 +128,42 @@ package("kb", function(exports) {
 		data.title = "Google";
 
 		gapi.load("auth2", function() {
-			data.autologin = function() {
+			var auth2 = gapi.auth2.init();
 
+			var trylogin = function() {
+				if (auth2.isSignedIn.get() == true) {
+					// check if not logged in
+					var user = auth2.currentUser.get();
+					var profile = user.getBasicProfile();
+					var token = user.getAuthResponse().id_token;
+
+					auth.loginTo("/system/auth/" + name,
+						profile.getEmail(),
+						token
+					);
+				}
+			};
+			auth2.isSignedIn.listen(trylogin);
+
+			data.autologin = function() {
+				trylogin();
 			};
 
 			data.login = function() {
-
+				auth2.signIn().then(
+					null,
+					auth.loginError.bind(auth)
+				);
 			};
 
 			data.logout = function() {
-				if (gapi.auth2) {
-					var auth = gapi.auth2.getAuthInstance();
-					if (auth) {
-						try {
-							auth.signOut();
-						} catch (ex) {}
-					}
+				try {
+					auth2.signOut();
+				} catch (ex) {
+
 				}
 			};
+
 			onloaded();
 		});
 	}
@@ -140,6 +173,7 @@ package("kb", function(exports) {
 		data.login = function(user, password) {
 			auth.loginTo("/system/auth/" + name, user, password);
 		};
+
 		onloaded();
 	}
 

@@ -22,6 +22,13 @@ package("kb.boot", function(exports) {
 			}
 
 			kb.Auth.on("login-success", this.loginSuccess, this);
+
+			var session = kb.Auth.currentSession;
+			if (session) {
+				this.loginSuccess({
+					session: session
+				});
+			}
 		},
 		componentWillUnmount: function() {
 			kb.Auth.remove(this);
@@ -59,7 +66,9 @@ package("kb.boot", function(exports) {
 				});
 			}
 
-			return React.createElement(Application, this.state);
+			return React.createElement(Application, {
+				Session: session
+			});
 		}
 	});
 
