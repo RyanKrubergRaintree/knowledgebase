@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -54,7 +55,12 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 		template.FuncMap{
 			"Site": func() Info { return server.Info },
 			"InitialSession": func() template.JS {
-				return "null"
+				session, ok := server.Login.SessionFromHeader(r)
+				if !ok {
+					return "null"
+				}
+				data, _ := json.Marshal(session)
+				return template.JS(data)
 			},
 			"LoginProviders": func() interface{} {
 				return server.Login.Provider

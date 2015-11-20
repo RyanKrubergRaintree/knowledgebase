@@ -127,7 +127,7 @@ func (server *Server) login(providername, username, pass string) (kb.User, sessi
 	return user, token, nil
 }
 
-func (server *Server) InitialSession(r *http.Request) (*SessionInfo, bool) {
+func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
 	auth := r.Header.Get("Authorization")
 
 	args := strings.SplitN(auth, " ", 3)
@@ -140,9 +140,19 @@ func (server *Server) InitialSession(r *http.Request) (*SessionInfo, bool) {
 		return nil, false
 	}
 
+	params := make(map[string]string)
+	if err := r.ParseForm(); err != nil {
+		for name, val := range r.PostForm {
+			if len(val) > 0 {
+				params[name] = val[0]
+			}
+		}
+	}
+
 	return &SessionInfo{
 		User:  user,
 		Token: token.String(),
+		Param: params,
 	}, true
 }
 
