@@ -6,8 +6,10 @@ import (
 	"encoding/xml"
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
+	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 	"github.com/raintreeinc/knowledgebase/extra/imagemap"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -95,15 +97,15 @@ func (conv *convert) toHTML(decoder *xml.Decoder, start *xml.StartElement) strin
 }
 
 func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error) {
-	internal := false
-	href := ""
+	href, title, internal := "", "", false
+
 	for i, a := range start.Attr {
 		if a.Name.Local == "href" {
 			if start.Name.Local == "img" || start.Name.Local == "image" || start.Name.Local == "fig" {
 				start.Attr[i].Name.Local = "src"
 				href = conv.convertImageURL(a.Value)
 			} else {
-				href, internal = conv.convertLinkURL(a.Value)
+				href, title, internal = conv.convertLinkURL(a.Value)
 			}
 			start.Attr[i].Value = href
 		} else if a.Name.Local == "id" {
@@ -112,6 +114,10 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 			// multiple times
 			start.Attr[i].Name.Local = "data-id"
 		}
+	}
+
+	if title != "" && getAttr(start, "title") == "" {
+		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "title"}, title})
 	}
 
 	if internal {
@@ -153,9 +159,9 @@ func (conv *convert) convertImageURL(url string) (href string) {
 	}
 }
 
-func (conv *convert) convertLinkURL(url string) (href string, internal bool) {
+func (conv *convert) convertLinkURL(url string) (href, title string, internal bool) {
 	if strings.HasPrefix(url, "http") || strings.HasPrefix(url, "mailto") {
-		return url, false
+		return url, "", false
 	}
 
 	var hash string
@@ -164,25 +170,37 @@ func (conv *convert) convertLinkURL(url string) (href string, internal bool) {
 		url, hash = url[:i], url[i:]
 	}
 
-	if url == "" {
-		//TODO: implement internal reference links
-		return url + hash, false
+	var filename string
+	if url != "" {
+		filename = filepath.Join(filepath.Dir(conv.Topic.Filename), url)
+	} else {
+		filename = conv.Topic.Filename
 	}
 
-	name := path.Clean(path.Join(path.Dir(conv.Topic.Filename), url))
-	cname := strings.ToLower(name)
+	if hash != "" {
+		var err error
+		full := conv.Index.Dir.Filepath(filename)
+		title, err = dita.ExtractTitle(full, strings.TrimPrefix(hash, "#"))
+		if err != nil {
+			conv.Errors = append(conv.Errors, fmt.Errorf("unable to extract title from %v [%v%v]: %s", filename, url, hash, err))
+		}
+	}
 
-	topic, ok := conv.Mapping.Topics[cname]
+	topic, ok := conv.Mapping.Topics[canonicalName(filename)]
 	if !ok {
-		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", name, url, hash))
-		return url + hash, false
+		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
+		return url + hash, title, false
+	}
+
+	if title == "" {
+		title = topic.Title
 	}
 
 	slug, ok := conv.Mapping.ByTopic[topic]
 	if !ok {
-		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", name, url, hash))
-		return url + hash, false
+		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
+		return url + hash, title, false
 	}
 
-	return string(slug) + hash, true
+	return string(slug) + hash, title, true
 }

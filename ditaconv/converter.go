@@ -14,11 +14,7 @@ import (
 func (mapping *Mapping) Convert(topic *Topic) (page *kb.Page, fatal error, errs []error) {
 	// make a shallow copy of rules
 	rules := xmlconv.NewRules()
-	rules.Translate = mapping.Rules.Translate
-	rules.Callback = mapping.Rules.Callback
-	rules.Remove = mapping.Rules.Remove
-	rules.Unwrap = mapping.Rules.Unwrap
-	rules.Handle = mapping.Rules.Handle
+	rules.Merge(mapping.Rules)
 
 	slug := mapping.ByTopic[topic]
 	if slug[0] != '/' {

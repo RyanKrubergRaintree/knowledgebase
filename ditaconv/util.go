@@ -42,7 +42,7 @@ func (d Dir) LoadTopic(filename string) (*Topic, error) {
 		}, fmt.Errorf("reading \"%s\": %s", filename, err)
 	}
 
-	desc, err := topic.ShortDesc.Text()
+	desc, _ := topic.ShortDesc.Text()
 	return &Topic{
 		Filename:   filename,
 		Title:      first(topic.NavTitle, topic.Title),
@@ -50,7 +50,7 @@ func (d Dir) LoadTopic(filename string) (*Topic, error) {
 		Synopsis:   desc,
 
 		Original: topic,
-	}, err
+	}, nil
 }
 
 func (d Dir) LoadMap(filename string) (*Map, error) {
