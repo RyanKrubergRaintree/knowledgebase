@@ -20,13 +20,6 @@ type Topic struct {
 	Original *dita.Topic
 }
 
-type Links struct {
-	Parent     *Topic
-	Prev, Next *Topic
-	Siblings   []*Topic
-	Children   []*Topic
-}
-
 type Context struct {
 	Dir     string
 	Entry   *Entry
@@ -57,6 +50,7 @@ type Index struct {
 type Entry struct {
 	Title     string
 	Topic     *Topic
+	Type      dita.CollectionType
 	Linking   dita.Linking
 	TOC       bool
 	LockTitle bool
@@ -70,102 +64,6 @@ func (index *Index) check(err error) bool {
 		return true
 	}
 	return false
-}
-
-func CreateLinks(context Context, entries []*Entry) {
-	linkable := make([]*Entry, 0, len(entries))
-	for _, e := range entries {
-		if e.Topic != nil {
-			linkable = append(linkable, e)
-		}
-	}
-
-	if context.Entry.Topic != nil && context.Entry.Linking.CanLinkTo() {
-		for _, a := range linkable {
-			if a.Linking.CanLinkFrom() {
-				a.Topic.Links = append(a.Topic.Links, Links{Parent: context.Entry.Topic})
-			}
-		}
-	}
-
-	if context.Entry.Topic != nil && context.Entry.Linking.CanLinkFrom() {
-		links := Links{}
-		for _, a := range linkable {
-			if a.Linking.CanLinkTo() {
-				links.Children = append(links.Children, a.Topic)
-			}
-		}
-
-		if len(links.Children) > 0 {
-			context.Entry.Topic.Links = append(context.Entry.Topic.Links, links)
-		}
-	}
-
-	switch context.Type {
-	case dita.Family:
-		for _, a := range linkable {
-			links := Links{}
-			if !a.Linking.CanLinkFrom() {
-				continue
-			}
-
-			for _, b := range linkable {
-				if a != b && b.Linking.CanLinkTo() {
-					links.Siblings = append(links.Siblings, b.Topic)
-				}
-			}
-
-			if len(links.Siblings) > 0 {
-				a.Topic.Links = append(a.Topic.Links, links)
-			}
-		}
-	case dita.Sequence:
-		for i, a := range linkable {
-			if !a.Linking.CanLinkFrom() {
-				continue
-			}
-
-			links := Links{}
-			if i-1 >= 0 {
-				prev := linkable[i-1]
-				if prev.Linking.CanLinkTo() {
-					links.Prev = prev.Topic
-				}
-			}
-			if i+1 < len(linkable) {
-				next := linkable[i+1]
-				if next.Linking.CanLinkTo() {
-					links.Next = next.Topic
-				}
-			}
-			if links.Prev != nil || links.Next != nil {
-				a.Topic.Links = append(a.Topic.Links, links)
-			}
-		}
-	}
-}
-
-func InterLink(A, B []*Entry) {
-	for _, a := range A {
-		if a.Topic == nil || !a.Linking.CanLinkFrom() {
-			continue
-		}
-
-		links := Links{}
-		for _, b := range B {
-			if b.Topic == nil {
-				continue
-			}
-
-			if b.Linking.CanLinkTo() {
-				links.Siblings = append(links.Siblings, b.Topic)
-			}
-		}
-
-		if len(links.Siblings) > 0 {
-			a.Topic.Links = append(a.Topic.Links, links)
-		}
-	}
 }
 
 func (index *Index) processRelRow(context Context, node *dita.MapNode) {
@@ -216,6 +114,9 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 	if node.Linking != "" {
 		context.Linking = node.Linking
 	}
+	if node.Type != "" {
+		context.Type = node.Type
+	}
 
 	if node.XMLName == dita.TopicGroup || node.XMLName.Local == "map" {
 		var entries []*Entry
@@ -253,6 +154,7 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 		entry.Title = node.Title
 	}
 	entry.Linking = context.Linking
+	entry.Type = context.Type
 
 	if node.Href != "" {
 		entry.Topic = index.loadTopic(context, node.Href)

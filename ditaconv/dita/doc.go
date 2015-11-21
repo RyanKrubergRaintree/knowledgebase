@@ -9,6 +9,7 @@ import (
 )
 
 type Topic struct {
+	XMLName   xml.Name
 	Title     string   `xml:"title"`
 	NavTitle  string   `xml:"titlealts>navtitle"`
 	Keywords  []string `xml:"prolog>metadata>keywords>indexterm"`

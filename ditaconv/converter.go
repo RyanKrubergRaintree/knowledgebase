@@ -146,27 +146,6 @@ func (conv *convert) unwrap(decoder *xml.Decoder, start *xml.StartElement) {
 	}
 }
 
-func (conv *convert) addRelatedLinks() {
-	for _, set := range conv.Topic.Links {
-		text := "<h4>Related</h4>"
-		text += "<ul>"
-
-		links := []*Topic{set.Parent, set.Prev, set.Next}
-		links = append(links, set.Children...)
-		links = append(links, set.Siblings...)
-
-		for _, topic := range links {
-			if topic == nil {
-				continue
-			}
-			text += "<li>" + conv.asLink(topic) + "</li>"
-		}
-		text += "</ul>"
-
-		conv.Page.Story.Append(kb.HTML(text))
-	}
-}
-
 func (conv *convert) asLink(topic *Topic) string {
 	slug := string(conv.Mapping.ByTopic[topic])
 	title := topic.Title
