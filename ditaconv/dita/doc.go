@@ -18,6 +18,7 @@ type Topic struct {
 	RelatedLink []Link `xml:"related-links>link>href"`
 
 	Elements []Body `xml:",any"`
+	Raw      []byte
 }
 
 type TopicHeader struct {
@@ -55,6 +56,7 @@ func LoadTopic(filename string) (*Topic, error) {
 	if err != nil {
 		return nil, err
 	}
+	topic.Raw = data
 
 	data, err = replaceConrefs(data, filename)
 	if err != nil {

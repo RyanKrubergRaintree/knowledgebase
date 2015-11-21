@@ -1,22 +1,17 @@
 package dita
 
 import (
+	"bytes"
 	"encoding/xml"
 	"errors"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
-func ExtractTitle(filename, nodepath string) (string, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-	dec := xml.NewDecoder(file)
+func (topic *Topic) ExtractTitle(nodepath string) (string, error) {
+	dec := xml.NewDecoder(bytes.NewReader(topic.Raw))
 
 	unmatched := strings.Split(nodepath, "/")
 	if len(unmatched) == 0 {

@@ -6,10 +6,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"path"
-	"path/filepath"
 	"strings"
 
-	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 	"github.com/raintreeinc/knowledgebase/extra/imagemap"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -204,27 +202,26 @@ func (conv *convert) convertLinkURL(url string) (href, title, desc string, inter
 		url, hash = url[:i], url[i:]
 	}
 
-	var filename string
+	name := conv.Topic.Filename
+	cname := canonicalName(name)
 	if url != "" {
-		filename = path.Join(path.Dir(conv.Topic.Filename), url)
-	} else {
-		filename = filepath.ToSlash(conv.Topic.Filename)
+		name = path.Join(path.Dir(conv.Topic.Filename), url)
+		cname = canonicalName(name)
+	}
+
+	topic, ok := conv.Mapping.Topics[cname]
+	if !ok {
+		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", name, url, hash))
+		return "", title, "", false
 	}
 
 	if hash != "" {
 		var err error
-		full := conv.Index.Dir.Filepath(filename)
-		title, err = dita.ExtractTitle(full, strings.TrimPrefix(hash, "#"))
+		title, err = topic.Original.ExtractTitle(hash)
 		if err != nil {
 			hash = ""
-			conv.Errors = append(conv.Errors, fmt.Errorf("unable to extract title from %v [%v%v]: %s", filename, url, hash, err))
+			conv.Errors = append(conv.Errors, fmt.Errorf("unable to extract title from %v [%v%v]: %s", name, url, hash, err))
 		}
-	}
-
-	topic, ok := conv.Mapping.Topics[canonicalName(filename)]
-	if !ok {
-		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
-		return "", title, "", false
 	}
 
 	if title == "" || hash == "" {
@@ -234,7 +231,7 @@ func (conv *convert) convertLinkURL(url string) (href, title, desc string, inter
 
 	slug, ok := conv.Mapping.ByTopic[topic]
 	if !ok {
-		conv.Errors = append(conv.Errors, fmt.Errorf("did not find slug %v [%v%v]", filename, url, hash))
+		conv.Errors = append(conv.Errors, fmt.Errorf("did not find slug %v [%v%v]", name, url, hash))
 		return url + hash, title, desc, false
 	}
 
