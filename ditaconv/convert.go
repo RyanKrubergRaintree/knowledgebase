@@ -70,9 +70,10 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 
 		href := getAttr(start, "href")
 		if title == "" {
-			title = getAttr(start, "title")
+			title = getAttr(start, "caption")
 		}
-		conv.Page.Story.Append(kb.Reference(title, href, ""))
+		desc := getAttr(start, "title")
+		conv.Page.Story.Append(kb.Reference(title, href, desc))
 	default:
 		text := conv.toHTML(decoder, start)
 		if alwaysHTML[start.Name.Local] {
@@ -99,7 +100,7 @@ func (conv *convert) toHTML(decoder *xml.Decoder, start *xml.StartElement) strin
 }
 
 func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error) {
-	href, title, internal := "", "", false
+	href, title, desc, internal := "", "", "", false
 
 	for i, a := range start.Attr {
 		if a.Name.Local == "href" {
@@ -107,7 +108,7 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 				start.Attr[i].Name.Local = "src"
 				href = conv.convertImageURL(a.Value)
 			} else {
-				href, title, internal = conv.convertLinkURL(a.Value)
+				href, title, desc, internal = conv.convertLinkURL(a.Value)
 			}
 			start.Attr[i].Value = href
 		} else if a.Name.Local == "id" {
@@ -118,8 +119,12 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 		}
 	}
 
-	if title != "" && getAttr(start, "title") == "" {
-		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "title"}, title})
+	if title != "" && getAttr(start, "caption") == "" {
+		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "caption"}, title})
+	}
+
+	if desc != "" && getAttr(start, "title") == "" {
+		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "title"}, desc})
 	}
 
 	if internal {
@@ -161,9 +166,9 @@ func (conv *convert) convertImageURL(url string) (href string) {
 	}
 }
 
-func (conv *convert) convertLinkURL(url string) (href, title string, internal bool) {
+func (conv *convert) convertLinkURL(url string) (href, title, desc string, internal bool) {
 	if strings.HasPrefix(url, "http") || strings.HasPrefix(url, "mailto") {
-		return url, "", false
+		return url, "", "", false
 	}
 
 	var hash string
@@ -184,6 +189,7 @@ func (conv *convert) convertLinkURL(url string) (href, title string, internal bo
 		full := conv.Index.Dir.Filepath(filename)
 		title, err = dita.ExtractTitle(full, strings.TrimPrefix(hash, "#"))
 		if err != nil {
+			hash = ""
 			conv.Errors = append(conv.Errors, fmt.Errorf("unable to extract title from %v [%v%v]: %s", filename, url, hash, err))
 		}
 	}
@@ -191,18 +197,19 @@ func (conv *convert) convertLinkURL(url string) (href, title string, internal bo
 	topic, ok := conv.Mapping.Topics[canonicalName(filename)]
 	if !ok {
 		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
-		return url + hash, title, false
+		return url + hash, title, "", false
 	}
 
-	if title == "" {
+	if title == "" || hash == "" {
 		title = topic.Title
+		desc, _ = topic.Original.ShortDesc.Text()
 	}
 
 	slug, ok := conv.Mapping.ByTopic[topic]
 	if !ok {
 		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
-		return url + hash, title, false
+		return url + hash, title, desc, false
 	}
 
-	return string(slug) + hash, title, true
+	return string(slug) + hash, title, desc, true
 }
