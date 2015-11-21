@@ -42,3 +42,16 @@ func StripTags(xmlcontent string) (string, error) {
 	dec := xml.NewDecoder(strings.NewReader(xmlcontent))
 	return Text(dec, nil)
 }
+
+func Skip(decoder *xml.Decoder, start *xml.StartElement) error {
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			return io.EOF
+		}
+
+		if _, done := token.(xml.EndElement); done {
+			return nil
+		}
+	}
+}

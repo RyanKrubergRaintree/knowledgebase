@@ -21,6 +21,7 @@ var alwaysHTML = map[string]bool{
 }
 
 func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) {
+	// NB! the converters must fully decode the element
 	switch start.Name.Local {
 	case "imagemap":
 		_, err := conv.handleAttrs(start)
@@ -44,6 +45,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			conv.handleAttrs(start)
 			href := getAttr(start, "href")
 			conv.Page.Story.Append(kb.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
+			xmlconv.Skip(decoder, start)
 		default:
 			text := conv.toHTML(decoder, start)
 			conv.Page.Story.Append(kb.HTML(text))
@@ -54,6 +56,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 		conv.check(err)
 		href := getAttr(start, "src")
 		conv.Page.Story.Append(kb.Image("", href, ""))
+		xmlconv.Skip(decoder, start)
 	case "title":
 		title, _ := xmlconv.Text(decoder, start)
 		if title != "" {
