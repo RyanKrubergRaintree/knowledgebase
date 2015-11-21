@@ -19,12 +19,12 @@ func HTML(text string) Item {
 	}
 }
 
-func Reference(title, site, text string) Item {
+func Reference(title, url, text string) Item {
 	return Item{
 		"type":  "reference",
 		"id":    NewID(),
 		"title": title,
-		"site":  site,
+		"url":   url,
 		"text":  text,
 	}
 }

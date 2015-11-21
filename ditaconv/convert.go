@@ -65,11 +65,13 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			conv.Page.Story.Append(kb.HTML("<h3>" + title + "</h3>"))
 		}
 	case "xref", "link", "a":
+		conv.handleAttrs(start)
 		title, _ := xmlconv.Text(decoder, start)
-		if title == "" {
-			title = getAttr(start, "href")
-		}
+
 		href := getAttr(start, "href")
+		if title == "" {
+			title = getAttr(start, "title")
+		}
 		conv.Page.Story.Append(kb.Reference(title, href, ""))
 	default:
 		text := conv.toHTML(decoder, start)
