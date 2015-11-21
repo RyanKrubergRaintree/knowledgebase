@@ -3,6 +3,7 @@ package xmlconv
 import (
 	"encoding/xml"
 	"io"
+	"strings"
 )
 
 func Text(decoder *xml.Decoder, start *xml.StartElement) (string, error) {
@@ -31,4 +32,13 @@ func Text(decoder *xml.Decoder, start *xml.StartElement) (string, error) {
 			panic("unknown token")
 		}
 	}
+}
+
+func StripTags(xmlcontent string) (string, error) {
+	if xmlcontent == "" {
+		return "", nil
+	}
+
+	dec := xml.NewDecoder(strings.NewReader(xmlcontent))
+	return Text(dec, nil)
 }

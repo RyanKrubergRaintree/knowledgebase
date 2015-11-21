@@ -4,13 +4,15 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"log"
+
+	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
 type Topic struct {
 	Title     string   `xml:"title"`
 	NavTitle  string   `xml:"titlealts>navtitle"`
 	Keywords  []string `xml:"prolog>metadata>keywords>indexterm"`
-	ShortDesc string   `xml:"shortdesc"`
+	ShortDesc InnerXML `xml:"shortdesc"`
 
 	RelatedLink []Link `xml:"related-links>link>href"`
 
@@ -18,13 +20,20 @@ type Topic struct {
 }
 
 type TopicHeader struct {
-	Title     string `xml:"title"`
-	ShortDesc string `xml:"shortdesc"`
+	Title     string   `xml:"title"`
+	ShortDesc InnerXML `xml:"shortdesc"`
 	TitleAlts struct {
 		Nav    string `xml:"navtitle"`
 		Search string `xml:"searchtitle"`
 	} `xml:"titlealts"`
 }
+
+type InnerXML struct {
+	XMLName xml.Name
+	Content string `xml:",innerxml"`
+}
+
+func (x *InnerXML) Text() (string, error) { return xmlconv.StripTags(x.Content) }
 
 type Body struct {
 	XMLName xml.Name
