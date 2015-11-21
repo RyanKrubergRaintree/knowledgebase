@@ -26,11 +26,10 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 	// NB! the converters must fully decode the element
 	switch start.Name.Local {
 	case "imagemap":
-		_, err := conv.handleAttrs(start)
-		conv.check(err)
+		conv.fixAttrs(start)
 
 		var m imagemap.XML
-		err = decoder.DecodeElement(&m, start)
+		err := decoder.DecodeElement(&m, start)
 		conv.check(err)
 
 		if err == nil {
@@ -44,7 +43,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 	case "data":
 		switch datatype := getAttr(start, "datatype"); strings.ToLower(datatype) {
 		case "rttutorial":
-			conv.handleAttrs(start)
+			conv.fixAttrs(start)
 			href := getAttr(start, "href")
 			conv.Page.Story.Append(kb.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
 			xmlconv.Skip(decoder, start)
@@ -54,8 +53,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			conv.Errors = append(conv.Errors, fmt.Errorf("unhandled datatype \"%v\"", datatype))
 		}
 	case "img", "image":
-		_, err := conv.handleAttrs(start)
-		conv.check(err)
+		conv.fixAttrs(start)
 		href := getAttr(start, "src")
 		conv.Page.Story.Append(kb.Image("", href, ""))
 		xmlconv.Skip(decoder, start)
@@ -65,7 +63,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			conv.Page.Story.Append(kb.HTML("<h3>" + title + "</h3>"))
 		}
 	case "xref", "link", "a":
-		conv.handleAttrs(start)
+		conv.fixAttrs(start)
 		title, _ := xmlconv.Text(decoder, start)
 
 		href := getAttr(start, "href")
@@ -99,7 +97,38 @@ func (conv *convert) toHTML(decoder *xml.Decoder, start *xml.StartElement) strin
 	return buf.String()
 }
 
-func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error) {
+func (conv *convert) handleXRef(enc xmlconv.Encoder, dec *xml.Decoder, start *xml.StartElement) error {
+	conv.fixAttrs(start)
+	caption, err := xmlconv.Text(dec, start)
+	conv.check(err)
+
+	if caption == "" {
+		caption = getAttr(start, "caption")
+	}
+
+	name := xml.Name{Local: "a"}
+	if err := enc.EncodeToken(xml.StartElement{
+		Name: name,
+		Attr: start.Attr,
+	}); err != nil {
+		return err
+	}
+	if err := enc.EncodeToken(xml.CharData(caption)); err != nil {
+		return err
+	}
+	if err := enc.EncodeToken(xml.EndElement{name}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (conv *convert) nestedElement(start *xml.StartElement) (skip bool, err error) {
+	conv.fixAttrs(start)
+	return false, nil
+}
+
+func (conv *convert) fixAttrs(start *xml.StartElement) {
 	href, title, desc, internal := "", "", "", false
 
 	for i, a := range start.Attr {
@@ -132,8 +161,6 @@ func (conv *convert) handleAttrs(start *xml.StartElement) (skip bool, err error)
 	}
 
 	start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "data-dita"}, start.Name.Local})
-
-	return false, nil
 }
 
 func (conv *convert) convertImageURL(url string) (href string) {

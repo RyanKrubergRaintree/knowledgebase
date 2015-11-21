@@ -29,7 +29,8 @@ func (mapping *Mapping) Convert(topic *Topic) (page *kb.Page, fatal error, errs 
 		Rules:   rules,
 	}
 
-	convert.Rules.Handle.Element = convert.handleAttrs
+	convert.Rules.Handle.Element = convert.nestedElement
+	convert.Rules.Callback["xref"] = convert.handleXRef
 
 	convert.run()
 
