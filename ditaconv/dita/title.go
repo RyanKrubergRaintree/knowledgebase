@@ -13,6 +13,10 @@ import (
 func (topic *Topic) ExtractTitle(nodepath string) (string, error) {
 	dec := xml.NewDecoder(bytes.NewReader(topic.Raw))
 
+	if i := strings.LastIndex(nodepath, "#"); i >= 0 {
+		nodepath = nodepath[i+1:]
+	}
+
 	unmatched := strings.Split(nodepath, "/")
 	if len(unmatched) == 0 {
 		return "", errors.New("Invalid target node path.")
