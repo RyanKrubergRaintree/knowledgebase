@@ -206,9 +206,9 @@ func (conv *convert) convertLinkURL(url string) (href, title, desc string, inter
 
 	var filename string
 	if url != "" {
-		filename = filepath.Join(filepath.Dir(conv.Topic.Filename), url)
+		filename = path.Join(path.Dir(conv.Topic.Filename), url)
 	} else {
-		filename = conv.Topic.Filename
+		filename = filepath.ToSlash(conv.Topic.Filename)
 	}
 
 	if hash != "" {
@@ -224,7 +224,7 @@ func (conv *convert) convertLinkURL(url string) (href, title, desc string, inter
 	topic, ok := conv.Mapping.Topics[canonicalName(filename)]
 	if !ok {
 		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
-		return url + hash, title, "", false
+		return "", title, "", false
 	}
 
 	if title == "" || hash == "" {
@@ -234,7 +234,7 @@ func (conv *convert) convertLinkURL(url string) (href, title, desc string, inter
 
 	slug, ok := conv.Mapping.ByTopic[topic]
 	if !ok {
-		conv.Errors = append(conv.Errors, fmt.Errorf("did not find topic %v [%v%v]", filename, url, hash))
+		conv.Errors = append(conv.Errors, fmt.Errorf("did not find slug %v [%v%v]", filename, url, hash))
 		return url + hash, title, desc, false
 	}
 
