@@ -59,8 +59,7 @@ package("kb", function(exports) {
 		},
 
 		closeLast: function() {
-			// always keep one stage open
-			if (this.stages.length > 1) {
+			if (this.stages.length > 0) {
 				this.stages[this.stages.length - 1].close();
 			}
 		},
