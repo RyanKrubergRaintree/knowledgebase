@@ -67,7 +67,10 @@ func (r *replacer) conref(start xml.StartElement) error {
 			}
 			unmatched = unmatched[1:]
 			if len(unmatched) == 0 {
-				return (&replacer{full, r.enc}).emit(dec, start)
+				r.enc.EncodeToken(start)
+				err := (&replacer{full, r.enc}).emit(dec, start)
+				r.enc.EncodeToken(xml.EndElement{Name: start.Name})
+				return err
 			}
 		}
 	}
@@ -90,23 +93,23 @@ func (r *replacer) emit(dec *xml.Decoder, start xml.StartElement) error {
 			return nil
 		}
 
-		r.enc.EncodeToken(token)
-
 		if start, ok := token.(xml.StartElement); ok {
 			var err error
 			if getAttr(start, "conref") != "" {
 				err = r.conref(start)
 				dec.Skip()
 			} else {
+				r.enc.EncodeToken(token)
 				err = r.emit(dec, start)
+				r.enc.EncodeToken(xml.EndElement{Name: start.Name})
 			}
-
-			r.enc.EncodeToken(xml.EndElement{Name: start.Name})
-
 			if err != nil {
 				return err
 			}
+			continue
 		}
+
+		r.enc.EncodeToken(token)
 	}
 	return nil
 }
