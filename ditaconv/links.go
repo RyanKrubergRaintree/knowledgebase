@@ -6,7 +6,7 @@ import (
 )
 
 type Links struct {
-	Type       dita.CollectionType
+	CollType   dita.CollectionType
 	Parent     *Topic
 	Prev, Next *Topic
 	Siblings   []*Topic
@@ -37,7 +37,7 @@ func CreateLinks(context Context, entries []*Entry) {
 	}
 
 	if context.Entry.Topic != nil && context.Entry.Linking.CanLinkFrom() {
-		links := Links{Type: context.Type}
+		links := Links{CollType: context.CollType}
 		for _, a := range linkable {
 			if a.Linking.CanLinkTo() {
 				links.Children = append(links.Children, a.Topic)
@@ -49,7 +49,7 @@ func CreateLinks(context Context, entries []*Entry) {
 		}
 	}
 
-	switch context.Type {
+	switch context.CollType {
 	case dita.Family:
 		for _, a := range linkable {
 			links := Links{}
@@ -134,7 +134,7 @@ func (conv *convert) addRelatedLinks() {
 
 	for _, set := range conv.Topic.Links {
 		if len(set.Children) > 0 {
-			if set.Type == dita.Sequence {
+			if set.CollType == dita.Sequence {
 				text += "<ol>"
 			} else {
 				text += "<ul>"
@@ -149,7 +149,7 @@ func (conv *convert) addRelatedLinks() {
 			}
 			text += "</ol>"
 
-			if set.Type == dita.Sequence {
+			if set.CollType == dita.Sequence {
 				text += "</ol>"
 			} else {
 				text += "</ul>"
@@ -198,6 +198,12 @@ func (conv *convert) addRelatedLinks() {
 
 	text += "</div>"
 	conv.Page.Story.Append(kb.HTML(text))
+}
+
+func (conv *convert) asLink(topic *Topic) string {
+	slug := string(conv.Mapping.ByTopic[topic])
+	title := topic.Title
+	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
 }
 
 func contains(xs []string, s string) bool {

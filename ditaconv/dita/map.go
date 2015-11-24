@@ -9,8 +9,9 @@ type MapNode struct {
 	NavTitle string `xml:"navtitle,attr"`
 	Href     string `xml:"href,attr"`
 
-	Type    CollectionType `xml:"collection-type,attr"`
-	Linking Linking        `xml:"linking,attr"`
+	Type     string         `xml:"type,attr"`
+	CollType CollectionType `xml:"collection-type,attr"`
+	Linking  Linking        `xml:"linking,attr"`
 
 	Format    string `xml:"format,attr"`
 	TOC       string `xml:"toc,attr"`

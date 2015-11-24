@@ -146,12 +146,6 @@ func (conv *convert) unwrap(decoder *xml.Decoder, start *xml.StartElement) {
 	}
 }
 
-func (conv *convert) asLink(topic *Topic) string {
-	slug := string(conv.Mapping.ByTopic[topic])
-	title := topic.Title
-	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
-}
-
 func (conv *convert) dropEmpty() {
 	s := conv.Page.Story
 	s = s[:0:cap(s)]

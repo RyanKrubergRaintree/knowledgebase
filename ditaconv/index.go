@@ -21,11 +21,11 @@ type Topic struct {
 }
 
 type Context struct {
-	Dir     string
-	Entry   *Entry
-	Type    dita.CollectionType
-	Linking dita.Linking
-	TOC     bool
+	Dir      string
+	Entry    *Entry
+	CollType dita.CollectionType
+	Linking  dita.Linking
+	TOC      bool
 }
 
 type Map struct {
@@ -50,7 +50,7 @@ type Index struct {
 type Entry struct {
 	Title     string
 	Topic     *Topic
-	Type      dita.CollectionType
+	CollType  dita.CollectionType
 	Linking   dita.Linking
 	TOC       bool
 	LockTitle bool
@@ -105,17 +105,17 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 		node.Href = href
 	}
 
-	if node.Type != "" {
-		context.Type = node.Type
+	if node.CollType != "" {
+		context.CollType = node.CollType
 	} else {
-		context.Type = dita.Unordered
+		context.CollType = dita.Unordered
 	}
 
 	if node.Linking != "" {
 		context.Linking = node.Linking
 	}
-	if node.Type != "" {
-		context.Type = node.Type
+	if node.CollType != "" {
+		context.CollType = node.CollType
 	}
 
 	if node.XMLName == dita.TopicGroup || node.XMLName.Local == "map" {
@@ -154,7 +154,7 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 		entry.Title = node.Title
 	}
 	entry.Linking = context.Linking
-	entry.Type = context.Type
+	entry.CollType = context.CollType
 
 	if node.Href != "" {
 		entry.Topic = index.loadTopic(context, node.Href)
@@ -229,11 +229,11 @@ func LoadIndex(filename string) (*Index, []error) {
 	}
 
 	context := Context{
-		Dir:     "",
-		Entry:   index.Nav,
-		Type:    dita.Unordered,
-		Linking: dita.NormalLinking,
-		TOC:     true,
+		Dir:      "",
+		Entry:    index.Nav,
+		CollType: dita.Unordered,
+		Linking:  dita.NormalLinking,
+		TOC:      true,
 	}
 
 	entries := index.loadMap(context, filepath.Base(filename))
