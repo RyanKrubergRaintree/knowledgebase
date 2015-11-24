@@ -14,12 +14,13 @@ package("kb.item", function(exports) {
 		}
 
 		text = text.replace(rxExternalLink,
-			"<a href=\"$1\" class=\"external-link\" target=\"_blank<div>\"</div> rel=\"nofollow\">$2</a>");
+			"<a href=\"$1\" class=\"external-link\" target=\"_blank\" rel=\"nofollow\">$2</a>");
 
 		text = text.replace(rxInternalLink, function(match, link) {
 			var ref = kb.convert.LinkToReference(link, stage);
 			return "<a href=\"" + ref.url + "\" data-link=\"" + ref.link + "\" >" + ref.title + "</a>";
 		});
+
 		return text;
 	}
 
