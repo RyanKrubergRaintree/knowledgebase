@@ -296,8 +296,9 @@ package("kb.Stage", function(exports) {
 
 				var loc = kb.convert.URLToLocation(this.props.stage.link);
 				if (loc.fragment !== "") {
+					var id = loc.fragment.substring(1);
 					var node = ReactDOM.findDOMNode(this);
-					var el = node.querySelector("[data-id=\"" + loc.fragment + "\"]");
+					var el = node.querySelector("[data-id=\"" + id + "\"]");
 					if (el) {
 						el.scrollIntoView();
 					}
