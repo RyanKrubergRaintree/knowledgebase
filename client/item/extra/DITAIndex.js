@@ -104,7 +104,9 @@ package("kb.item.content", function(exports) {
 			}
 			return n;
 		}
-
+		if (typeof root === "undefined" || root === null) {
+			return null;
+		}
 		return mknode(root);
 	}
 
