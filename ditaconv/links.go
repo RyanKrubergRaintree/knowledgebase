@@ -13,6 +13,13 @@ type Links struct {
 	Children   []*Topic
 }
 
+func (links *Links) IsEmpty() bool {
+	return links.Parent == nil &&
+		links.Prev == nil && links.Next == nil &&
+		len(links.Siblings) == 0 &&
+		len(links.Children) == 0
+}
+
 func CreateLinks(context Context, entries []*Entry) {
 	linkable := make([]*Entry, 0, len(entries))
 	for _, e := range entries {
@@ -109,7 +116,20 @@ func InterLink(A, B []*Entry) {
 	}
 }
 
+func emptylinks(links []Links) bool {
+	for _, set := range links {
+		if !set.IsEmpty() {
+			return false
+		}
+	}
+	return true
+}
+
 func (conv *convert) addRelatedLinks() {
+	if emptylinks(conv.Topic.Links) {
+		return
+	}
+
 	text := "<div class=\"dita-related-links\">"
 
 	for _, set := range conv.Topic.Links {
