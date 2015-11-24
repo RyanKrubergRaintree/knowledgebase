@@ -77,12 +77,16 @@ package("kb.boot", function(exports) {
 			var session = this.props.Session;
 			var lineup = new kb.Lineup(session);
 			var crumbs = new kb.Crumbs(lineup);
-			return {
+			var selection = new kb.Selection();
+
+			// expose the current major state!
+			kb.app = {
 				Lineup: lineup,
 				Crumbs: crumbs,
-				CurrentSelection: new kb.Selection(),
+				CurrentSelection: selection,
 				Session: session
 			};
+			return kb.app;
 		},
 		childContextTypes: {
 			Lineup: React.PropTypes.object,
