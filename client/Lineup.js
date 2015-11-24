@@ -228,6 +228,13 @@ package("kb", function(exports) {
 				return;
 			}
 
+			var scope = t.attributes["scope"];
+			if (typeof scope !== "undefined") {
+				if (scope.value === "external") {
+					return;
+				}
+			}
+
 			var href = t.attributes["href"];
 			if (typeof href === "undefined") {
 				return;

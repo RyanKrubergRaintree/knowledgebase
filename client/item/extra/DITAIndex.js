@@ -104,8 +104,15 @@ package("kb.item.content", function(exports) {
 			}
 			return n;
 		}
+
 		if (typeof root === "undefined" || root === null) {
-			return null;
+			return {
+				title: "",
+				slug: "",
+				active: false,
+				activechild: false,
+				children: []
+			};
 		}
 		return mknode(root);
 	}

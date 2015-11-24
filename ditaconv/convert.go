@@ -158,6 +158,11 @@ func (conv *convert) fixAttrs(start *xml.StartElement) {
 		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "data-link"}, href})
 	}
 
+	if getAttr(start, "format") != "" && href != "" {
+		title := path.Base(href)
+		start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "download"}, title})
+	}
+
 	start.Attr = append(start.Attr, xml.Attr{xml.Name{Local: "data-dita"}, start.Name.Local})
 }
 
