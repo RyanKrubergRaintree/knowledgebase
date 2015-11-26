@@ -25,52 +25,96 @@ type replacer struct {
 	enc  *xml.Encoder
 }
 
+func splitref(ref string) (file string, path []string) {
+	if !strings.Contains(ref, "#") {
+		return ref, nil
+	}
+
+	tokens := strings.SplitN(ref, "#", 2)
+	return tokens[0], strings.Split(tokens[1], "/")
+}
+
+func sameroot(a, b []string) bool {
+	if len(a) == 0 || len(a) != len(b) {
+		return false
+	}
+
+	for i, v := range a[:len(a)-1] {
+		if !strings.EqualFold(v, b[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 func (r *replacer) conref(start xml.StartElement) error {
-	conref := getAttr(start, "conref")
-	if !strings.Contains(conref, "#") {
-		return errors.New("Invalid conref value.")
+	startfile, startpath := splitref(getAttr(start, "conref"))
+	endfile, endpath := splitref(getAttr(start, "conrefend"))
+
+	if endfile == "" && len(endpath) == 0 {
+		endfile, endpath = startfile, startpath
 	}
 
-	tokens := strings.Split(conref, "#")
-	file, nodepath := tokens[0], tokens[1]
-
-	full := filepath.Join(filepath.Dir(r.file), filepath.FromSlash(file))
-	if file == "" {
-		full = r.file
+	if startfile == "" && endfile == "" {
+		startfile = r.file
+		endfile = r.file
+	} else {
+		startfile = filepath.Join(filepath.Dir(r.file), filepath.FromSlash(startfile))
+		endfile = filepath.Join(filepath.Dir(r.file), filepath.FromSlash(endfile))
 	}
 
-	data, err := os.Open(full)
+	if startfile != endfile {
+		return errors.New("conref and conrefend are in different files")
+	}
+	if !sameroot(startpath, endpath) {
+		return errors.New("conref and conrefend have different root elements")
+	}
+	if len(startpath) == 0 || len(endpath) == 0 {
+		return errors.New("invalid conref path")
+	}
+
+	data, err := os.Open(startfile)
 	if err != nil {
-		return fmt.Errorf("Problem opening %v: %v", full, err)
+		return fmt.Errorf("Problem opening %v: %v", startfile, err)
 	}
+
 	defer data.Close()
 	dec := xml.NewDecoder(data)
 
-	unmatched := strings.Split(nodepath, "/")
-	if len(unmatched) == 0 {
-		return errors.New("Invalid target node path.")
+	s, err := walknodepath(dec, startpath)
+	if err != nil {
+		if err == io.EOF {
+			return errors.New("did not find conref")
+		}
+		return err
 	}
 
+	lastid := endpath[len(endpath)-1]
 	for {
-		token, err := dec.Token()
-		if err == io.EOF {
-			return errors.New("Did not find conref " + conref)
-		}
+		r.enc.EncodeToken(s)
+		err := (&replacer{startfile, r.enc}).emit(dec, s)
+		r.enc.EncodeToken(xml.EndElement{Name: s.Name})
 		if err != nil {
 			return err
 		}
 
-		if start, ok := token.(xml.StartElement); ok {
-			id := getAttr(start, "id")
-			if !strings.EqualFold(id, unmatched[0]) {
-				continue
-			}
-			unmatched = unmatched[1:]
-			if len(unmatched) == 0 {
-				r.enc.EncodeToken(start)
-				err := (&replacer{full, r.enc}).emit(dec, start)
-				r.enc.EncodeToken(xml.EndElement{Name: start.Name})
+		if strings.EqualFold(lastid, getAttr(s, "id")) {
+			return nil
+		}
+
+		for {
+			x, err := dec.Token()
+			if err != nil {
+				if err == io.EOF {
+					return errors.New("did not find conrefend")
+				}
 				return err
+			}
+
+			var ok bool
+			s, ok = x.(xml.StartElement)
+			if ok {
+				break
 			}
 		}
 	}
