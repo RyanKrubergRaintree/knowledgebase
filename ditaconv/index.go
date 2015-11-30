@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 )
@@ -18,6 +19,8 @@ type Topic struct {
 	Links []Links
 
 	Original *dita.Topic
+
+	pageLinksProcessed bool
 }
 
 type Context struct {
@@ -86,7 +89,7 @@ func (index *Index) processRelRow(context Context, node *dita.MapNode) {
 	for i, a := range entrysets {
 		for j, b := range entrysets {
 			if i != j {
-				InterLink(a, b)
+				interLink(a, b)
 			}
 		}
 	}
@@ -127,7 +130,7 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 			entries = append(entries, index.processNode(childcontext, child)...)
 		}
 		context.Entry = &Entry{}
-		CreateLinks(context, entries)
+		createLinks(context, entries)
 		return entries
 	}
 
@@ -175,7 +178,8 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 	}
 	entry.Children = append(entry.Children, entries...)
 
-	CreateLinks(childcontext, entries)
+	createLinks(childcontext, entries)
+	index.addPageLinks(childcontext, entry)
 
 	return []*Entry{entry}
 }
@@ -202,6 +206,10 @@ func (index *Index) loadMap(context Context, filename string) []*Entry {
 
 // Loads a single topic from a concrete file with context
 func (index *Index) loadTopic(context Context, filename string) *Topic {
+	if i := strings.Index(filename, "#"); i >= 0 {
+		filename = filename[:i]
+	}
+
 	name := path.Join(context.Dir, filename)
 	cname := canonicalName(name)
 	if topic, loaded := index.Topics[cname]; loaded {

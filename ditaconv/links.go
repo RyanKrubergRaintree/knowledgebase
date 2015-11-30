@@ -1,6 +1,9 @@
 package ditaconv
 
 import (
+	"path"
+	"strings"
+
 	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
@@ -9,6 +12,8 @@ type Link struct {
 	Topic *Topic
 	Title string
 	Type  string
+	Scope string
+	Href  string
 }
 
 func (e *Entry) asLink() *Link {
@@ -16,6 +21,8 @@ func (e *Entry) asLink() *Link {
 		Topic: e.Topic,
 		Title: e.Title,
 		Type:  e.Type,
+		Scope: "",
+		Href:  "",
 	}
 }
 
@@ -34,7 +41,7 @@ func (links *Links) IsEmpty() bool {
 		len(links.Children) == 0
 }
 
-func CreateLinks(context Context, entries []*Entry) {
+func createLinks(context Context, entries []*Entry) {
 	linkable := make([]*Entry, 0, len(entries))
 	for _, e := range entries {
 		if e.Topic != nil {
@@ -107,7 +114,7 @@ func CreateLinks(context Context, entries []*Entry) {
 	}
 }
 
-func InterLink(A, B []*Entry) {
+func interLink(A, B []*Entry) {
 	for _, a := range A {
 		if a.Topic == nil || !a.Linking.CanLinkFrom() {
 			continue
@@ -127,6 +134,44 @@ func InterLink(A, B []*Entry) {
 		if len(links.Siblings) > 0 {
 			a.Topic.Links = append(a.Topic.Links, links)
 		}
+	}
+}
+
+func (index *Index) addPageLinks(context Context, a *Entry) {
+	if a.Topic == nil || a.Topic.pageLinksProcessed {
+		return
+	}
+	a.Topic.pageLinksProcessed = true
+
+	pagecontext := context
+	pagecontext.Dir = path.Dir(a.Topic.Filename)
+
+	links := Links{}
+	for _, rellink := range a.Topic.Original.RelatedLink {
+		if rellink.Scope == "external" || strings.HasPrefix(rellink.Href, "http:") {
+			links.Siblings = append(links.Siblings, &Link{
+				Topic: nil,
+				Title: rellink.Text,
+				Scope: "external",
+				Href:  rellink.Href,
+			})
+			continue
+		}
+
+		var topic *Topic
+		if rellink.Href != "" {
+			topic = index.loadTopic(pagecontext, rellink.Href)
+			if topic != nil {
+				links.Siblings = append(links.Siblings, &Link{
+					Topic: topic,
+					Title: rellink.Text,
+				})
+			}
+		}
+	}
+
+	if len(links.Siblings) > 0 {
+		a.Topic.Links = append(a.Topic.Links, links)
 	}
 }
 
@@ -185,7 +230,10 @@ func (conv *convert) addRelatedLinks() {
 	order := []string{"concept", "task", "reference", "tutorial", "information"}
 	for _, set := range conv.Topic.Links {
 		for _, link := range set.Siblings {
-			kind := link.Topic.Original.XMLName.Local
+			kind := ""
+			if link.Topic != nil {
+				kind = link.Topic.Original.XMLName.Local
+			}
 			if link.Type != "" {
 				kind = link.Type
 			}
@@ -218,6 +266,18 @@ func (conv *convert) addRelatedLinks() {
 }
 
 func (conv *convert) linkAsHTML(link *Link) string {
+	if link.Scope == "external" {
+		title := link.Title
+		if title == "" {
+			title = link.Href
+		}
+		return "<a href=\"" + link.Href + "\" class=\"external-link\" target=\"_blank\" rel=\"nofollow\">" + title + "</a>"
+	}
+
+	if link.Topic == nil {
+		return ""
+	}
+
 	slug := string(conv.Mapping.ByTopic[link.Topic])
 	title := link.Topic.Title
 	if link.Title != "" {

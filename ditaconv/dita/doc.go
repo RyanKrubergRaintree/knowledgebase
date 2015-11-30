@@ -15,7 +15,7 @@ type Topic struct {
 	Keywords  []string `xml:"prolog>metadata>keywords>indexterm"`
 	ShortDesc InnerXML `xml:"shortdesc"`
 
-	RelatedLink []Link `xml:"related-links>link>href"`
+	RelatedLink []Link `xml:"related-links>link"`
 
 	Elements []Body `xml:",any"`
 	Raw      []byte
