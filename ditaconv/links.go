@@ -5,12 +5,26 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
+type Link struct {
+	Topic *Topic
+	Title string
+	Type  string
+}
+
+func (e *Entry) asLink() *Link {
+	return &Link{
+		Topic: e.Topic,
+		Title: e.Title,
+		Type:  e.Type,
+	}
+}
+
 type Links struct {
 	CollType   dita.CollectionType
-	Parent     *Topic
-	Prev, Next *Topic
-	Siblings   []*Topic
-	Children   []*Topic
+	Parent     *Link
+	Prev, Next *Link
+	Siblings   []*Link
+	Children   []*Link
 }
 
 func (links *Links) IsEmpty() bool {
@@ -31,7 +45,7 @@ func CreateLinks(context Context, entries []*Entry) {
 	if context.Entry.Topic != nil && context.Entry.Linking.CanLinkTo() {
 		for _, a := range linkable {
 			if a.Linking.CanLinkFrom() {
-				a.Topic.Links = append(a.Topic.Links, Links{Parent: context.Entry.Topic})
+				a.Topic.Links = append(a.Topic.Links, Links{Parent: context.Entry.asLink()})
 			}
 		}
 	}
@@ -40,7 +54,7 @@ func CreateLinks(context Context, entries []*Entry) {
 		links := Links{CollType: context.CollType}
 		for _, a := range linkable {
 			if a.Linking.CanLinkTo() {
-				links.Children = append(links.Children, a.Topic)
+				links.Children = append(links.Children, a.asLink())
 			}
 		}
 
@@ -59,7 +73,7 @@ func CreateLinks(context Context, entries []*Entry) {
 
 			for _, b := range linkable {
 				if a != b && b.Linking.CanLinkTo() {
-					links.Siblings = append(links.Siblings, b.Topic)
+					links.Siblings = append(links.Siblings, b.asLink())
 				}
 			}
 
@@ -77,13 +91,13 @@ func CreateLinks(context Context, entries []*Entry) {
 			if i-1 >= 0 {
 				prev := linkable[i-1]
 				if prev.Linking.CanLinkTo() {
-					links.Prev = prev.Topic
+					links.Prev = prev.asLink()
 				}
 			}
 			if i+1 < len(linkable) {
 				next := linkable[i+1]
 				if next.Linking.CanLinkTo() {
-					links.Next = next.Topic
+					links.Next = next.asLink()
 				}
 			}
 			if links.Prev != nil || links.Next != nil {
@@ -106,7 +120,7 @@ func InterLink(A, B []*Entry) {
 			}
 
 			if b.Linking.CanLinkTo() {
-				links.Siblings = append(links.Siblings, b.Topic)
+				links.Siblings = append(links.Siblings, b.asLink())
 			}
 		}
 
@@ -140,10 +154,10 @@ func (conv *convert) addRelatedLinks() {
 				text += "<ul>"
 			}
 
-			for _, topic := range set.Children {
-				text += "<li>" + conv.asLink(topic)
-				if topic.Synopsis != "" {
-					text += "<p>" + topic.Synopsis + "</p>"
+			for _, link := range set.Children {
+				text += "<li>" + conv.linkAsHTML(link)
+				if link.Topic.Synopsis != "" {
+					text += "<p>" + link.Topic.Synopsis + "</p>"
 				}
 				text += "</li>"
 			}
@@ -157,32 +171,35 @@ func (conv *convert) addRelatedLinks() {
 		}
 
 		if set.Parent != nil {
-			text += "<div><b>Parent topic: </b>" + conv.asLink(set.Parent) + "</div>"
+			text += "<div><b>Parent topic: </b>" + conv.linkAsHTML(set.Parent) + "</div>"
 		}
 		if set.Prev != nil {
-			text += "<div><b>Previous topic: </b>" + conv.asLink(set.Prev) + "</div>"
+			text += "<div><b>Previous topic: </b>" + conv.linkAsHTML(set.Prev) + "</div>"
 		}
 		if set.Next != nil {
-			text += "<div><b>Next topic: </b>" + conv.asLink(set.Next) + "</div>"
+			text += "<div><b>Next topic: </b>" + conv.linkAsHTML(set.Next) + "</div>"
 		}
 	}
 
-	grouped := make(map[string][]*Topic)
+	grouped := make(map[string][]*Link)
 	order := []string{"concept", "task", "reference", "tutorial", "information"}
 	for _, set := range conv.Topic.Links {
-		for _, topic := range set.Siblings {
-			kind := topic.Original.XMLName.Local
+		for _, link := range set.Siblings {
+			kind := link.Topic.Original.XMLName.Local
+			if link.Type != "" {
+				kind = link.Type
+			}
 			if !contains(order, kind) {
 				kind = "information"
 			}
 
-			grouped[kind] = append(grouped[kind], topic)
+			grouped[kind] = append(grouped[kind], link)
 		}
 	}
 
 	for _, kind := range order {
-		topics := grouped[kind]
-		if len(topics) == 0 {
+		links := grouped[kind]
+		if len(links) == 0 {
 			continue
 		}
 
@@ -190,8 +207,8 @@ func (conv *convert) addRelatedLinks() {
 			kind += "s"
 		}
 		text += "<div><b>Related " + kind + "</b>"
-		for _, topic := range topics {
-			text += "<div>" + conv.asLink(topic) + "</div>"
+		for _, link := range links {
+			text += "<div>" + conv.linkAsHTML(link) + "</div>"
 		}
 		text += "</div>"
 	}
@@ -200,9 +217,12 @@ func (conv *convert) addRelatedLinks() {
 	conv.Page.Story.Append(kb.HTML(text))
 }
 
-func (conv *convert) asLink(topic *Topic) string {
-	slug := string(conv.Mapping.ByTopic[topic])
-	title := topic.Title
+func (conv *convert) linkAsHTML(link *Link) string {
+	slug := string(conv.Mapping.ByTopic[link.Topic])
+	title := link.Topic.Title
+	if link.Title != "" {
+		title = link.Title
+	}
 	return "<a href=\"" + slug + "\" data-link=\"" + slug + "\">" + title + "</a>"
 }
 

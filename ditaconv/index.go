@@ -50,6 +50,7 @@ type Index struct {
 type Entry struct {
 	Title     string
 	Topic     *Topic
+	Type      string
 	CollType  dita.CollectionType
 	Linking   dita.Linking
 	TOC       bool
@@ -148,6 +149,7 @@ func (index *Index) processNode(context Context, node *dita.MapNode) []*Entry {
 	entry := &Entry{
 		Title:     node.NavTitle,
 		LockTitle: node.LockTitle == "yes",
+		Type:      node.Type,
 		TOC:       isChildTOC(context.TOC, node.TOC),
 	}
 	if entry.Title == "" {
