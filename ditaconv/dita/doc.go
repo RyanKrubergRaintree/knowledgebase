@@ -8,11 +8,18 @@ import (
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
 )
 
+type Prolog struct {
+	Keywords   []string `xml:"metadata>keywords>indexterm"`
+	ResourceID []struct {
+		Name string `xml:"id,attr"`
+	} `xml:"resourceid"`
+}
+
 type Topic struct {
 	XMLName   xml.Name
 	Title     string   `xml:"title"`
 	NavTitle  string   `xml:"titlealts>navtitle"`
-	Keywords  []string `xml:"prolog>metadata>keywords>indexterm"`
+	Prolog    Prolog   `xml:"prolog"`
 	ShortDesc InnerXML `xml:"shortdesc"`
 
 	RelatedLink []Link `xml:"related-links>link"`

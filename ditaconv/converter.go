@@ -93,7 +93,7 @@ func (conv *convert) run() {
 		Synopsis: conv.Topic.Synopsis,
 	}
 
-	tags := convertTags(topic.Keywords)
+	tags := convertTags(&topic.Prolog)
 	if len(tags) > 0 {
 		conv.Page.Story.Append(kb.Tags(tags...))
 	}

@@ -219,6 +219,10 @@ package("kb.item.content", function(exports) {
 				})
 				.filter(function(tag) {
 					return tag !== "";
+				})
+				.filter(function(tag) {
+					// hide tags starting with id/...
+					return !(/^id\//.test(tag));
 				});
 			return React.DOM.div({
 					className: "item-contet content-tags"
@@ -229,7 +233,7 @@ package("kb.item.content", function(exports) {
 					return React.DOM.a({
 						className: "tag",
 						key: i,
-						href: "/tag=" + kb.convert.TextToSlug(tag)
+						href: "/tag=pages/" + kb.convert.TextToSlug(tag)
 					}, tag);
 				}) : React.DOM.p({}, "Double click here to add page tags."),
 				React.DOM.div({

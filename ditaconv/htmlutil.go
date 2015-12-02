@@ -3,12 +3,20 @@ package ditaconv
 import (
 	"encoding/xml"
 
+	"github.com/raintreeinc/knowledgebase/ditaconv/dita"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-func convertTags(keywords []string) []string {
+func convertTags(prolog *dita.Prolog) []string {
 	tags := []string{}
-	for _, tag := range keywords {
+
+	raw := []string{}
+	raw = append(raw, prolog.Keywords...)
+	for _, rid := range prolog.ResourceID {
+		raw = append(raw, "id/"+rid.Name)
+	}
+
+	for _, tag := range raw {
 		slug := string(kb.Slugify(tag))
 		if slug == "" || slug == "-" {
 			continue
