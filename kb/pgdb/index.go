@@ -25,7 +25,7 @@ func (db Index) Search(text string) ([]kb.PageEntry, error) {
 		`, db.UserID, text)
 }
 
-func (db Index) SearchCustomFilter(text, exclude, include string) ([]kb.PageEntry, error) {
+func (db Index) SearchFilter(text, exclude, include string) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
@@ -74,6 +74,19 @@ func (db Index) ByTag(tag kb.Slug) ([]kb.PageEntry, error) {
 		  AND AccessView.Access >= 'reader'
 		  AND TagSlugs @> $2
 	`, db.UserID, tagSlugs)
+}
+
+func (db Index) ByTagFilter(tag kb.Slug, exclude, include string) ([]kb.PageEntry, error) {
+	tags := kb.SlugifyTags([]string{string(tag)})
+	tagSlugs := stringSlice(tags)
+
+	return db.pageEntries(`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND (OwnerID NOT LIKE $3 || '%' OR OwnerID = $4)
+		  AND TagSlugs @> $2
+		`, db.UserID, tagSlugs, exclude, include)
 }
 
 func (db Index) readable() (groups []kb.Group, err error) {

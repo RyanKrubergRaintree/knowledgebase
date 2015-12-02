@@ -46,6 +46,13 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		mod.pages(w, r, kb.Slugify(id))
+	} else if strings.HasPrefix(r.URL.Path, "/tag=first/") {
+		id := strings.TrimPrefix(r.URL.Path, "/tag=first/")
+		if id == "" {
+			http.Error(w, "id missing", http.StatusBadRequest)
+			return
+		}
+		mod.first(w, r, kb.Slugify(id))
 	} else {
 		http.NotFound(w, r)
 	}
@@ -101,4 +108,35 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.WriteResponse(w)
+}
+
+func (mod *Module) first(w http.ResponseWriter, r *http.Request, tag kb.Slug) {
+	_, index, ok := mod.server.IndexContext(w, r)
+	if !ok {
+		return
+	}
+
+	filter := r.FormValue("filter")
+
+	var entries []kb.PageEntry
+	var err error
+	if filter == "" {
+		entries, err = index.ByTag(tag)
+	} else {
+		filter = string(kb.Slugify(filter))
+		entries, err = index.ByTagFilter(tag, "help-", "help-"+filter)
+	}
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(entries) == 0 {
+		http.Error(w, "No entries.", http.StatusResetContent)
+		return
+	}
+
+	first := entries[0]
+	http.Redirect(w, r, string("/"+first.Slug), http.StatusSeeOther)
 }

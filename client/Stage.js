@@ -150,6 +150,9 @@ package("kb", function(exports) {
 						this.creating = true;
 					}
 				}
+				if (response.xhr.status === 205) {
+					this.close();
+				}
 			}
 
 			this.lastStatus = response.status;

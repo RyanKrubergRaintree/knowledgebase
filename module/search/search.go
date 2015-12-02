@@ -80,7 +80,7 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 		entries, err = index.Search(q)
 	} else {
 		filter = string(kb.Slugify(filter))
-		entries, err = index.SearchCustomFilter(q, "help-", "help-"+filter)
+		entries, err = index.SearchFilter(q, "help-", "help-"+filter)
 	}
 
 	if err != nil {

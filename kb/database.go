@@ -116,12 +116,13 @@ type Pages interface {
 
 type Index interface {
 	List() ([]PageEntry, error)
-	Search(text string) ([]PageEntry, error)
 
-	SearchCustomFilter(text, exclude, include string) ([]PageEntry, error)
+	Search(text string) ([]PageEntry, error)
+	SearchFilter(text, exclude, include string) ([]PageEntry, error)
 
 	Tags() ([]TagEntry, error)
 	ByTag(tag Slug) ([]PageEntry, error)
+	ByTagFilter(tag Slug, exclude, include string) ([]PageEntry, error)
 
 	Groups(min Rights) ([]Group, error)
 	ByGroup(groupID Slug) ([]PageEntry, error)
