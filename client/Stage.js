@@ -150,7 +150,7 @@ package("kb", function(exports) {
 						this.creating = true;
 					}
 				}
-				if (response.xhr.status === 205) {
+				if (response.xhr.status === 204) {
 					this.close();
 				}
 			}

@@ -133,7 +133,7 @@ func (mod *Module) first(w http.ResponseWriter, r *http.Request, tag kb.Slug) {
 	}
 
 	if len(entries) == 0 {
-		http.Error(w, "No entries.", http.StatusResetContent)
+		http.Error(w, "", http.StatusNoContent)
 		return
 	}
 

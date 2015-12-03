@@ -52,9 +52,18 @@ type Store struct {
 }
 
 func NewStore(maxage time.Duration) *Store {
-	return &Store{
+	store := &Store{
 		entries: make(map[Token]*Info),
 		maxage:  maxage,
+	}
+
+	go store.purge()
+	return store
+}
+
+func (store *Store) purge() {
+	for range time.Tick(time.Minute) {
+		store.PurgeOld()
 	}
 }
 
