@@ -183,3 +183,7 @@
 	overflow: auto;
 	font-family: monospace;
 }
+
+.content-html {
+	overflow: auto;
+}
