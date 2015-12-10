@@ -49,13 +49,14 @@ func NewHTMLRules() *xmlconv.Rules {
 			"shortcut":    "span",
 			"wintitle":    "span",
 			"filepath":    "span",
-			"userinput":   "span",
 			"menucascade": "span",
 
 			"synph":    "span",
 			"delim":    "span",
 			"sep":      "span",
 			"parmname": "span",
+
+			"userinput": "kbd",
 
 			"image": "img",
 
