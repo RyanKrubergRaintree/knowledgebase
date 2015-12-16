@@ -86,6 +86,10 @@ table.tight {
 	font-size: 13px;
 }
 
+table td {
+	vertical-align: top;
+}
+
 ul.tight {
 	font-size: 13px;
 }
