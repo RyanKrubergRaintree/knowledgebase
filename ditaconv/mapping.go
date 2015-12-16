@@ -2,7 +2,6 @@ package ditaconv
 
 import (
 	"fmt"
-	"regexp"
 	"sort"
 
 	"github.com/raintreeinc/knowledgebase/ditaconv/xmlconv"
@@ -31,18 +30,6 @@ func (a byfilename) Len() int           { return len(a) }
 func (a byfilename) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byfilename) Less(i, j int) bool { return a[i].Filename < a[j].Filename }
 
-var (
-	rxOr  = regexp.MustCompile(` ?/ ?`)
-	rxAnd = regexp.MustCompile(`(?:[^\^]) ?& ?`)
-)
-
-// replace / and & inside the title
-func titelize(title string) string {
-	title = rxOr.ReplaceAllString(title, " or ")
-	title = rxAnd.ReplaceAllString(title, " and ")
-	return title
-}
-
 func CreateMapping(index *Index) (*Mapping, []error) {
 	topics := index.Topics
 
@@ -52,8 +39,8 @@ func CreateMapping(index *Index) (*Mapping, []error) {
 
 	// assign slugs to the topics
 	for _, topic := range topics {
-		topic.Title = titelize(topic.Title)
-		topic.ShortTitle = titelize(topic.ShortTitle)
+		topic.Title = topic.Title
+		topic.ShortTitle = topic.ShortTitle
 		slug := kb.Slugify(topic.Title)
 
 		if other, clash := byslug[slug]; clash {

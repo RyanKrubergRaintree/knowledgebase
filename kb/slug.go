@@ -40,16 +40,17 @@ func ValidateSlug(slug Slug) error {
 
 // Slugify converts text to a slug
 //
-// * numbers, '/' are left intact
+// * numbers, '/', '=' are emitted
 // * letters will be lowercased (if possible)
 // * '-', ',', '.', ' ', '_' will be converted to '-'
+// * repeated '/' and '=' are removed
 // * other symbols or punctuations will be converted to html entity reference name
 //   (if there exists such reference name)
 // * everything else will be converted to '-'
 //
 // Example:
 //   "&Hello_世界/+!" ==> "amp-hello-世界/plus-excl"
-//   "Hello  World  /  Test" ==> "hello-world/test"
+//   "Hello  World  //  Test" ==> "hello-world/test"
 func Slugify(s string) Slug {
 	cutdash := true
 	emitdash := false
@@ -68,7 +69,9 @@ func Slugify(s string) Slug {
 		}
 		switch r {
 		case '/', '=':
-			slug = append(slug, r)
+			if len(slug) == 0 || slug[len(slug)-1] != r {
+				slug = append(slug, r)
+			}
 			emitdash = false
 			cutdash = true
 		case '-', ',', '.', ' ', '_':

@@ -67,7 +67,9 @@ package("kb.convert", function(exports) {
 				continue;
 			}
 			if ((r === "/") || (r === "=")) {
-				slug += r;
+				if ((slug.length == 0) || (slug[slug.length - 1] != r)) {
+					slug += r;
+				}
 				emitdash = false;
 				cutdash = true;
 			} else if ((r === "-") || (r === ",") || (r === ".") || (r === " ") || (r === "_")) {
@@ -95,7 +97,8 @@ package("kb.convert", function(exports) {
 	TestCase("TextToSlug", function(assert) {
 		assert.equal(TextToSlug(""), "-");
 		assert.equal(TextToSlug("&Hello_世界/+!"), "amp-hello-世界/plus-excl");
-		assert.equal(TextToSlug("Hello  World  /  Test"), "hello-world/test");
+		assert.equal(TextToSlug("Hello  World  ////  Test"), "hello-world/test");
+		assert.equal(TextToSlug("alpha====beta"), "alpha=beta");
 	});
 
 	// There are several possible links

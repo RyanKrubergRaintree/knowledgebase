@@ -19,9 +19,10 @@ var slugcases = []struct {
 	{In: "alpha + beta", Exp: "alpha-plus-beta"},
 	{In: "alpha & beta", Exp: "alpha-amp-beta"},
 	{In: "alpha # beta", Exp: "alpha-num-beta"},
-	{In: "hello +/& world", Exp: "hello-plus/amp-world"},
+	{In: "alpha===beta", Exp: "alpha=beta"},
+	{In: "hello +//& world", Exp: "hello-plus/amp-world"},
 	{In: "hello+/&world", Exp: "hello-plus/amp-world"},
-	{In: "&Hello_世界/+!", Exp: "amp-hello-世界/plus-excl"},
+	{In: "&Hello_世界/////+!", Exp: "amp-hello-世界/plus-excl"},
 }
 
 func TestSlugify(t *testing.T) {
