@@ -59,6 +59,11 @@ func (d Dir) LoadMap(filename string) (*Map, error) {
 		return nil, fmt.Errorf("loading \"%s\": %s", filename, err)
 	}
 
+	data, err = dita.EnsureAudience(data)
+	if err != nil {
+		return nil, fmt.Errorf("reading \"%s\": %s", filename, err)
+	}
+
 	node := &dita.MapNode{}
 	if err := xml.Unmarshal(data, &node); err != nil {
 		return nil, fmt.Errorf("reading \"%s\": %s", filename, err)

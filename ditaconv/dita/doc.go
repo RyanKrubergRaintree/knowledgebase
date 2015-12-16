@@ -70,6 +70,11 @@ func LoadTopic(filename string) (*Topic, error) {
 		log.Println(err)
 	}
 
+	data, err = EnsureAudience(data)
+	if err != nil {
+		log.Println(err)
+	}
+
 	err = xml.Unmarshal(data, topic)
 	if err != nil {
 		return nil, err
