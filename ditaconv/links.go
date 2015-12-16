@@ -138,7 +138,7 @@ func interLink(A, B []*Entry) {
 }
 
 func (index *Index) addPageLinks(context Context, a *Entry) {
-	if a.Topic == nil || a.Topic.pageLinksProcessed {
+	if a.Topic == nil || a.Topic.pageLinksProcessed || a.Topic.Original == nil {
 		return
 	}
 	a.Topic.pageLinksProcessed = true
