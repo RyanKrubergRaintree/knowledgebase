@@ -219,15 +219,19 @@ package("kb.item.content", function(exports) {
 				})
 				.filter(function(tag) {
 					return tag !== "";
-				})
-				.filter(function(tag) {
-					// hide tags starting with id/...
-					return !(/^id\//.test(tag));
 				});
+
+			var hasValidTag = tags.length > 0;
+
+			tags = tags.filter(function(tag) {
+				// hide tags starting with id/...
+				return !(/^id\//.test(tag));
+			});
+
 			return React.DOM.div({
 					className: "item-contet content-tags"
 				},
-				tags.length > 0 ?
+				hasValidTag ?
 				tags.map(function(tag, i) {
 					tag = tag.trim();
 					return React.DOM.a({
