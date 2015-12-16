@@ -21,6 +21,13 @@ var alwaysHTML = map[string]bool{
 }
 
 func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) {
+	appenditem := func(item kb.Item) {
+		if id := getAttr(start, "id"); id != "" {
+			item["id"] = id
+		}
+		conv.Page.Story.Append(item)
+	}
+
 	// NB! the converters must fully decode the element
 	switch start.Name.Local {
 	case "imagemap":
@@ -33,7 +40,7 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 		if err == nil {
 			m.Image.Href = conv.convertImageURL(m.Image.Href)
 			if item, err := imagemap.FromXML(&m); err == nil {
-				conv.Page.Story.Append(item)
+				appenditem(item)
 			} else {
 				conv.check(err)
 			}
@@ -43,22 +50,22 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 		case "rttutorial":
 			conv.fixAttrs(start)
 			href := getAttr(start, "href")
-			conv.Page.Story.Append(kb.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
+			appenditem(kb.HTML("<video controls src=\"" + href + "\" >Browser doesn't support video.</video>"))
 			xmlconv.Skip(decoder, start)
 		default:
 			text := conv.toHTML(decoder, start)
-			conv.Page.Story.Append(kb.HTML(text))
+			appenditem(kb.HTML(text))
 			conv.Errors = append(conv.Errors, fmt.Errorf("unhandled datatype \"%v\"", datatype))
 		}
 	case "img", "image":
 		conv.fixAttrs(start)
 		href := getAttr(start, "src")
-		conv.Page.Story.Append(kb.Image("", href, ""))
+		appenditem(kb.Image("", href, ""))
 		xmlconv.Skip(decoder, start)
 	case "title":
 		title, _ := xmlconv.Text(decoder, start)
 		if title != "" {
-			conv.Page.Story.Append(kb.HTML("<h3>" + title + "</h3>"))
+			appenditem(kb.HTML("<h3>" + title + "</h3>"))
 		}
 	case "xref", "link", "a":
 		conv.fixAttrs(start)
@@ -69,17 +76,17 @@ func (conv *convert) convertItem(decoder *xml.Decoder, start *xml.StartElement) 
 			title = getAttr(start, "caption")
 		}
 		desc := getAttr(start, "title")
-		conv.Page.Story.Append(kb.Reference(title, href, desc))
+		appenditem(kb.Reference(title, href, desc))
 	default:
 		text := conv.toHTML(decoder, start)
 		if alwaysHTML[start.Name.Local] {
-			conv.Page.Story.Append(kb.HTML(text))
+			appenditem(kb.HTML(text))
 		} else {
 			// try to convert to paragraph
 			if para, ok := asParagraph(text); ok {
-				conv.Page.Story.Append(kb.Paragraph(para))
+				appenditem(kb.Paragraph(para))
 			} else {
-				conv.Page.Story.Append(kb.HTML(text))
+				appenditem(kb.HTML(text))
 			}
 		}
 	}

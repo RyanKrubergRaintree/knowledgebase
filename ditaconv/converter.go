@@ -164,7 +164,12 @@ func (conv *convert) dropEmpty() {
 
 func (conv *convert) assignIDs() {
 	s := conv.Page.Story
+	found := map[string]struct{}{}
 	for _, item := range s {
-		item["id"] = kb.NewID()
+		id := item.ID()
+		_, ok := found[id]
+		if id == "" || ok {
+			item["id"] = kb.NewID()
+		}
 	}
 }

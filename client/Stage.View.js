@@ -299,6 +299,10 @@ package("kb.Stage", function(exports) {
 					var id = loc.fragment.substring(1);
 					var node = ReactDOM.findDOMNode(this);
 					var el = node.querySelector("[data-id=\"" + id + "\"]");
+					if (el === null) {
+						var id2 = loc.fragment.substring(loc.fragment.lastIndexOf("/") + 1);
+						el = node.querySelector("[data-id=\"" + id2 + "\"]");
+					}
 					if (el) {
 						el.scrollIntoView();
 					}
