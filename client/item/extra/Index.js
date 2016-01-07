@@ -1,10 +1,10 @@
 package("kb.item.content", function(exports) {
 	"use strict";
 
-	depends("DITAIndex.css");
+	depends("Index.css");
 
 	var Item = React.createClass({
-		displayName: "DITAIndexItem",
+		displayName: "IndexItem",
 		getInitialState: function() {
 			return {
 				expanded: false
@@ -35,13 +35,13 @@ package("kb.item.content", function(exports) {
 				}
 
 				toggle = React.DOM.span({
-					className: "dita-index-toggle mdi " + icon,
+					className: "index-toggle mdi " + icon,
 					onClick: this.toggle
 				});
 
 				if (expanded || item.activechild) {
 					children = React.DOM.div({
-						className: "dita-index-children"
+						className: "index-children"
 					}, item.children.map(function(item, i) {
 						return React.createElement(Item, {
 							key: i,
@@ -54,12 +54,12 @@ package("kb.item.content", function(exports) {
 			var link = null;
 			if (item.slug === "") {
 				link = React.DOM.span({
-					className: "dita-index-title " + (item.active ? "dita-index-title-active" : ""),
+					className: "index-title " + (item.active ? "index-title-active" : ""),
 					onClick: this.open
 				}, item.title);
 			} else {
 				link = React.DOM.a({
-					className: "dita-index-title " + (item.active ? "dita-index-title-active" : ""),
+					className: "index-title " + (item.active ? "index-title-active" : ""),
 					href: item.slug,
 					"data-link": item.slug,
 					onClick: this.open
@@ -67,7 +67,7 @@ package("kb.item.content", function(exports) {
 			}
 
 			return React.DOM.div({
-					className: "dita-index-item"
+					className: "index-item"
 				},
 				toggle,
 				link,
@@ -117,8 +117,8 @@ package("kb.item.content", function(exports) {
 		return mknode(root);
 	}
 
-	exports["dita-index"] = React.createClass({
-		displayName: "DITAIndex",
+	exports["index"] = React.createClass({
+		displayName: "Index",
 		contextTypes: {
 			Lineup: React.PropTypes.object
 		},
@@ -141,13 +141,13 @@ package("kb.item.content", function(exports) {
 		render: function() {
 			if (this.props.item === null) {
 				return React.DOM.div({
-					className: "item-content content-dita-index"
+					className: "item-content content-index"
 				}, "No index available.");
 			}
 
 			var root = this.state.root;
 			return React.DOM.div({
-					className: "item-content content-dita-index"
+					className: "item-content content-index"
 				},
 				root.children.map(function(item, i) {
 					return React.createElement(Item, {

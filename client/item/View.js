@@ -6,7 +6,7 @@ package("kb.item", function(exports) {
 	depends("content.js");
 
 	depends("extra/SimpleForm.js");
-	depends("extra/DITAIndex.js");
+	depends("extra/Index.js");
 	depends("extra/ImageMap.js");
 
 	exports.DropCanceled = null;
