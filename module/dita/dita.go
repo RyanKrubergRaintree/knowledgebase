@@ -136,7 +136,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (mod *Module) reload() {
 	start := time.Now()
 
-	context := NewConversion(mod.name, mod.ditamap)
+	context := NewConversion(kb.Slugify(mod.name), mod.ditamap)
 	context.Run()
 	mod.cache.Store(context)
 

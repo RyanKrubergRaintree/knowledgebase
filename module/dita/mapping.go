@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/raintreeinc/ditaconvert"
+	"github.com/raintreeinc/knowledgebase/extra/index"
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
@@ -43,14 +44,14 @@ func RemapTitles(conversion *Conversion, index *ditaconvert.Index) (*TitleMappin
 
 	// assign slugs to topics
 	for _, topic := range index.Topics {
-		slug := kb.Slugify(topic.Title)
+		slug := conversion.Group + "=" + kb.Slugify(topic.Title)
 		if other, clash := mapping.BySlug[slug]; clash {
 			errors = append(errors, fmt.Errorf("clashing title \"%v\" in \"%v\" and \"%v\"", topic.Title, topic.Path, other.Path))
 			continue
 		}
 
 		if topic.Title == "" {
-			errors = append(errors, fmt.Errorf("title missing in \"%v\"", topic.Filename))
+			errors = append(errors, fmt.Errorf("title missing in \"%v\"", topic.Path))
 			continue
 		}
 
@@ -64,7 +65,7 @@ func RemapTitles(conversion *Conversion, index *ditaconvert.Index) (*TitleMappin
 			continue
 		}
 
-		slug := kb.Slugify(topic.ShortTitle)
+		slug := conversion.Group + "=" + kb.Slugify(topic.ShortTitle)
 		if _, exists := mapping.BySlug[slug]; exists {
 			continue
 		}
@@ -73,8 +74,27 @@ func RemapTitles(conversion *Conversion, index *ditaconvert.Index) (*TitleMappin
 
 		delete(mapping.BySlug, prev)
 		mapping.BySlug[slug] = topic
-		mapping.byTopic[topic] = slug
+		mapping.ByTopic[topic] = slug
 	}
 
 	return mapping, errors
+}
+
+func (mapping *TitleMapping) EntryToIndexItem(entry *ditaconvert.Entry) *index.Item {
+	item := &index.Item{
+		Title: entry.Title,
+	}
+	if entry.Topic != nil {
+		item.Slug = mapping.ByTopic[entry.Topic]
+	}
+
+	for _, child := range entry.Children {
+		if !child.TOC {
+			continue
+		}
+		childitem := mapping.EntryToIndexItem(child)
+		item.Children = append(item.Children, childitem)
+	}
+
+	return item
 }

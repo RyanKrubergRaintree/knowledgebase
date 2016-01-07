@@ -82,7 +82,7 @@ func (context *Conversion) Run() {
 		return context.Slugs[i] < context.Slugs[j]
 	})
 
-	context.Nav = EntryToIndexItem(index.Nav)
+	context.Nav = mapping.EntryToIndexItem(index.Nav)
 }
 
 func (context *Conversion) Convert(slug kb.Slug, topic *ditaconvert.Topic) (page *kb.Page, errs []error, fatal error) {
