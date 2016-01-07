@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/raintreeinc/knowledgebase/extra/simpleform"
 	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/kb/kbitem/simpleform"
 )
 
 var esc = html.EscapeString

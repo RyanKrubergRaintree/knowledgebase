@@ -12,8 +12,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/raintreeinc/knowledgebase/extra/index"
 	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/kb/kbitem/index"
 )
 
 var _ *kb.Page

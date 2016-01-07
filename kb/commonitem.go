@@ -1,7 +1,9 @@
 // This package implements common federated wiki types
 package kb
 
-import "strings"
+import (
+	"strings"
+)
 
 func Paragraph(text string) Item {
 	return Item{
