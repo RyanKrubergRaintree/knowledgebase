@@ -38,7 +38,7 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 	}
 
 	page.Story.Append(kb.HTML(context.Output.String()))
-	page.Story.Append(kb.HTML(context.RelatedLinksAsHTML()))
+	page.Story.Append(kb.HTML(conversion.RelatedLinksAsHTML()))
 
 	return page, context.Errors, nil
 }
