@@ -6,7 +6,7 @@ import (
 
 	"github.com/raintreeinc/ditaconvert"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kb/kbitem/index"
+	"github.com/raintreeinc/knowledgebase/kb/items/index"
 )
 
 type TitleMapping struct {

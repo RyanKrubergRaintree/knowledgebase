@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kb/kbitem/simpleform"
+	"github.com/raintreeinc/knowledgebase/kb/items/simpleform"
 )
 
 var esc = html.EscapeString

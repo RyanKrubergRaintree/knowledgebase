@@ -159,4 +159,7 @@ package("kb.item.content", function(exports) {
 			);
 		}
 	});
+
+	// backwards compatibility
+	exports["dita-index"] = exports["index"];
 });

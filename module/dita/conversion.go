@@ -2,14 +2,13 @@ package dita
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"path/filepath"
 
 	"github.com/bradfitz/slice"
 	"github.com/raintreeinc/ditaconvert"
 	"github.com/raintreeinc/knowledgebase/kb"
-	"github.com/raintreeinc/knowledgebase/kb/kbitem/index"
+	"github.com/raintreeinc/knowledgebase/kb/items/index"
 )
 
 type Conversion struct {
@@ -53,7 +52,14 @@ func (context *Conversion) Run() {
 	context.MappingErrors = mappingErrors
 
 	for slug, topic := range mapping.BySlug {
-		page, errs, fatal := context.Convert(slug, topic)
+		page, errs, fatal := (&PageConversion{
+			Conversion: context,
+			Mapping:    mapping,
+			Slug:       slug,
+			Index:      index,
+			Topic:      topic,
+		}).Convert()
+
 		if fatal != nil {
 			context.Errors = append(context.Errors, ConversionError{
 				Path:  topic.Path,
@@ -83,8 +89,4 @@ func (context *Conversion) Run() {
 	})
 
 	context.Nav = mapping.EntryToIndexItem(index.Nav)
-}
-
-func (context *Conversion) Convert(slug kb.Slug, topic *ditaconvert.Topic) (page *kb.Page, errs []error, fatal error) {
-	return &kb.Page{}, nil, errors.New("TODO")
 }
