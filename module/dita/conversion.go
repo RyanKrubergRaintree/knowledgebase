@@ -3,7 +3,6 @@ package dita
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"path/filepath"
 
 	"github.com/bradfitz/slice"
@@ -42,7 +41,10 @@ type ConversionError struct {
 	Errors []error
 }
 
-const maxPageSize = 1048575
+const (
+	maxPageSize         = 1 << 20 // 1MB
+	recommendedPageSize = 1 << 18 // 0.25MB
+)
 
 func (context *Conversion) Run() {
 	fs := ditaconvert.Dir(filepath.Dir(context.Ditamap))
@@ -79,14 +81,30 @@ func (context *Conversion) Run() {
 
 		data, err := json.Marshal(page)
 		if err != nil {
-			log.Println(err)
+			context.Errors = append(context.Errors, ConversionError{
+				Path:  topic.Path,
+				Slug:  slug,
+				Fatal: fmt.Errorf("Marshaling page failed"),
+			})
+			continue
 		}
 
 		if len(data) > maxPageSize {
 			context.Errors = append(context.Errors, ConversionError{
 				Path:  topic.Path,
 				Slug:  slug,
-				Fatal: fmt.Errorf("Page is too large %vMB (%vB)", len(data)>>20, len(data)),
+				Fatal: fmt.Errorf("Page is too large %.3fMB (%v bytes)", float64(len(data))/(1<<20), len(data)),
+			})
+			continue
+		}
+
+		if len(data) > recommendedPageSize {
+			context.Errors = append(context.Errors, ConversionError{
+				Path: topic.Path,
+				Slug: slug,
+				Errors: []error{
+					fmt.Errorf("Page should be smaller %.3fMB (%v bytes)", float64(len(data))/(1<<20), len(data)),
+				},
 			})
 		}
 
