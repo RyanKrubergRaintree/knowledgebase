@@ -21,6 +21,8 @@ type PageConversion struct {
 
 func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal error) {
 	conversion.Context = ditaconvert.NewConversion(conversion.Index, conversion.Topic)
+	conversion.Context.Encoder.RewriteID = "data-id"
+
 	context, topic := conversion.Context, conversion.Topic
 
 	page = &kb.Page{
@@ -110,11 +112,14 @@ func (conversion *PageConversion) ResolveLinkInfo(url string) (href, title, syno
 	}
 	context := conversion.Context
 
-	var selector string
+	var selector, hash string
 	url, selector = ditaconvert.SplitLink(url)
+	if selector != "" {
+		hash = "#" + selector
+	}
 
 	if url == "" {
-		return "#" + selector, "", "", true
+		return hash, "", "", true
 	}
 
 	name := context.DecodingPath
@@ -150,8 +155,5 @@ func (conversion *PageConversion) ResolveLinkInfo(url string) (href, title, syno
 		return href, title, synopsis, false
 	}
 
-	if selector != "" {
-		return string(slug) + "#" + selector, title, synopsis, true
-	}
-	return string(slug), title, synopsis, true
+	return string(slug) + hash, title, synopsis, true
 }

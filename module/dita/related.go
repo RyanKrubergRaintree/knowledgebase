@@ -135,10 +135,15 @@ func (conversion *PageConversion) LinkAsAnchor(link *ditaconvert.Link) string {
 		return `<span style="background: #f00">` + title + `</span>`
 	}
 
+	selector := link.Selector
+	if selector != "" {
+		selector = "#" + selector
+	}
+
 	slug, ok := conversion.Mapping.ByTopic[link.Topic]
 	if !ok {
 		return `<span style="background: #f00">` + title + `</span>`
 	}
 
-	return `<a href="` + string(slug) + `" data-link="` + string(slug) + `">` + title + `</a>`
+	return `<a href="` + string(slug) + selector + `" data-link="` + string(slug) + selector + `">` + title + `</a>`
 }

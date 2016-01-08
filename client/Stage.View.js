@@ -205,7 +205,9 @@ package("kb.Stage", function(exports) {
 
 	exports.View = React.createClass({
 		displayName: "Stage",
-
+		contextTypes: {
+			CurrentSelection: React.PropTypes.object
+		},
 		toggleWidth: function() {
 			if (this.props.stage.wide) {
 				this.props.stage.collapse();
@@ -302,8 +304,10 @@ package("kb.Stage", function(exports) {
 					if (el === null) {
 						var id2 = loc.fragment.substring(loc.fragment.lastIndexOf("/") + 1);
 						el = node.querySelector("[data-id=\"" + id2 + "\"]");
+						id = id2;
 					}
 					if (el) {
+						this.context.CurrentSelection.highlight(id);
 						el.scrollIntoView();
 					}
 				}
