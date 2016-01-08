@@ -89,6 +89,9 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.HTML("<h3>Converting</h3>"))
 		for _, errs := range cache.Errors {
 			text := "<h4>[[" + string(errs.Slug) + "]]</h4>"
+			if errs.Fatal != nil {
+				text += "<p style='background:#f88;'>" + errs.Fatal.Error() + "</p>"
+			}
 			for _, err := range errs.Errors {
 				text += "<p>" + err.Error() + "</p>"
 			}
