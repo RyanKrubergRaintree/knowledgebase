@@ -1,3 +1,11 @@
+.conversion-error {
+	height: 3rem;
+	line-height: 3rem;
+	text-align: center;
+	background: #f88;
+	font-weight: bold;
+}
+
 .key {
 	font-weight: bold;
 	background-color : #666666;
