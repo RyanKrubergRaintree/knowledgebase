@@ -1,12 +1,12 @@
-.content-dita-index {}
+.content-index {}
 
-.content-dita-index .dita-index-item {
+.content-index .index-item {
 	position: relative;
 	font-size: 14px;
 	margin-bottom: 2px;
 }
 
-.content-dita-index .dita-index-toggle {
+.content-index .index-toggle {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -17,19 +17,19 @@
 	cursor: pointer;
 }
 
-.content-dita-index .dita-index-title {
+.content-index .index-title {
 	margin-left: 20px;
 	padding: 1px 4px;
 
 	cursor: pointer;
 }
 
-.content-dita-index .dita-index-title-active {
+.content-index .index-title-active {
 	background: #1260A2;
 	color: #fff;
 }
 
-.content-dita-index .dita-index-children {
+.content-index .index-children {
 	margin-left: 8px;
 	padding-left: 16px;
 	padding-bottom: 4px;

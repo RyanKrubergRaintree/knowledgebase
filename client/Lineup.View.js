@@ -34,9 +34,9 @@ package("kb.Lineup", function(exports) {
 				style += "[data-id=\"" + id + "\"], " +
 					"[data-focusid=\"" + id + "\"]" +
 					"{" +
-					"outline: 1px dashed #aaf !important;" +
-					"background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;" +
-					"background: rgba(0,0,255,0.1) !important;" +
+					"border: 1px dashed #22F !important;" +
+					"padding: 2px 8px;" +
+					"background: rgba(127,127,255,0.05) !important;" +
 					"}";
 			}
 			if (state.selected !== "") {
@@ -44,9 +44,9 @@ package("kb.Lineup", function(exports) {
 				style += "[data-id=\"" + id + "\"], " +
 					"[data-focusid=\"" + id + "\"]" +
 					"{" +
-					"outline: 2px solid #88f !important;" +
-					"background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYPgvCQACHAEZoAhVLwAAAABJRU5ErkJggg==) !important;" +
-					"background: rgba(0,0,255,0.1) !important;" +
+					"border: 1px dashed #22F !important;" +
+					"padding: 2px 8px;" +
+					"background: rgba(127,127,255,0.05) !important;" +
 					"}";
 			}
 

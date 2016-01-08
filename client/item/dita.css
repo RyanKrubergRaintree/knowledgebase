@@ -1,18 +1,12 @@
+.conversion-error {
+	height: 3rem;
+	line-height: 3rem;
+	text-align: center;
+	background: #f88;
+	font-weight: bold;
+}
 
-*[data-dita="note"]:before {
-	content: 'Note: ';
-	font-weight: bold;
-}
-*[data-dita="note"][type="tip"]:before {
-	content: 'Tip: ';
-	font-weight: bold;
-}
-*[data-dita="note"][type="caution"]:before {
-	content: 'Caution! ';
-	font-weight: bold;
-}
-*[data-dita="info"] {}
-*[data-dita="keystroke"] {
+.key {
 	font-weight: bold;
 	background-color : #666666;
 	color : #ffffff;
@@ -21,35 +15,28 @@
 	padding-left : 3px;
 	padding-right : 3px;
 }
-*[data-dita="secright"] {}
-*[data-dita="codeblock"] {
+.secright {}
+.codeblock {
 	font-family: monospace;
 	white-space: pre;
 }
-*[data-dita="codeph"] {
+.codeph {
 	font-family: monospace;
 }
-*[data-dita="filepath"] {
+.filepath {
 	font-family: monospace;
 }
-*[data-dita="uicontrol"] {
+.uicontrol {
 	font-weight: bold;
 }
-*[data-dita="wintitle"] {
+.wintitle {
 	font-weight: bold;
 }
-*[data-dita="cmdname"] {
+.cmdname {
 	font-family: monospace;
 }
-*[data-dita="shortcut"] {
+.shortcut {
 	text-decoration: underline;
-}
-*[data-dita="menucascade"] span:after {
-	content: ' >';
-	font-weight: normal;
-}
-*[data-dita="menucascade"] span:last-of-type:after {
-	content: '';
 }
 *[data-dita="step"][importance="optional"]:before {
 	content: '(Optional) ';
