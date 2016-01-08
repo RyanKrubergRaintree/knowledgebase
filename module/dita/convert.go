@@ -37,6 +37,10 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 		return page, nil, err
 	}
 
+	tags := conversion.Topic.Original.Prolog.Keywords.Terms()
+	if len(tags) > 0 {
+		page.Story.Append(kb.Tags(tags...))
+	}
 	page.Story.Append(kb.HTML(context.Output.String()))
 	page.Story.Append(kb.HTML(conversion.RelatedLinksAsHTML()))
 
@@ -97,7 +101,7 @@ func (conversion *PageConversion) InlineImage(context *ditaconvert.Context, dec 
 }
 
 func (conversion *PageConversion) ResolveLinkInfo(url string) (href, title, synopsis string, internal bool) {
-	if strings.HasPrefix(url, "http:") || strings.HasPrefix(url, "https:") {
+	if strings.HasPrefix(url, "http:") || strings.HasPrefix(url, "https:") || strings.HasPrefix(url, "mailto:") {
 		return url, "", "", false
 	}
 	context := conversion.Context

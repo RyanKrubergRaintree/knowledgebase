@@ -14,6 +14,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/kb/items/index"
 	"github.com/raintreeinc/knowledgebase/kb/pgdb"
 	"github.com/raintreeinc/knowledgebase/module/dita"
 )
@@ -94,72 +95,55 @@ func Upload(name string, config *Config) error {
 		return errors.New("ditamap doesn't exist")
 	}
 
-	index, errs := ditaconv.LoadIndex(p.Ditamap)
-	if len(errs) > 0 {
-		log.Println()
-		log.Println(errs)
+	owner := kb.Slugify(p.Group)
+	conversion := dita.NewConversion(owner, p.Ditamap)
+
+	log.Println("== Running Conversion")
+	conversion.Run()
+
+	if len(conversion.LoadErrors) > 0 {
+		log.Println("== Index Errors")
+		for _, err := range conversion.LoadErrors {
+			log.Println(err)
+		}
 		if *stoponerr {
 			return errors.New("errors in index")
 		}
 	}
 
-	log.Println()
-	log.Println("== Creating mapping")
-	mapping, errs := ditaconv.CreateMapping(index)
-	if len(errs) > 0 {
-		log.Println()
-		log.Println(errs)
+	if len(conversion.MappingErrors) > 0 {
+		log.Println("== Mapping Errors")
+		for _, err := range conversion.MappingErrors {
+			log.Println(err)
+		}
 		if *stoponerr {
-			return errors.New("errors in mapping")
+			return errors.New("errors in index")
 		}
 	}
 
-	owner := kb.Slugify(p.Group)
-	for topic, slug := range mapping.ByTopic {
-		ownerslug := owner + "=" + slug
-		mapping.ByTopic[topic] = ownerslug
-		delete(mapping.BySlug, slug)
-		mapping.BySlug[ownerslug] = topic
-	}
-
-	navindex := index.EntryToItem(mapping, index.Nav)
-
-	mapping.Rules.Merge(dita.RaintreeDITA())
-
-	log.Println()
-	log.Println("== Converting pages")
-	log.Println()
-	pages := make(map[kb.Slug]*kb.Page)
-	for _, topic := range mapping.BySlug {
-		page, fatal, errs := mapping.Convert(topic)
-		if fatal != nil {
-			log.Println(fatal)
-			if *stoponerr {
-				return errors.New("error in converting " + topic.Title)
+	if len(conversion.Errors) > 0 {
+		log.Println("== Conversion Errors")
+		for _, err := range conversion.Errors {
+			log.Println(err.Path+":", err.Slug)
+			if err.Fatal != nil {
+				log.Println("\tFATAL:", err.Fatal)
+				if *stoponerr {
+					return errors.New("conversion error")
+				}
 			}
-			continue
-		} else if len(errs) > 0 {
-			log.Println(errs)
+			for _, err := range err.Errors {
+				log.Println("\t", err)
+			}
 		}
-
-		if page.Slug == "" {
-			log.Printf("No slug for \"%s\".", page.Title)
-			continue
-		}
-
-		if page.Slug[0] == '/' {
-			page.Slug = page.Slug[1:]
-		}
-		pages[page.Slug] = page
 	}
 
-	navindexslug := kb.Slug(owner + "=index")
-	pages[navindexslug] = &kb.Page{
-		Slug:     navindexslug,
+	indexslug := kb.Slug(owner + "=index")
+	conversion.Pages[indexslug] = &kb.Page{
+		Slug:     indexslug,
 		Title:    "Index",
 		Synopsis: "Help navigation index",
 		Story: kb.Story{
-			index.New("index", navindex),
+			index.New("index", conversion.Nav),
 		},
 	}
 
@@ -191,8 +175,8 @@ func Upload(name string, config *Config) error {
 	log.Println()
 
 	complete := 0
-	total := len(pages)
-	err = DB.Context("admin").Pages(owner).BatchReplace(pages, func(slug kb.Slug) {
+	total := len(conversion.Pages)
+	err = DB.Context("admin").Pages(owner).BatchReplace(conversion.Pages, func(slug kb.Slug) {
 		complete++
 		log.Printf("%04d/%04d : %v\n", complete, total, slug)
 	})
