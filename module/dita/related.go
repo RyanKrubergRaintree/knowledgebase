@@ -7,11 +7,9 @@ import (
 )
 
 func (conversion *PageConversion) RelatedLinksAsHTML() (div string) {
-	context := conversion.Context
-
-	topic := context.Topic
+	topic := conversion.Topic
 	if topic == nil || ditaconvert.EmptyLinkSets(topic.Links) {
-		return ""
+		return "<div></div>"
 	}
 
 	contains := func(xs []string, s string) bool {
@@ -23,40 +21,53 @@ func (conversion *PageConversion) RelatedLinksAsHTML() (div string) {
 		return false
 	}
 
-	div += `<div class="related-links">`
+	div += `<div>`
 
+	var hasFamilyLinks bool
 	for _, set := range topic.Links {
-		if len(set.Children) > 0 {
-			if set.CollType == dita.Sequence {
-				div += "<ol>"
-			} else {
-				div += "<ul>"
-			}
-
-			for _, link := range set.Children {
-				div += "<li>" + conversion.LinkAsAnchor(link)
-				if link.Topic.Synopsis != "" {
-					div += "<p>" + link.Topic.Synopsis + "</p>"
-				}
-				div += "</li>"
-			}
-
-			if set.CollType == dita.Sequence {
-				div += "</ol>"
-			} else {
-				div += "</ul>"
-			}
+		hasFamilyLinks = hasFamilyLinks || set.Parent != nil || set.Prev != nil || set.Next != nil
+		if len(set.Children) == 0 {
+			continue
 		}
 
-		if set.Parent != nil {
-			div += "<div><b>Parent topic: </b>" + conversion.LinkAsAnchor(set.Parent) + "</div>"
+		if set.CollType == dita.Sequence {
+			div += `<ol class="ullinks">`
+		} else {
+			div += `<ul class="ullinks">`
 		}
-		if set.Prev != nil {
-			div += "<div><b>Previous topic: </b>" + conversion.LinkAsAnchor(set.Prev) + "</div>"
+
+		for _, link := range set.Children {
+			div += `<li class="ulchildlink">` + conversion.LinkAsAnchor(link)
+			if link.Topic.Synopsis != "" {
+				div += `<p>` + link.Topic.Synopsis + `</p>`
+			}
+			div += `</li>`
 		}
-		if set.Next != nil {
-			div += "<div><b>Next topic: </b>" + conversion.LinkAsAnchor(set.Next) + "</div>"
+
+		if set.CollType == dita.Sequence {
+			div += `</ol>`
+		} else {
+			div += `</ul>`
 		}
+	}
+
+	if hasFamilyLinks {
+		div += `<div class="familylinks">`
+		for _, set := range topic.Links {
+			if set.Parent == nil && set.Prev == nil && set.Next == nil {
+				continue
+			}
+			if set.Parent != nil {
+				div += `<div class="parentlink"><strong>Parent topic: </strong>` + conversion.LinkAsAnchor(set.Parent) + `</div>`
+			}
+			if set.Prev != nil {
+				div += `<div class="previouslink"><strong>Previous topic: </strong>` + conversion.LinkAsAnchor(set.Prev) + `</div>`
+			}
+			if set.Next != nil {
+				div += `<div class="nextlink"><strong>Next topic: </strong>` + conversion.LinkAsAnchor(set.Next) + `</div>`
+			}
+		}
+		div += `</div>`
 	}
 
 	grouped := make(map[string][]*ditaconvert.Link)
@@ -78,25 +89,40 @@ func (conversion *PageConversion) RelatedLinksAsHTML() (div string) {
 		}
 	}
 
+	// for _, links := range grouped {
+	// 	ditaconvert.SortLinks(links)
+	// }
+
 	for _, kind := range order {
 		links := grouped[kind]
 		if len(links) == 0 {
 			continue
 		}
 
-		if kind != "information" && len(links) > 1 {
-			kind += "s"
+		if kind != "information" {
+			class := kindclass[kind]
+			if len(links) > 1 {
+				kind += "s"
+			}
+			div += `<div class="relinfo ` + class + `"><strong>Related ` + kind + `</strong>`
+		} else {
+			div += `<div class="relinfo"><strong>Related information</strong>`
 		}
-		div += "<div><b>Related " + kind + "</b>"
 		for _, link := range links {
 			div += "<div>" + conversion.LinkAsAnchor(link) + "</div>"
 		}
 		div += "</div>"
 	}
-
 	div += "</div>"
 
 	return div
+}
+
+var kindclass = map[string]string{
+	"tutorial":  "reltutorials",
+	"reference": "relref",
+	"concept":   "relconcepts",
+	"task":      "reltasks",
 }
 
 func (conversion *PageConversion) LinkAsAnchor(link *ditaconvert.Link) string {
