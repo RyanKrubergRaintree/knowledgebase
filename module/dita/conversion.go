@@ -2,6 +2,7 @@ package dita
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -41,6 +42,8 @@ type ConversionError struct {
 	Errors []error
 }
 
+const maxPageSize = 1048575
+
 func (context *Conversion) Run() {
 	fs := ditaconvert.Dir(filepath.Dir(context.Ditamap))
 	index := ditaconvert.NewIndex(fs)
@@ -77,6 +80,14 @@ func (context *Conversion) Run() {
 		data, err := json.Marshal(page)
 		if err != nil {
 			log.Println(err)
+		}
+
+		if len(data) > maxPageSize {
+			context.Errors = append(context.Errors, ConversionError{
+				Path:  topic.Path,
+				Slug:  slug,
+				Fatal: fmt.Errorf("Page is too large %vMB (%vB)", len(data)>>20, len(data)),
+			})
 		}
 
 		context.Pages[slug] = page
