@@ -39,6 +39,10 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 
 	tags := conversion.Topic.Original.Prolog.Keywords.Terms()
 	if len(tags) > 0 {
+		for i, tag := range tags {
+			tag = strings.Replace(tag, ":", " ", -1)
+			tags[i] = tag
+		}
 		page.Story.Append(kb.Tags(tags...))
 	}
 	page.Story.Append(kb.HTML(context.Output.String()))
@@ -63,7 +67,7 @@ func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.
 
 	setAttr(&start, "scope", "")
 	if internal && href != "" {
-		//setAttr(&start, "data-link", href)
+		setAttr(&start, "data-link", href)
 	}
 
 	if getAttr(&start, "format") != "" && href != "" {
