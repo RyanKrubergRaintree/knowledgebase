@@ -11,6 +11,11 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb/items/index"
 )
 
+const (
+	maxPageSize         = 1 << 20 // 1MB
+	recommendedPageSize = 1 << 19 // 0.5MB
+)
+
 type Conversion struct {
 	Group   kb.Slug
 	Ditamap string
@@ -40,11 +45,6 @@ type ConversionError struct {
 	Fatal  error
 	Errors []error
 }
-
-const (
-	maxPageSize         = 1 << 20 // 1MB
-	recommendedPageSize = 1 << 18 // 0.25MB
-)
 
 func (context *Conversion) Run() {
 	fs := ditaconvert.Dir(filepath.Dir(context.Ditamap))
