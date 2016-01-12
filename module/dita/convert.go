@@ -39,18 +39,32 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 		return page, nil, err
 	}
 
-	tags := conversion.Topic.Original.Prolog.Keywords.Terms()
-	if len(tags) > 0 {
-		for i, tag := range tags {
-			tag = strings.Replace(tag, ":", " ", -1)
-			tags[i] = tag
-		}
+	if tags := conversion.ConvertTags(); len(tags) > 0 {
 		page.Story.Append(kb.Tags(tags...))
 	}
+
 	page.Story.Append(kb.HTML(context.Output.String()))
 	page.Story.Append(kb.HTML(conversion.RelatedLinksAsHTML()))
 
 	return page, context.Errors, nil
+}
+
+func (conversion *PageConversion) ConvertTags() []string {
+	raw := conversion.Topic.Original.Prolog.Keywords.Terms()
+	for _, key := range conversion.Topic.Original.Prolog.ResourceID {
+		raw = append(raw, "id/"+key.Name)
+	}
+
+	tags := []string{}
+	for _, tag := range raw {
+		slug := string(kb.Slugify(tag))
+		if slug == "" || slug == "-" {
+			continue
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags
 }
 
 func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.Decoder, start xml.StartElement) error {
