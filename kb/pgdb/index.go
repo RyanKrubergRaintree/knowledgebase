@@ -72,21 +72,27 @@ func (db Index) ByTag(tag kb.Slug) ([]kb.PageEntry, error) {
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
 		  AND AccessView.Access >= 'reader'
-		  AND TagSlugs @> $2
+		  AND TagSlugs && $2
 	`, db.UserID, tagSlugs)
 }
 
-func (db Index) ByTagFilter(tag kb.Slug, exclude, include string) ([]kb.PageEntry, error) {
-	tags := kb.SlugifyTags([]string{string(tag)})
-	tagSlugs := stringSlice(tags)
+func (db Index) ByTagFilter(tags []kb.Slug, exclude, include string) ([]kb.PageEntry, error) {
+	if len(tags) == 0 {
+		return nil, nil
+	}
+
+	tagSlugs := make([]string, len(tags))
+	for i, tag := range tags {
+		tagSlugs[i] = string(tag)
+	}
 
 	return db.pageEntries(`
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
 		  AND AccessView.Access >= 'reader'
-		  AND (OwnerID NOT LIKE $3 || '%' OR OwnerID = $4)
-		  AND TagSlugs @> $2
-		`, db.UserID, tagSlugs, exclude, include)
+		  AND (OwnerID NOT LIKE ($3 || '%') OR OwnerID = $4)
+		  AND TagSlugs && $2
+		`, db.UserID, stringSlice(tagSlugs), exclude, include)
 }
 
 func (db Index) readable() (groups []kb.Group, err error) {

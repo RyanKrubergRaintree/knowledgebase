@@ -126,7 +126,9 @@ package("kb.boot", function(exports) {
 		componentDidMount: function() {
 			document.onkeydown = this.keydown;
 			document.onclick = this.click;
-			this.state.Crumbs.attach(this.state.Session.home);
+			this.state.Crumbs.attach(
+				this.state.Session.pages,
+				this.state.Session.home);
 		},
 		componentWillUnmount: function() {
 			if (document.onkeydown === this.keydown) {

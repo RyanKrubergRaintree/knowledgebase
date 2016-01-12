@@ -37,10 +37,14 @@ package("kb", function(exports) {
 	}
 
 	Crumbs.prototype = {
-		attach: function(defaultPage) {
+		attach: function(defaultPages, home) {
 			var hash = window.location.hash;
 			if ((hash === "") || (hash === "#")) {
-				this.lineup_.openLink(defaultPage);
+				if (defaultPages.length > 0) {
+					this.lineup_.openPages(defaultPages);
+				} else {
+					this.lineup_.openLink(home);
+				}
 			} else {
 				this.lineup_.updateRefs(hashToRefs(window.location.hash));
 			}

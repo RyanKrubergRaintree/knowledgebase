@@ -124,7 +124,7 @@ func (mod *Module) first(w http.ResponseWriter, r *http.Request, tag kb.Slug) {
 		entries, err = index.ByTag(tag)
 	} else {
 		filter = string(kb.Slugify(filter))
-		entries, err = index.ByTagFilter(tag, "help-", "help-"+filter)
+		entries, err = index.ByTagFilter([]kb.Slug{tag}, "help-", "help-"+filter)
 	}
 
 	if err != nil {

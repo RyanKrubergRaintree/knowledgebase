@@ -59,6 +59,7 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 				if !ok {
 					return "null"
 				}
+
 				data, _ := json.Marshal(session)
 				return template.JS(data)
 			},

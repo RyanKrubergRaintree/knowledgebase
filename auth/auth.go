@@ -64,6 +64,7 @@ type SessionInfo struct {
 	Token string  `json:"token"`
 	User  kb.User `json:"user"`
 
+	Pages []kb.Slug         `json:"pages"`
 	Param map[string]string `json:"param,omitempty"`
 }
 
@@ -144,11 +145,28 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
 		return nil, false
 	}
 
+	slugs := []kb.Slug{}
 	params := make(map[string]string)
-	if err := r.ParseForm(); err != nil {
+	if err := r.ParseForm(); err == nil {
 		for name, val := range r.PostForm {
 			if len(val) > 0 {
 				params[name] = val[0]
+			}
+		}
+
+		if pagelist := params["pages"]; pagelist != "" {
+			tags := []kb.Slug{}
+			for _, tag := range strings.Split(pagelist, "|") {
+				tags = append(tags, kb.Slugify(tag))
+			}
+
+			filter := kb.Slugify(params["branch"])
+			index := server.DB.Context(user.ID).Index(user.ID)
+			entries, err := index.ByTagFilter(tags, "help-", "help-"+string(filter))
+			if err == nil {
+				for _, entry := range entries {
+					slugs = append(slugs, entry.Slug)
+				}
 			}
 		}
 	}
@@ -156,6 +174,7 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
 	return &SessionInfo{
 		User:  user,
 		Token: token.String(),
+		Pages: slugs,
 		Param: params,
 	}, true
 }

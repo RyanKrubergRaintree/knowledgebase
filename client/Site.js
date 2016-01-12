@@ -165,9 +165,7 @@ package("kb", function(exports) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			var lineup = this.props.Lineup;
-			lineup.clear();
-			lineup.openLink(this.props.Session.home);
+			this.props.Lineup.openPages(this.props.Session.home);
 		},
 		createNewPage: function(ev) {
 			ev.preventDefault();

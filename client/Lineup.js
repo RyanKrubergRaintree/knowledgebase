@@ -102,6 +102,17 @@ package("kb", function(exports) {
 			this.open(kb.convert.LinkToReference(link));
 		},
 
+		openPages: function(pages) {
+			this.clear();
+			if (pages instanceof Array) {
+				for (var i = 0; i < pages.length; i++) {
+					this.openLink(pages[i]);
+				}
+			} else {
+				this.openLink(pages);
+			}
+		},
+
 		handleClose: function(ev) {
 			this.stages = this.stages.filter(function(stage) {
 				return stage !== ev.stage;

@@ -122,7 +122,7 @@ type Index interface {
 
 	Tags() ([]TagEntry, error)
 	ByTag(tag Slug) ([]PageEntry, error)
-	ByTagFilter(tag Slug, exclude, include string) ([]PageEntry, error)
+	ByTagFilter(tag []Slug, exclude, include string) ([]PageEntry, error)
 
 	Groups(min Rights) ([]Group, error)
 	ByGroup(groupID Slug) ([]PageEntry, error)
