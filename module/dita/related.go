@@ -75,7 +75,7 @@ func (conversion *PageConversion) RelatedLinksAsHTML() (div string) {
 	for _, set := range topic.Links {
 		for _, link := range set.Siblings {
 			kind := ""
-			if link.Topic != nil {
+			if link.Topic != nil && link.Topic.Original != nil {
 				kind = link.Topic.Original.XMLName.Local
 			}
 			if link.Type != "" {
