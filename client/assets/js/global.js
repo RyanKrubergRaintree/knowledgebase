@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 
 window.GetDataAttribute = function GetDataAttribute(el, name) {
-	if (typeof el.dataset !== 'undefined') {
+	if (typeof el.dataset !== "undefined") {
 		return el.dataset[name];
 	} else {
-		return el.getAttribute('data-' + name);
+		return el.getAttribute("data-" + name);
 	}
 };
 
@@ -15,18 +15,18 @@ window.GenerateID = function GenerateID() {
 
 window.TestCase = function TestCase(casename, runcase) {
 	var assert = {
-		'true': function(ok, msg) {
+		"true": function(ok, msg) {
 			if (!ok) {
 				throw new Error(msg);
 			}
 		},
-		'fail': function(err) {
+		"fail": function(err) {
 			throw new Error(err);
 		},
-		'equal': function(actual, expect, msg) {
+		"equal": function(actual, expect, msg) {
 			if (actual !== expect) {
-				var full = '\ngot ' + actual + '\nexp ' + expect;
-				if (typeof msg !== 'undefined') {
+				var full = "\ngot " + actual + "\nexp " + expect;
+				if (typeof msg !== "undefined") {
 					full = msg + full;
 				}
 				throw new Error(full);
@@ -37,7 +37,7 @@ window.TestCase = function TestCase(casename, runcase) {
 	try {
 		runcase(assert);
 	} catch (err) {
-		console.error('assert ' + casename + ' failed:', err);
+		console.error("assert " + casename + " failed:", err);
 	}
 };
 
@@ -46,17 +46,17 @@ window.getClassList = function(el) {
 		return s.length ? s.split(/\s+/g) : [];
 	}
 
-	if ('classList' in el) {
+	if ("classList" in el) {
 		return el.classList;
 	}
 
 	return {
 		add: function(token) {
-			el.className += ' ' + token;
+			el.className += " " + token;
 		},
 		remove: function(token) {
-			var tokens = ' ' + el.className + ' ';
-			tokens = tokens.replace(' ' + token + ' ', '');
+			var tokens = " " + el.className + " ";
+			tokens = tokens.replace(" " + token + " ", "");
 			el.className = tokens.trim();
 		},
 		contains: function(token) {

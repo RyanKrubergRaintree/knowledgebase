@@ -1,6 +1,6 @@
 {
   "browser": true,
-  "esnext": true,
+  "esnext": false,
   "globals": {
     "ga": true,
     "React": true,

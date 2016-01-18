@@ -110,7 +110,7 @@ package("kb.Stage", function(exports) {
 
 		groupsReceived: function(response) {
 			if (response.ok) {
-				var info = response.json;
+				var info = response.json || {};
 				this.setState({
 					groups: info.groups || []
 				});

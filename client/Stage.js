@@ -7,15 +7,6 @@ package("kb", function(exports) {
 
 	depends("util/ParseJSON.js");
 
-	function bindready(xhr, fn, self) {
-		return function() {
-			if (xhr.readyState !== 4) {
-				return;
-			}
-			fn.call(self, xhr);
-		};
-	}
-
 	function Editing(stage) {
 		this.stage = stage;
 		this.items = {};

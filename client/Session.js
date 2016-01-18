@@ -68,10 +68,15 @@ package("kb", function(exports) {
 					return;
 				}
 
+				var json = null;
+				try {
+					json = JSON.parse(xhr.responseText);
+				} catch (err) {
+					json = null;
+				}
+
 				var response = {
-					get json() {
-						return JSON.parse(xhr.responseText);
-					},
+					json: json,
 					url: xhr.responseURL || opts.url,
 					status: xhr.status,
 					ok: xhr.status === 200,

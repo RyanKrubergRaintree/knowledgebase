@@ -170,7 +170,7 @@ package("kb", function(exports) {
 			var auth2 = gapi.auth2.init();
 
 			var trylogin = function() {
-				if (auth2.isSignedIn.get() == true) {
+				if (auth2.isSignedIn.get() === true) {
 					// check if not logged in
 					var user = auth2.currentUser.get();
 					var profile = user.getBasicProfile();
@@ -189,7 +189,7 @@ package("kb", function(exports) {
 			};
 
 			data.login = function() {
-				if (auth2.isSignedIn.get() == true) {
+				if (auth2.isSignedIn.get() === true) {
 					trylogin();
 				} else {
 					auth2.signIn().then(

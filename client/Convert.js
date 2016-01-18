@@ -67,7 +67,7 @@ package("kb.convert", function(exports) {
 				continue;
 			}
 			if ((r === "/") || (r === "=")) {
-				if ((slug.length == 0) || (slug[slug.length - 1] != r)) {
+				if ((slug.length === 0) || (slug[slug.length - 1] !== r)) {
 					slug += r;
 				}
 				emitdash = false;
