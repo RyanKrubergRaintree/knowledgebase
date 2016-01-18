@@ -40,6 +40,9 @@ package("kb", function(exports) {
 			this.changed();
 		},
 		highlight: function(id) {
+			if (this.highlighted === id) {
+				return;
+			}
 			this.highlighted = id;
 			this.changed();
 		},
@@ -47,6 +50,28 @@ package("kb", function(exports) {
 			if (this.highlighted === id) {
 				this.highlighted = "";
 				this.changed();
+			}
+		},
+
+
+		_targetId: function(ev) {
+			if ((!ev) || (!ev.target)) {
+				return;
+			}
+			if (ev.target.nodeName !== "A") {
+				return
+			}
+			var id = GetDataAttribute(ev.target, "focusid");
+			if (id == null) {
+				return;
+			}
+			return id;
+		},
+
+		highlightTarget: function(ev) {
+			var id = this._targetId(ev);
+			if (id) {
+				this.highlight(id);
 			}
 		}
 	};

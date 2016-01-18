@@ -34,6 +34,7 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 
 	context.Rules.Custom["a"] = conversion.ToSlug
 	context.Rules.Custom["img"] = conversion.InlineImage
+	context.Rules.Custom["imagemap"] = conversion.ConvertImageMap
 
 	if err := context.Run(); err != nil {
 		return page, nil, err

@@ -246,7 +246,7 @@ ul.tight {
 	animation: fadeIn ease-in 0.2s;
 }
 
-.page-story img { max-width: 100%; }
+.page-story img { max-width: 100%; -ms-interpolation-mode: bicubic; }
 .page-story video { max-width: 100%; }
 
 .round-scrollbar::-webkit-scrollbar {

@@ -34,9 +34,8 @@ package("kb.Lineup", function(exports) {
 				style += "[data-id=\"" + id + "\"], " +
 					"[data-focusid=\"" + id + "\"]" +
 					"{" +
-					"border: 1px dashed #22F !important;" +
-					"padding: 2px 8px;" +
-					"background: rgba(127,127,255,0.05) !important;" +
+					"outline: 1px dashed #22F !important;" +
+					"background: rgba(127,127,255,0.1) !important;" +
 					"}";
 			}
 			if (state.selected !== "") {
@@ -44,9 +43,8 @@ package("kb.Lineup", function(exports) {
 				style += "[data-id=\"" + id + "\"], " +
 					"[data-focusid=\"" + id + "\"]" +
 					"{" +
-					"border: 1px dashed #22F !important;" +
-					"padding: 2px 8px;" +
-					"background: rgba(127,127,255,0.05) !important;" +
+					"outline: 1px dashed #22F !important;" +
+					"background: rgba(127,127,255,0.1) !important;" +
 					"}";
 			}
 

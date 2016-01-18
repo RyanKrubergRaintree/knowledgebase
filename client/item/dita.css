@@ -39,6 +39,45 @@
 	text-decoration: underline;
 }
 
+
+.imagemap .imagemap-tip {
+	color: #888;
+	font-size: 80%;
+	font-style: italic;
+}
+
+.imagemap .imagemap-layers {
+	position: relative;
+	font-size: 0;
+}
+
+.imagemap .imagemap-overlay {
+	position: absolute;
+	padding: 0;	margin: 0;
+	left: 0; top: 0; right: 0; bottom: 0;
+}
+
+.imagemap .imagemap-overlay a {
+	display: block;
+	position: absolute;
+
+	padding: 0; margin: 0;
+
+	/* hack-fix for IE
+	   IE ignores events from transparent A tags,
+	   use a image to supress this behavior
+	*/
+	background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+
+	outline: 1px dashed #00f;
+	cursor: pointer;
+
+	line-height: 100%;
+	text-align: center;
+
+	text-decoration: none;
+}
+
 /* Backwards compatibility */
 
 *[data-dita="note"]:before {

@@ -119,13 +119,18 @@ package("kb.boot", function(exports) {
 			}
 		},
 		click: function(ev) {
-			ev = ev || event;
-			this.state.Lineup.handleClickLink(ev);
+			this.state.Lineup.handleClickLink(ev || event);
 		},
 
+		highlight: function(ev) {
+			this.state.CurrentSelection.highlightTarget(ev || event);
+		},
 		componentDidMount: function() {
 			document.onkeydown = this.keydown;
 			document.onclick = this.click;
+
+			document.onmouseover = this.highlight;
+
 			this.state.Crumbs.attach(
 				this.state.Session.pages,
 				this.state.Session.home);
