@@ -59,7 +59,7 @@ func RemapTitles(conversion *Conversion, index *ditaconvert.Index) (*TitleMappin
 		mapping.ByTopic[topic] = slug
 	}
 
-	// promote to shorter titles, if possible
+	/* Code for promoting to shorter titles
 	for prev, topic := range mapping.BySlug {
 		if topic.ShortTitle == "" || len(topic.Title) <= len(topic.ShortTitle) {
 			continue
@@ -76,6 +76,7 @@ func RemapTitles(conversion *Conversion, index *ditaconvert.Index) (*TitleMappin
 		mapping.BySlug[slug] = topic
 		mapping.ByTopic[topic] = slug
 	}
+	*/
 
 	return mapping, errors
 }
