@@ -103,15 +103,14 @@ package("kb", function(exports) {
 		},
 
 		loginTo: function(url, user, code) {
-			var form = new FormData();
-			form.append("user", user);
-			form.append("code", code);
-
 			kb.Session.fetch({
 				url: url,
 				ondone: this.loginSuccess.bind(this),
 				onerror: this.loginError.bind(this),
-				body: form
+				body: {
+					"user": user,
+					"code": code
+				}
 			});
 		},
 		tryAutoLogin: function() {

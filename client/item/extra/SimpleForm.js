@@ -51,15 +51,15 @@ package("kb.item.content", function(exports) {
 				message: "processing..."
 			});
 
-			var form = new FormData();
 			var items = this.props.item.items || [];
+			var body = {};
 			var self = this;
 			items.map(function(item) {
 				var id = item.id || item.label;
 				var node = self.refs[id];
 				if (typeof node !== "undefined") {
 					var value = node.value;
-					form.append(id, value);
+					body[id] = value;
 				}
 			});
 
@@ -71,7 +71,7 @@ package("kb.item.content", function(exports) {
 				},
 				ondone: this.done,
 				onerror: this.errored,
-				body: form
+				body: body
 			});
 		},
 

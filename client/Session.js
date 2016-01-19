@@ -112,7 +112,20 @@ package("kb", function(exports) {
 			if ((typeof opts.body === "undefined") || (opts.body === null)) {
 				xhr.send();
 			} else {
-				xhr.send(opts.body);
+				var pairs = [];
+				for (name in opts.body) {
+					if (opts.body.hasOwnProperty(name)) {
+						pairs.push(
+							encodeURIComponent(name) + "=" +
+							encodeURIComponent(opts.body[name]));
+					}
+				}
+
+				var encoded = pairs.join("&").replace(/%20/g, "+");
+				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				xhr.setRequestHeader("Content-Length", encoded.length);
+
+				xhr.send(encoded);
 			}
 
 			return xhr;
