@@ -64,8 +64,8 @@ type SessionInfo struct {
 	Token string  `json:"token"`
 	User  kb.User `json:"user"`
 
-	Pages []kb.Slug         `json:"pages"`
-	Param map[string]string `json:"param,omitempty"`
+	Pages  []kb.Slug         `json:"pages"`
+	Params map[string]string `json:"params,omitempty"`
 }
 
 func (server *Server) info(w http.ResponseWriter, r *http.Request) {
@@ -172,10 +172,10 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
 	}
 
 	return &SessionInfo{
-		User:  user,
-		Token: token.String(),
-		Pages: slugs,
-		Param: params,
+		User:   user,
+		Token:  token.String(),
+		Pages:  slugs,
+		Params: params,
 	}, true
 }
 
