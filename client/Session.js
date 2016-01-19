@@ -123,7 +123,6 @@ package("kb", function(exports) {
 
 				var encoded = pairs.join("&").replace(/%20/g, "+");
 				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-				xhr.setRequestHeader("Content-Length", encoded.length);
 
 				xhr.send(encoded);
 			}
