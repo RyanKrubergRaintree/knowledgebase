@@ -21,7 +21,7 @@ package("kb", function(exports) {
 		var params = context.params || {};
 		this.pages = context.pages || [];
 		this.home = params.home || "Community=Welcome";
-		this.branch = params.branch || "10.2.600";
+		this.branch = params.branch || "";
 		this.token = context.token || null;
 
 		this.logoutProvider_ = logoutProvider;

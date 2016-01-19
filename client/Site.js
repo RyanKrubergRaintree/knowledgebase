@@ -32,7 +32,8 @@ package("kb", function(exports) {
 						"10.2.100",
 						"9.4"
 					],
-					selected: this.props.Session.branch
+					selected: this.props.Session.branch || "10.2.600",
+					hidden: this.props.Session.branch != ""
 				}
 			};
 		},
@@ -112,6 +113,9 @@ package("kb", function(exports) {
 				React.DOM.select({
 						className: "search-filter",
 						ref: "filter",
+						style: {
+							display: filter.hidden ? "none" : null
+						},
 						defaultValue: filter.selected
 					},
 					filter.options.map(function(item) {
