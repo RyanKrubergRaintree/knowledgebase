@@ -3,6 +3,7 @@ package dita
 import (
 	"encoding/xml"
 	"fmt"
+	"html"
 	"path"
 	"strings"
 
@@ -69,12 +70,12 @@ func (conversion *PageConversion) ConvertTags() []string {
 }
 
 func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.Decoder, start xml.StartElement) error {
-	var href, desc string
+	var href, title, desc string
 	var internal bool
 
 	href = getAttr(&start, "href")
 	if href != "" {
-		href, _, desc, internal = conversion.ResolveLinkInfo(href)
+		href, title, desc, internal = conversion.ResolveLinkInfo(href)
 		setAttr(&start, "href", href)
 	}
 
@@ -96,8 +97,20 @@ func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.
 			setAttr(&start, "target", "_blank")
 		}
 	}
+	// encode starting tag and attributes
+	if err := context.Encoder.WriteStart("a", start.Attr...); err != nil {
+		return err
+	}
 
-	return context.EmitWithChildren(dec, start)
+	// recurse on child tokens
+	err, count := context.RecurseChildCount(dec)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		context.Encoder.WriteRaw(html.EscapeString(title))
+	}
+	return context.Encoder.WriteEnd("a")
 }
 
 func (conversion *PageConversion) InlineImage(context *ditaconvert.Context, dec *xml.Decoder, start xml.StartElement) error {
