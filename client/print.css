@@ -1,0 +1,42 @@
+@media print {
+	*, html, body, #content, .lineup, .stage-scroll {
+		position: static !important;
+		box-shadow: none !important;
+		overflow: hidden !important;
+	}
+
+	iframe {
+		display: none !important;
+	}
+
+	#header,
+	.stage .stage-buttons,
+	.background-info,
+	.item-drag {
+		display: none !important;
+	}
+
+	#content, .item {
+		background: none !important;
+	}
+
+	.stage {
+		width: auto !important;
+	}
+
+	.page {
+		border: 0 !important;
+		background: transparent !important;
+	}
+
+	.stage {
+		border-top: 1px solid #888 !important;
+	}
+
+	.page-owner {
+		color: #888 !important;
+	}
+	.page-title {
+		margin-top: 0px !important;
+	}
+}

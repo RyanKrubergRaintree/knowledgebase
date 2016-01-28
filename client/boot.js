@@ -2,6 +2,7 @@ package("kb.boot", function(exports) {
 	"use strict";
 
 	depends("boot.css");
+	depends("print.css");
 
 	depends("Auth.js");
 	depends("Login.js");
