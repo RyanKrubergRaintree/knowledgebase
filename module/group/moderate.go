@@ -25,7 +25,7 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		action := r.Header.Get("action")
+		action := r.FormValue("action")
 		switch action {
 		case "add-user", "remove-user",
 			"add-community", "remove-community":

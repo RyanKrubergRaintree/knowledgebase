@@ -111,6 +111,8 @@ package("kb", function(exports) {
 
 			if ((typeof opts.body === "undefined") || (opts.body === null)) {
 				xhr.send();
+			} else if (typeof opts.body === "string") {
+				xhr.send(opts.body);
 			} else {
 				var pairs = [];
 				for (name in opts.body) {

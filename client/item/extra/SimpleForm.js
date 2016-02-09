@@ -62,16 +62,14 @@ package("kb.item.content", function(exports) {
 					body[id] = value;
 				}
 			});
+			items["action"] = GetDataAttribute(ev.currentTarget, "action");
 
 			this.context.Session.fetch({
 				method: "POST",
 				url: this.props.item.url,
-				headers: {
-					"action": GetDataAttribute(ev.currentTarget, "action")
-				},
 				ondone: this.done,
 				onerror: this.errored,
-				body: body
+				body: items
 			});
 		},
 
