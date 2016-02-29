@@ -141,23 +141,6 @@ package("kb.Page", function(exports) {
 			ev.dataTransfer.setData("Text", JSON.stringify(data));
 		},
 
-		dropEffectFor: function(ev) {
-			var effect = "copy";
-			try {
-				effect = ev.dataTransfer.effectAllowed;
-			} catch (ex) {
-				// HACK-FIX, this is required for IE11
-				// otherwise getting effectAllowed fails
-			}
-			if (effect === "copy") {
-				return "copy";
-			}
-			if (ev.shiftKey) {
-				return "copy";
-			}
-			return "move";
-		},
-
 		dragEnter: function( /*ev*/ ) {},
 		dragOver: function(ev) {
 			clearDropPosition();
@@ -171,7 +154,7 @@ package("kb.Page", function(exports) {
 			}
 
 			ev.preventDefault();
-			ev.dataTransfer.dropEffect = this.dropEffectFor(ev);
+			ev.dataTransfer.dropEffect = kb.DropEffectFor(ev);
 
 			var drop = findListPosition(ev, "page", "page-story");
 			if (drop === null) {
@@ -203,7 +186,7 @@ package("kb.Page", function(exports) {
 			}
 			var after = getAfter(page, drop);
 
-			var dropEffect = this.dropEffectFor(ev);
+			var dropEffect = kb.DropEffectFor(ev);
 
 			var data = ev.dataTransfer.getData("Text");
 			try {

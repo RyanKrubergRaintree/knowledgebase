@@ -55,7 +55,7 @@ package("kb.item", function(exports) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if (ev.dataTransfer.dropEffect === "move") {
+			if (kb.DropEffectFor(ev) === "move") {
 				stage.patch({
 					type: "remove",
 					id: item.id

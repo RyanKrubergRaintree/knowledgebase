@@ -4,6 +4,23 @@ package("kb", function(exports) {
 	depends("Convert.js");
 	var rxCode = /[=><;{}\[\]]/;
 
+	exports.DropEffectFor = function(ev){
+		var effect = "copy";
+		try {
+			effect = ev.dataTransfer.effectAllowed;
+		} catch (ex) {
+			// HACK-FIX, this is required for IE11
+			// otherwise getting effectAllowed fails
+		}
+		if (effect === "copy") {
+			return "copy";
+		}
+		if (ev.shiftKey) {
+			return "copy";
+		}
+		return "move";
+	}
+
 	function getImage(dataTransfer) {
 		var acceptedImages = {
 			"image/png": true,
