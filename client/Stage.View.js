@@ -24,12 +24,10 @@ package("kb.Stage", function(exports) {
 				text: ""
 			};
 
-			ev.dataTransfer.effectAllowed = "copy";
-			var data = {
+			kb.drop.SetAllowed(ev, "copy");
+			kb.drop.SetItem(ev, {
 				item: item
-			};
-
-			ev.dataTransfer.setData("Text", JSON.stringify(data));
+			});
 		},
 
 		deletePage: function() {

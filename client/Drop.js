@@ -1,17 +1,51 @@
-package("kb", function(exports) {
+package("kb.drop", function(exports) {
 	"use strict";
 
 	depends("Convert.js");
 	var rxCode = /[=><;{}\[\]]/;
 
-	exports.DropEffectFor = function(ev){
-		var effect = "copy";
+	exports.Item = undefined;
+	exports.Allowed = "";
+	exports.Effect = "";
+
+	exports.SetAllowed = function(ev, allowed){
+		exports.Allowed = allowed;
 		try {
-			effect = ev.dataTransfer.effectAllowed;
-		} catch (ex) {
-			// HACK-FIX, this is required for IE11
-			// otherwise getting effectAllowed fails
+			ev.dataTransfer.allowedEffect = allowed;
+		} catch (e) {
 		}
+	};
+
+	exports.GetAllowed = function(ev){
+		var result = "copy";
+		try {
+			result = ev.dataTransfer.allowedEffect;
+		} catch (e) {
+			result = exports.Allowed;
+		}
+		return result;
+	};
+
+	exports.SetEffect = function(ev, effect){
+		exports.Effect = effect;
+		try {
+			ev.dataTransfer.dropEffect = dropEffect;
+		} catch (e) {}
+	};
+
+	exports.GetEffect = function(ev){
+		var result = "copy";
+		try {
+			result = ev.dataTransfer.dropEffect;
+		} catch (e) {
+			result = exports.Effect;
+		}
+		return result;
+	};
+
+	exports.EffectFor = function(ev){
+		var effect = "copy";
+		var effect = exports.GetAllowed(ev);
 		if (effect === "copy") {
 			return "copy";
 		}
@@ -19,6 +53,33 @@ package("kb", function(exports) {
 			return "copy";
 		}
 		return "move";
+	}
+
+	exports.SetItem = function(ev, item){
+		exports.Item = JSON.stringify(item);
+		try {
+			ev.dataTransfer.setData("Text", JSON.stringify(item));
+		} catch(e) {}
+	};
+
+	exports.GetItem = function(ev){
+		var result = null;
+		try {
+			var data = ev.dataTransfer.getData("Text");
+			result = JSON.parse(data);
+		} catch (e) {
+			result = exports.Item;
+		}
+		exports.Item = null;
+		return result;
+	};
+
+	exports.SetDragImage = function(ev, node, x, y) {
+		try {
+			if (ev.dataTransfer.setDragImage) {
+				ev.dataTransfer.setDragImage(node, x, y);
+			}
+		} catch (e) { }
 	}
 
 	function getImage(dataTransfer) {
@@ -64,6 +125,19 @@ package("kb", function(exports) {
 			onResized(canvas.toDataURL());
 		};
 		image.src = src;
+	}
+
+	exports.ConvertUnknown = ConvertUnknown;
+	function ConvertUnknown(stage, after, dataTransfer) {
+		var item = createItem(stage, dataTransfer);
+		if (item) {
+			stage.patch({
+				type: "add",
+				after: after,
+				id: item.id,
+				item: item
+			});
+		}
 	}
 
 	function createItem(stage, dataTransfer) {
@@ -143,19 +217,5 @@ package("kb", function(exports) {
 		}
 
 		console.log("Unhandled drop item:", JSON.parse(JSON.stringify(dataTransfer)));
-	}
-
-	exports.DropData = DropData;
-
-	function DropData(stage, after, dataTransfer) {
-		var item = createItem(stage, dataTransfer);
-		if (item) {
-			stage.patch({
-				type: "add",
-				after: after,
-				id: item.id,
-				item: item
-			});
-		}
 	}
 });

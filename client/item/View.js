@@ -19,16 +19,14 @@ package("kb.item", function(exports) {
 				item = this.props.item;
 
 			if (stage.canModify()) {
-				ev.dataTransfer.effectAllowed = "all";
+				kb.drop.SetAllowed(ev, "all");
 			} else {
-				ev.dataTransfer.effectAllowed = "copy";
+				kb.drop.SetAllowed(ev, "copy");
 			}
 
-			if (ev.dataTransfer.setDragImage) {
-				var off = mouseOffset(ev);
-				var viewnode = ReactDOM.findDOMNode(this);
-				ev.dataTransfer.setDragImage(viewnode, off.x, off.y);
-			}
+			var off = mouseOffset(ev);
+			var viewnode = ReactDOM.findDOMNode(this);
+			kb.drop.SetDragImage(ev, viewnode, off.x, off.y);
 
 			var data = {
 				item: item,
@@ -36,7 +34,7 @@ package("kb.item", function(exports) {
 				url: stage.url,
 				text: stage.page.synopsis
 			};
-			ev.dataTransfer.setData("Text", JSON.stringify(data));
+			kb.drop.SetItem(ev, data);
 
 			function mouseOffset(ev) {
 				ev = ev.nativeEvent || ev;
@@ -55,7 +53,7 @@ package("kb.item", function(exports) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
-			if (kb.DropEffectFor(ev) === "move") {
+			if (kb.drop.EffectFor(ev) === "move") {
 				stage.patch({
 					type: "remove",
 					id: item.id

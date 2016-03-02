@@ -133,12 +133,10 @@ package("kb.Page", function(exports) {
 				text: page.synopsis
 			};
 
-			ev.dataTransfer.effectAllowed = "copy";
-			var data = {
+			kb.drop.SetAllowed(ev, "copy");
+			kb.drop.SetItem(ev, {
 				item: item
-			};
-
-			ev.dataTransfer.setData("Text", JSON.stringify(data));
+			});
 		},
 
 		dragEnter: function( /*ev*/ ) {},
@@ -154,7 +152,7 @@ package("kb.Page", function(exports) {
 			}
 
 			ev.preventDefault();
-			ev.dataTransfer.dropEffect = kb.DropEffectFor(ev);
+			kb.drop.SetEffect(ev, kb.drop.EffectFor(ev));
 
 			var drop = findListPosition(ev, "page", "page-story");
 			if (drop === null) {
@@ -185,17 +183,9 @@ package("kb.Page", function(exports) {
 				return;
 			}
 			var after = getAfter(page, drop);
-
-			var dropEffect = kb.DropEffectFor(ev);
-
-			var data = ev.dataTransfer.getData("Text");
-			try {
-				JSON.parse(data);
-			} catch (ex) {
-				data = null;
-			}
+			var dropEffect = kb.drop.EffectFor(ev);
+			var data = kb.drop.GetItem(ev);
 			if (data) {
-				var data = kb.util.ParseJSON(data);
 				var item = data.item;
 
 				if (data.url && (data.url !== page.url)) {
@@ -218,8 +208,8 @@ package("kb.Page", function(exports) {
 						after: after
 					});
 
-					ev.dataTransfer.effectAllowed = "none";
-					ev.dataTransfer.dropEffect = "none";
+					kb.drop.SetAllowed(ev, "none");
+					kb.drop.SetEffect(ev, "none");
 					return;
 				}
 
@@ -229,10 +219,10 @@ package("kb.Page", function(exports) {
 					item: item,
 					after: after
 				});
-				ev.dataTransfer.dropEffect = dropEffect;
+				kb.drop.SetEffect(ev, dropEffect);
 			} else {
-				ev.dataTransfer.dropEffect = "copy";
-				kb.DropData(stage, after, ev.dataTransfer);
+				kb.drop.SetEffect(ev, "copy");
+				kb.drop.ConvertUnknown(stage, after, ev.dataTransfer);
 			}
 		},
 		dragLeave: function( /*ev*/ ) {
