@@ -106,6 +106,10 @@ func main() {
 	}
 	log.Println("DB Initialization complete.")
 
+	http.HandleFunc("/system/health", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "OK")
+	})
+
 	// start auth server
 	ruleset := MustLoadRules(*rules)
 	authServer := auth.NewServer(ruleset, db)

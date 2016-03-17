@@ -29,6 +29,7 @@ type Server struct {
 	Login *auth.Server
 
 	bootstrap string
+	dir       string
 	assets    http.Handler
 	client    http.Handler
 }
@@ -39,9 +40,9 @@ func NewServer(info Info, login *auth.Server, dir string, development bool) *Ser
 		Login: login,
 
 		bootstrap: filepath.Join(dir, "index.html"),
+		dir:       dir,
 		assets: http.StripPrefix("/assets/",
 			http.FileServer(http.Dir(filepath.Join(dir, "assets")))),
-
 		client: livepkg.NewServer(
 			http.Dir(dir),
 			development,
@@ -84,7 +85,7 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.URL.Path == "/favicon.ico":
-		http.Redirect(w, r, "/assets/ico/favicon.ico", http.StatusMovedPermanently)
+		http.ServeFile(w, r, filepath.Join(server.dir, "assets", "ico", "favicon.ico"))
 	case r.URL.Path == "/":
 		server.index(w, r)
 	case strings.HasPrefix(r.URL.Path, "/assets/"):
