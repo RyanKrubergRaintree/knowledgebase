@@ -246,6 +246,11 @@ package("kb", function(exports) {
 				}
 			}
 
+			var download = t.attributes["download"];
+			if (typeof download !== "undefined") {
+				return;
+			}
+
 			var href = t.attributes["href"];
 			if (typeof href === "undefined") {
 				return;

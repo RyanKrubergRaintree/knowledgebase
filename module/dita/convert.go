@@ -88,10 +88,18 @@ func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.
 		setAttr(&start, "data-link", href)
 	}
 
+	if !internal {
+		if class := getAttr(&start, "class"); class != "" {
+			setAttr(&start, "class", class+" external-link")
+		} else {
+			setAttr(&start, "class", "external-link")
+		}
+	}
+
 	if getAttr(&start, "format") != "" && href != "" {
 		setAttr(&start, "format", "")
 		ext := strings.ToLower(path.Ext(href))
-		if ext == ".pdf" || ext == ".doc" || ext == ".xml" || ext == ".rtf" || ext == ".zip" || ext == ".exe" {
+		if ext == ".doc" || ext == ".xml" || ext == ".rtf" || ext == ".zip" || ext == ".exe" {
 			setAttr(&start, "download", path.Base(href))
 		} else {
 			setAttr(&start, "target", "_blank")
