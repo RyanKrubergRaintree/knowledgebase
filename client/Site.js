@@ -21,21 +21,26 @@ package("kb", function(exports) {
 		lastStageId: undefined,
 		getInitialState: function() {
 			return {
-				filter: {
-					options: [
-						"All",
-						"10.2.600",
-						"10.2.500",
-						"10.2.400",
-						"10.2.300",
-						"10.2.200",
-						"10.2.100",
-						"9.4"
-					],
-					selected: this.props.Session.branch || "10.2.600",
-					hidden: this.props.Session.branch != ""
-				}
+				options: [
+					"All",
+					"10.2.600",
+					"10.2.500",
+					"10.2.400",
+					"10.2.300",
+					"10.2.200",
+					"10.2.100",
+					"9.4"
+				],
+				hidden: this.props.Session.branch != ""
 			};
+		},
+		updateFilter: function(ev){
+			var filter = this.refs.filter.value;
+			if (filter !== "All") {
+				this.props.Session.filter = filter;
+			} else {
+				this.props.Session.filter = "";
+			}
 		},
 		search: function(ev) {
 			var Lineup = this.props.Lineup;
@@ -45,10 +50,6 @@ package("kb", function(exports) {
 			}
 
 			var param = "q=" + query;
-			var filter = this.refs.filter.value;
-			if (filter !== "All") {
-				param += "&filter=" + filter;
-			}
 
 			this.lastStageId = Lineup.open({
 				url: "/search=search?" + param,
@@ -100,7 +101,7 @@ package("kb", function(exports) {
 			}
 		},
 		render: function() {
-			var filter = this.state.filter;
+			var filter = this.state;
 			return React.DOM.form({
 					className: "search",
 					onSubmit: this.search
@@ -116,7 +117,8 @@ package("kb", function(exports) {
 						style: {
 							display: filter.hidden ? "none" : null
 						},
-						defaultValue: filter.selected
+						onChange: this.updateFilter,
+						defaultValue: this.props.Session.filter
 					},
 					filter.options.map(function(item) {
 						return React.DOM.option({

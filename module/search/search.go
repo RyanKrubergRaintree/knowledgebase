@@ -72,7 +72,7 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := r.URL.Query().Get("q")
-	filter := r.URL.Query().Get("filter")
+	filter := r.Header.Get("X-Filter")
 
 	var entries []kb.PageEntry
 	var err error

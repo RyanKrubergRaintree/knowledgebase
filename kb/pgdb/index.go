@@ -90,7 +90,7 @@ func (db Index) ByTagFilter(tags []kb.Slug, exclude, include string) ([]kb.PageE
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
 		  AND AccessView.Access >= 'reader'
-		  AND (OwnerID NOT LIKE ($3 || '%') OR OwnerID = $4)
+		  AND (OwnerID NOT LIKE $3 || '%' OR OwnerID = $4)
 		  AND TagSlugs && $2
 		`, db.UserID, stringSlice(tagSlugs), exclude, include)
 }

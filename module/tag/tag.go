@@ -64,7 +64,20 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request, tag kb.Slug) {
 		return
 	}
 
-	entries, err := index.ByTag(tag)
+	filter := r.Header.Get("X-Filter")
+
+	var entries []kb.PageEntry
+	var err error
+	if filter == "" {
+		entries, err = index.ByTag(tag)
+	} else {
+		filter = string(kb.Slugify(filter))
+		entries, err = index.ByTagFilter([]kb.Slug{tag}, "help-", "help-"+filter)
+		if len(entries) == 0 {
+			entries, err = index.ByTag(tag)
+		}
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
