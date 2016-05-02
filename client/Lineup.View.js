@@ -3,6 +3,7 @@ package("kb.Lineup", function(exports) {
 
 	depends("Lineup.js");
 	depends("Stage.View.js");
+	depends("Pin.View.js");
 
 	var SelectionStyle = React.createClass({
 		displayName: "SelectionStyle",
@@ -87,24 +88,44 @@ package("kb.Lineup", function(exports) {
 			wide = Math.min(wide, 700);
 
 			var left = 0;
+			var stages = this.props.Lineup.stages.map(function(stage) {
+				var width = stage.wide ? wide : normal;
+				var r = React.createElement(kb.Stage.View, {
+					style: {
+						width: width + "px",
+						left: left + "px"
+					},
+					onWidthChanged: self.onStageWidthChanged,
+					key: stage.id,
+					stage: stage
+				});
+				left += width;
+				return r;
+			});
+
+			var pinned = null;
+			if(this.props.Lineup.pinned.visible)
+			{
+				var pin = this.props.Lineup.pinned;
+				pinned = React.createElement(kb.Pin.View, {
+					style: {
+						left: left + "px",
+						width: pin.width + "px"
+					},
+					width: pin.width,
+					height: pin.height,
+					onHide: this.hidePin,
+					url: pin.url
+				});
+			}
+
 			return React.DOM.div({
 					className: "lineup"
 				},
 				React.createElement(SelectionStyle, this.props),
-				this.props.Lineup.stages.map(function(stage) {
-					var width = stage.wide ? wide : normal;
-					var r = React.createElement(kb.Stage.View, {
-						style: {
-							width: width + "px",
-							left: left + "px"
-						},
-						onWidthChanged: self.onStageWidthChanged,
-						key: stage.id,
-						stage: stage
-					});
-					left += width;
-					return r;
-				}));
+				stages,
+				pinned
+			);
 		},
 
 		// bindings to Lineup
@@ -112,6 +133,9 @@ package("kb.Lineup", function(exports) {
 			this.forceUpdate();
 		},
 
+		hidePin: function(){
+			this.props.Lineup.hidePin();
+		},
 		onStageWidthChanged: function() {
 			this.forceUpdate();
 		},

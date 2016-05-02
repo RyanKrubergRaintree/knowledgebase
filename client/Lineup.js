@@ -9,6 +9,11 @@ package("kb", function(exports) {
 
 	function Lineup(session) {
 		this.stages = [];
+		this.pinned = {
+			visible: false,
+			width: 0,
+			url: ""
+		};
 		this.notifier = new kb.util.Notifier();
 		this.notifier.mixto(this);
 		this.session_ = session;
@@ -43,6 +48,7 @@ package("kb", function(exports) {
 		},
 
 		trim_: function(id) {
+			this.hidePin();
 			if (typeof id === "undefined") {
 				return;
 			}
@@ -59,6 +65,10 @@ package("kb", function(exports) {
 		},
 
 		closeLast: function() {
+			if(this.pinned.visible){
+				this.hidePin();
+				return;
+			}
 			if (this.stages.length > 0) {
 				this.stages[this.stages.length - 1].close();
 			}
@@ -103,6 +113,8 @@ package("kb", function(exports) {
 		},
 
 		openPages: function(pages) {
+			this.hidePin();
+
 			this.clear();
 			if (pages instanceof Array) {
 				for (var i = 0; i < pages.length; i++) {
@@ -227,8 +239,46 @@ package("kb", function(exports) {
 			}
 		},
 
+		pin: function(image){
+			this.pinned.visible = true;
+			this.pinned.url = image.url;
+			this.pinned.width = image.width;
+			this.changed();
+		},
+		hidePin: function(){
+			this.pinned.visible = false;
+			this.pinned.url = "";
+			this.changed();
+		},
+
+		handleClickImage: function(ev){
+			var target = ev.target;
+			var stage = this.findStageFromElement(target);
+			if(!stage){
+				return;
+			}
+
+			ev.preventDefault();
+			ev.stopPropagation();
+
+			if (!ev.ctrlKey) {
+				this.trim_(stage.id);
+			}
+
+			this.pin({
+				url: target.src,
+				width: target.naturalWidth + 40
+			});
+
+			this.changed();
+		},
+
 		handleClickLink: function(ev) {
 			var t = ev.target;
+			if ((t.nodeName === "IMG") || (t.nodeName === "IMAGE")){
+				this.handleClickImage(ev);
+				return;
+			}
 			if (t.nodeName !== "A") {
 				return;
 			}

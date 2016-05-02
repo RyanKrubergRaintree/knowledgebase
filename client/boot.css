@@ -209,6 +209,10 @@ ul.tight {
 	overflow: auto;
 }
 
+.pinned-image {
+	margin: 0.5em;
+}
+
 .page .page-title {
 	position: relative;
 	margin: 34px 10px 16px 10px;
@@ -246,7 +250,14 @@ ul.tight {
 	animation: fadeIn ease-in 0.2s;
 }
 
-.page-story img { max-width: 100%; -ms-interpolation-mode: bicubic; }
+.page-story img {
+	max-width: 100%;
+	-ms-interpolation-mode: bicubic;
+	cursor: pointer;
+}
+.page-story img:hover {
+	outline: 1px dashed #00f;
+}
 .page-story video { max-width: 100%; }
 
 .round-scrollbar::-webkit-scrollbar {
@@ -272,8 +283,6 @@ ul.tight {
 .page-story { border-bottom: 20px solid #fff; }
 .drop-before { border-top: 20px solid #ff0 !important; }
 .drop-after { border-bottom: 20px solid #ff0 !important; }
-
-
 
 .new-page form {
 	padding: 8px;
