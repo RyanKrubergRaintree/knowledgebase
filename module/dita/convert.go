@@ -116,6 +116,9 @@ func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.
 		return err
 	}
 	if count == 0 {
+		if title == "" {
+			context.Errors = append(context.Errors, fmt.Errorf("unable to find title for %v", href))
+		}
 		context.Encoder.WriteRaw(html.EscapeString(title))
 	}
 	return context.Encoder.WriteEnd("a")
@@ -152,10 +155,6 @@ func (conversion *PageConversion) ResolveLinkInfo(url string) (href, title, syno
 	url, selector = ditaconvert.SplitLink(url)
 	if selector != "" {
 		hash = "#" + selector
-	}
-
-	if url == "" {
-		return hash, "", "", true
 	}
 
 	name := context.DecodingPath
