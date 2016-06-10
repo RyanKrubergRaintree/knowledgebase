@@ -33,6 +33,12 @@ html, body {
 	color: #333333;
 }
 
+.application-starting {
+	position: absolute;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: url("/client/assets/img/spinner.gif") center center no-repeat;
+}
+
 * { box-sizing: border-box; }
 
 .clear-fix { clear: both; }

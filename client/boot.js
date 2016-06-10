@@ -151,5 +151,7 @@ package("kb.boot", function(exports) {
 	});
 
 	var bootstrap = React.createElement(Bootstrap);
-	ReactDOM.render(bootstrap, document.getElementById("boot"));
+	var boot = document.getElementById("boot");
+	ReactDOM.render(bootstrap, boot);
+	boot.className = "";
 });
