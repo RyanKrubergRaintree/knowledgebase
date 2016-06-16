@@ -95,6 +95,7 @@ package("kb.item", function(exports) {
 					className: "item-drag",
 					title: "Move or copy item.",
 					draggable: "true",
+					tabIndex: -1,
 
 					href: "#",
 					onClick: function(ev) {
