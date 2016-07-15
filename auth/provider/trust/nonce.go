@@ -9,8 +9,8 @@ import (
 var nonceHistory = make(nonces, 0, maxNonces)
 
 var (
-	nonceUsed      = errors.New("Nonce has been used.")
-	nonceTableFull = errors.New("Nonce table is full.")
+	nonceUsed      = errors.New("nonce has been used")
+	nonceTableFull = errors.New("nonce table is full")
 )
 
 type nonce [6]byte

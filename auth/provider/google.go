@@ -2,7 +2,6 @@ package provider
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -32,7 +31,7 @@ func (conf *Google) Verify(user, code string) (kb.User, error) {
 	const tokinfo = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 	r, err := http.Get(tokinfo + "?id_token=" + url.QueryEscape(token))
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Failed to get response: %v", err)
+		return kb.User{}, fmt.Errorf("Failed to get response for user \"%v\": %v", user, err)
 	}
 
 	var result struct {
@@ -48,22 +47,22 @@ func (conf *Google) Verify(user, code string) (kb.User, error) {
 	}
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Failed to read result: %v", err)
+		return kb.User{}, fmt.Errorf("Failed to read result for user \"%v\": %v", user, err)
 	}
 
 	err = json.Unmarshal(data, &result)
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Invalid result: %v", err)
+		return kb.User{}, fmt.Errorf("Invalid JSON for user \"%v\": %v", user, err)
 	}
 
 	if r.StatusCode != http.StatusOK {
-		return kb.User{}, fmt.Errorf("Failed to authenticate with Google: %s")
+		return kb.User{}, fmt.Errorf("Failed to authenticate with Google user \"%v\": %s", user, r.Status)
 	}
 
 	if result.EmailVerified != "true" ||
 		result.Audience != conf.ClientID ||
 		result.Email != user {
-		return kb.User{}, errors.New("Invalid token")
+		return kb.User{}, fmt.Errorf("Invalid token for \"%v\"", user)
 	}
 
 	return kb.User{
