@@ -78,6 +78,15 @@
 	text-decoration: none;
 }
 
+div.note > i {
+	vertical-align: top;
+}
+
+div.note > span {
+	display: inline-block;
+	width: calc(100% - 24px);
+	vertical-align: top;
+}
 /* Backwards compatibility */
 
 *[data-dita="note"]:before {
