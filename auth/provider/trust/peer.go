@@ -10,7 +10,7 @@ import (
 
 var (
 	// Maximum skew in times between servers
-	MaxRequestSkew = 2 * time.Minute
+	MaxRequestSkew = 4 * time.Minute
 	// Maximum authorization field size
 	MaxAuthorizationSize = 10 << 10
 )
