@@ -13,7 +13,10 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb"
 )
 
-var ErrUnauthorized = errors.New("Unauthorized")
+var (
+	ErrUnauthorized = errors.New("Unauthorized")
+	ErrTimeSkewed   = errors.New("TimeSkewed")
+)
 
 type Provider interface {
 	Boot() template.HTML
@@ -106,15 +109,18 @@ func (server *Server) logout(w http.ResponseWriter, r *http.Request) {
 	server.Sessions.Delete(token)
 }
 
-func (server *Server) login(providername, username, pass string) (kb.User, session.Token, error) {
+func (server *Server) login(providername, username, pass string) (user kb.User, token session.Token, err error) {
 	provider, ok := server.Provider[providername]
 	if !ok {
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
-	user, err := provider.Verify(username, pass)
+	user, err = provider.Verify(username, pass)
 	if err != nil {
 		log.Println("Verification failed:", err.Error())
+		if strings.Contains(err.Error(), "time skewed") {
+			return kb.User{}, session.ZeroToken, ErrTimeSkewed
+		}
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
@@ -123,26 +129,26 @@ func (server *Server) login(providername, username, pass string) (kb.User, sessi
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
-	token, err := server.Sessions.New(user)
+	token, err = server.Sessions.New(user)
 	if err != nil {
 		log.Println("Session failed:", err.Error())
-		return kb.User{}, session.ZeroToken, err
+		return kb.User{}, session.ZeroToken, ErrUnauthorized
 	}
 
 	return user, token, nil
 }
 
-func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
+func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, error) {
 	auth := r.Header.Get("Authorization")
 
 	args := strings.SplitN(auth, " ", 3)
 	if len(args) != 3 {
-		return nil, false
+		return nil, ErrUnauthorized
 	}
 
 	user, token, err := server.login(args[0], args[1], args[2])
 	if err != nil {
-		return nil, false
+		return nil, err
 	}
 
 	slugs := []kb.Slug{}
@@ -176,7 +182,7 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, bool) {
 		Token:  token.String(),
 		Pages:  slugs,
 		Params: params,
-	}, true
+	}, nil
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -199,6 +205,11 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == ErrUnauthorized {
 			http.Error(w, "Access denied.", http.StatusForbidden)
+			return
+		}
+
+		if err == ErrTimeSkewed {
+			http.Error(w, "Time skewed, authentiaction failed.", http.StatusUnauthorized)
 			return
 		}
 

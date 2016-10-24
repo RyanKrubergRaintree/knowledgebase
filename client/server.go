@@ -13,6 +13,13 @@ import (
 	"github.com/raintreeinc/knowledgebase/auth"
 )
 
+var (
+	errTimeSkewedMessage = "\n\n" +
+		"Knowledge Base authentication failed due to incorrect computer time.\n" +
+		"Accuracy within to 2 minutes is required.\n\n" +
+		"Tip: Enable automatic time adjustment in your computer's settings."
+)
+
 type Info struct {
 	Domain string
 
@@ -54,17 +61,22 @@ func NewServer(info Info, login *auth.Server, dir string, development bool) *Ser
 }
 
 func (server *Server) index(w http.ResponseWriter, r *http.Request) {
+	initialSession, initialSessionErr := server.Login.SessionFromHeader(r)
+	if initialSessionErr == auth.ErrTimeSkewed {
+		http.Error(w, errTimeSkewedMessage, http.StatusUnauthorized)
+		return
+	}
+
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
 			"Development": func() bool { return server.development },
 			"Site":        func() Info { return server.Info },
 			"InitialSession": func() template.JS {
-				session, ok := server.Login.SessionFromHeader(r)
-				if !ok {
+				if initialSessionErr != nil {
 					return "null"
 				}
 
-				data, _ := json.Marshal(session)
+				data, _ := json.Marshal(initialSession)
 				return template.JS(data)
 			},
 			"LoginProviders": func() interface{} {
