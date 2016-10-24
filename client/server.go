@@ -28,10 +28,11 @@ type Server struct {
 	Info
 	Login *auth.Server
 
-	bootstrap string
-	dir       string
-	assets    http.Handler
-	client    http.Handler
+	development bool
+	bootstrap   string
+	dir         string
+	assets      http.Handler
+	client      http.Handler
 }
 
 func NewServer(info Info, login *auth.Server, dir string, development bool) *Server {
@@ -39,8 +40,9 @@ func NewServer(info Info, login *auth.Server, dir string, development bool) *Ser
 		Info:  info,
 		Login: login,
 
-		bootstrap: filepath.Join(dir, "index.html"),
-		dir:       dir,
+		development: development,
+		bootstrap:   filepath.Join(dir, "index.html"),
+		dir:         dir,
 		assets: http.StripPrefix("/assets/",
 			http.FileServer(http.Dir(filepath.Join(dir, "assets")))),
 		client: livepkg.NewServer(
@@ -54,7 +56,8 @@ func NewServer(info Info, login *auth.Server, dir string, development bool) *Ser
 func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
-			"Site": func() Info { return server.Info },
+			"Development": func() bool { return server.development },
+			"Site":        func() Info { return server.Info },
 			"InitialSession": func() template.JS {
 				session, ok := server.Login.SessionFromHeader(r)
 				if !ok {

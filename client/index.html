@@ -13,8 +13,13 @@
 	<script src="/client/assets/js/es5.js"></script>
 	<script src="/client/assets/js/dom.js"></script>
 	<script src="/client/assets/js/global.js?{{Site.Version}}"></script>
+	{{ if Development }}
 	<script src="/client/assets/js/react.js?{{Site.Version}}"></script>
 	<script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
+	{{ else }}
+	<script src="/client/assets/js/react.min.js?{{Site.Version}}"></script>
+	<script src="/client/assets/js/react-dom.min.js?{{Site.Version}}"></script>
+	{{ end }}
 
 	<!-- icons -->
 	<link rel="icon" type="image/png" href="/client/assets/ico/24.png" sizes="24x24">

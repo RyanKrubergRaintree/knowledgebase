@@ -11,7 +11,12 @@ package("kb", function(exports) {
 					className: "header-menu"
 				},
 				this.props.items.map(function(item) {
-					return React.DOM.a(item, item.caption);
+					var props = {
+						key: item.key,
+						href: item.href,
+						onClick: item.onClick
+					};
+					return React.DOM.a(props, item.caption);
 				})
 			);
 		}
@@ -34,7 +39,7 @@ package("kb", function(exports) {
 				hidden: this.props.Session.branch != ""
 			};
 		},
-		updateFilter: function(ev){
+		updateFilter: function(ev) {
 			var filter = this.refs.filter.value;
 			if (filter !== "All") {
 				this.props.Session.filter = filter;
