@@ -22,7 +22,9 @@ package("kb.item.content", function(exports) {
 		},
 		render: function() {
 			var item = this.props.item;
-
+			if (!item.visible) {
+				return null;
+			}
 			var expanded = this.state.expanded;
 
 			var toggle = null;
@@ -51,15 +53,19 @@ package("kb.item.content", function(exports) {
 				}
 			}
 
+			var className = "index-title " +
+				(item.active ? "index-title-active " : "") +
+				(item.filter ? "index-title-filter" : "");
+
 			var link = null;
 			if (item.slug === "") {
 				link = React.DOM.span({
-					className: "index-title " + (item.active ? "index-title-active" : ""),
+					className: className,
 					onClick: this.open
 				}, item.title);
 			} else {
 				link = React.DOM.a({
-					className: "index-title " + (item.active ? "index-title-active" : ""),
+					className: className,
 					href: item.slug,
 					"data-link": item.slug,
 					onClick: this.open
@@ -77,7 +83,7 @@ package("kb.item.content", function(exports) {
 	});
 
 	// builds a item tree that contains the active/activechild properties
-	function build(root, stages) {
+	function build(root, stages, filter) {
 		var isactive = {};
 		for (var i = 0; i < stages.length; i++) {
 			var stage = stages[i];
@@ -86,22 +92,39 @@ package("kb.item.content", function(exports) {
 			}
 		}
 
+		filter = filter.toLowerCase();
+
 		function mknode(item) {
 			var n = {
 				title: item.title,
 				slug: item.slug,
+				visible: (filter === ""),
+				visiblechild: false,
+				filter: false,
+				filterchild: false,
 				active: isactive[item.slug] || isactive["/" + item.slug],
 				activechild: false,
 				children: []
 			};
+			n.visible = n.visible || n.active;
+			n.visiblechild = n.visiblechild || n.activechild;
 
 			if (Array.isArray(item.children)) {
 				for (var i = 0; i < item.children.length; i++) {
 					var c = mknode(item.children[i]);
 					n.activechild = n.activechild || c.active || c.activechild;
+					n.filterchild = n.filterchild || c.filter || c.filterchild;
+					n.visiblechild = n.visiblechild || c.visible || c.visiblechild;
 					n.children.push(c);
 				}
 			}
+
+			if (!n.active && !n.activechild && !n.filterchild && (filter !== "")) {
+				n.filter = item.title.toLowerCase().indexOf(filter) >= 0;
+			}
+			n.activechild = n.activechild || n.filter || n.filterchild;
+			n.visible = n.visible || n.visiblechild || n.activechild;
+
 			return n;
 		}
 
@@ -111,6 +134,8 @@ package("kb.item.content", function(exports) {
 				slug: "",
 				active: false,
 				activechild: false,
+				visible: true,
+				visiblechild: false,
 				children: []
 			};
 		}
@@ -124,19 +149,36 @@ package("kb.item.content", function(exports) {
 		},
 		getInitialState: function() {
 			return {
-				root: build(this.props.item.root, this.context.Lineup.stages)
+				filter: "",
+				root: build(this.props.item.root, this.context.Lineup.stages, "")
 			};
 		},
 		activeChanged: function() {
 			this.setState({
-				root: build(this.props.item.root, this.context.Lineup.stages)
+				root: build(this.props.item.root, this.context.Lineup.stages, this.state.filter)
 			});
 		},
 		componentDidMount: function() {
 			this.context.Lineup.on("changed", this.activeChanged, this);
 		},
 		componentWillUnmount: function() {
+			window.clearTimeout(this.filterUpdateDelay);
 			this.context.Lineup.remove(this);
+		},
+
+		filterUpdateDelay: null,
+		nextFilter: "",
+		changeFilter: function() {
+			this.nextFilter = this.refs.filter.value;
+			window.clearTimeout(this.filterUpdateDelay);
+
+			var self = this;
+			this.filterUpdateDelay = window.setTimeout(function() {
+				self.setState({
+					filter: self.nextFilter,
+					root: build(self.props.item.root, self.context.Lineup.stages, self.nextFilter)
+				});
+			}, 500);
 		},
 		render: function() {
 			if (this.props.item === null) {
@@ -149,6 +191,13 @@ package("kb.item.content", function(exports) {
 			return React.DOM.div({
 					className: "item-content content-index"
 				},
+				React.DOM.input({
+					ref: "filter",
+					className: "index-filter",
+					placeholder: "Filter",
+					defaultValue: this.state.filter,
+					onInput: this.changeFilter
+				}),
 				root.children.map(function(item, i) {
 					return React.createElement(Item, {
 						key: i,
