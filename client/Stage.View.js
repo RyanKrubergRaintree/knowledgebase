@@ -98,6 +98,8 @@ package("kb.Stage", function(exports) {
 			ev.stopPropagation();
 		},
 
+		checkTitleInterval: null,
+
 		getInitialState: function() {
 			return {
 				title: this.props.stage.title,
@@ -116,6 +118,10 @@ package("kb.Stage", function(exports) {
 		},
 
 		componentDidMount: function() {
+			this.checkTitleInterval = window.setInterval(
+				this.checkTitleChanges,
+				100
+			);
 			this.context.Session.fetch({
 				method: "GET",
 				url: "/user=editor-groups",
@@ -125,6 +131,9 @@ package("kb.Stage", function(exports) {
 				}
 			});
 		},
+		componentWillUnmount: function() {
+			window.clearInterval(this.checkTitleInterval);
+		},
 
 		ownerChanged: function(ev) {
 			this.setState({
@@ -132,6 +141,13 @@ package("kb.Stage", function(exports) {
 			});
 		},
 
+		checkTitleChanges: function() {
+			if (this.refs.title) {
+				if (this.state.title !== this.refs.title.value) {
+					this.titleChanged();
+				}
+			}
+		},
 		titleChanged: function() {
 			this.setState({
 				title: this.refs.title.value

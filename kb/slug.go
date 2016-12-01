@@ -12,12 +12,15 @@ import (
 type Slug string
 
 func (slug *Slug) Scan(value interface{}) error {
-	data, ok := value.([]byte)
-	if !ok {
-		return errors.New("slug is of type []byte/string")
+	if data, ok := value.([]byte); ok {
+		*slug = Slug(data)
+		return nil
 	}
-	*slug = Slug(data)
-	return nil
+	if data, ok := value.(string); ok {
+		*slug = Slug(data)
+		return nil
+	}
+	return errors.New("slug must be of type []byte/string")
 }
 
 func (slug Slug) Value() (driver.Value, error) {
