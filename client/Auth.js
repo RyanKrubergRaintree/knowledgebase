@@ -166,7 +166,30 @@ package("kb", function(exports) {
 		data.title = "Google";
 
 		gapi.load("auth2", function() {
-			var auth2 = gapi.auth2.init();
+			if (typeof gapi === "undefined") {
+				console.error("Google authentication unavailable.");
+
+				data.login = function() {
+					console.error("Google authentication unavailable.");
+				}
+				data.logout = function() {
+					console.error("Google authentication unavailable.");
+				}
+
+				data.errored = true;
+				onloaded();
+				return;
+			}
+
+			var hosted_domain = null;
+			if (typeof GoogleHostedDomain !== "undefined") {
+				hosted_domain = GoogleHostedDomain;
+			}
+
+			var auth2 = gapi.auth2.init({
+				hosted_domain: hosted_domain,
+				authuser: -1
+			});
 
 			var trylogin = function() {
 				if (auth2.isSignedIn.get() === true) {

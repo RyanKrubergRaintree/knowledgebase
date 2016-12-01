@@ -14,6 +14,7 @@ import (
 type Google struct {
 	ClientID     string
 	ClientSecret string
+	HostedDomain string
 }
 
 func (conf *Google) Boot() template.HTML {
@@ -21,6 +22,7 @@ func (conf *Google) Boot() template.HTML {
 	head += `<script src="https://apis.google.com/js/platform.js"></script>`
 	head += `<meta name="google-signin-client_id" content="` +
 		template.JSEscapeString(conf.ClientID) + `">`
+	head += `<script>var GoogleHostedDomain="` + template.JSEscapeString(conf.HostedDomain) + `"</script>`
 	return template.HTML(head)
 }
 

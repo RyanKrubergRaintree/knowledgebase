@@ -126,6 +126,10 @@ package("kb.boot", function(exports) {
 					}
 
 					var provider = providers[name];
+					if (provider.errored) {
+						continue;
+					}
+
 					var view = loginView[provider.view];
 					if (typeof view === "undefined" || view === null) {
 						continue;

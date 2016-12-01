@@ -120,6 +120,7 @@ func main() {
 		authServer.Provider["google"] = &provider.Google{
 			ClientID:     key,
 			ClientSecret: os.Getenv("GPLUS_SECRET"),
+			HostedDomain: os.Getenv("GPLUS_HOSTED_DOMAIN"),
 		}
 	}
 	if caskey := os.Getenv("CASKEY"); caskey != "" {
