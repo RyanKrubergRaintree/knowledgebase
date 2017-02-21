@@ -52,7 +52,7 @@ func (conversion *PageConversion) Convert() (page *kb.Page, errs []error, fatal 
 }
 
 func (conversion *PageConversion) ConvertTags() []string {
-	raw := conversion.Topic.Original.Prolog.Keywords.Terms()
+	raw := conversion.Topic.Original.Prolog.Keywords
 	for _, key := range conversion.Topic.Original.Prolog.ResourceID {
 		raw = append(raw, "id/"+key.Name)
 	}
