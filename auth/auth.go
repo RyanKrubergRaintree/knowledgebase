@@ -170,6 +170,8 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, error) {
 			index := server.DB.Context(user.ID).Index(user.ID)
 			entries, err := index.ByTagFilter(tags, "help-", "help-"+string(filter))
 			if err == nil {
+				kb.SortPageEntriesByRank(entries, tags)
+
 				for _, entry := range entries {
 					slugs = append(slugs, entry.Slug)
 				}

@@ -1,9 +1,8 @@
 package kb
 
 import (
+	"sort"
 	"time"
-
-	"github.com/bradfitz/slice"
 )
 
 type PageEntry struct {
@@ -39,21 +38,58 @@ type TagEntry struct {
 }
 
 func SortPageEntriesByDate(xs []PageEntry) {
-	slice.Sort(xs, func(i, j int) bool { return xs[i].Modified.After(xs[j].Modified) })
+	sort.Slice(xs, func(i, j int) bool { return xs[i].Modified.After(xs[j].Modified) })
 }
 
 func SortPageEntries(xs []PageEntry, fn func(a, b *PageEntry) bool) {
-	slice.Sort(xs, func(i, j int) bool {
+	sort.Slice(xs, func(i, j int) bool {
 		return fn(&xs[i], &xs[j])
 	})
 }
 
 func SortPageEntriesBySlug(xs []PageEntry) {
-	slice.Sort(xs, func(i, j int) bool { return xs[i].Slug < xs[j].Slug })
+	sort.Slice(xs, func(i, j int) bool { return xs[i].Slug < xs[j].Slug })
 }
 
 func SortTagEntriesByName(xs []TagEntry) {
-	slice.Sort(xs, func(i, j int) bool { return xs[i].Name < xs[j].Name })
+	sort.Slice(xs, func(i, j int) bool { return xs[i].Name < xs[j].Name })
+}
+
+func SortPageEntriesByRank(xs []PageEntry, ranking []Slug) {
+
+	calculateRank := func(tags []string) int {
+		rank := len(ranking)
+		for _, tag := range tags {
+			stag := Slugify(tag)
+			for k, target := range ranking[:rank] {
+				if stag == target {
+					rank = k
+					break
+				}
+			}
+			if rank == 0 {
+				break
+			}
+		}
+		return rank
+	}
+
+	type PageRank struct {
+		Entry PageEntry
+		Rank  int
+	}
+
+	order := make([]PageRank, len(xs))
+	for i, x := range xs {
+		order[i].Entry = x
+		order[i].Rank = calculateRank(x.Tags)
+	}
+
+	sort.Slice(order, func(i, k int) bool { return order[i].Rank < order[k].Rank })
+
+	for i, x := range order {
+		xs[i] = x.Entry
+	}
 }
 
 func StoryFromEntries(entries []PageEntry) Story {
