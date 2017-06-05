@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sort"
 
-	"github.com/bradfitz/slice"
 	"github.com/raintreeinc/ditaconvert"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/kb/items/index"
@@ -113,7 +113,7 @@ func (context *Conversion) Run() {
 		context.Slugs = append(context.Slugs, slug)
 	}
 
-	slice.Sort(context.Slugs, func(i, j int) bool {
+	sort.Slice(context.Slugs, func(i, j int) bool {
 		return context.Slugs[i] < context.Slugs[j]
 	})
 
