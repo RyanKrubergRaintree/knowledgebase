@@ -1,6 +1,7 @@
 package page
 
 import (
+	"html"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -75,21 +76,43 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
-	_, index, ok := mod.server.IndexContext(w, r)
+	context, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
 		return
 	}
 
-	entries, err := index.RecentChanges()
+	user, err := context.Users().ByID(context.ActiveUserID())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	groups, err := index.Groups(kb.Reader)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	kb.SortGroupsByPriority(user, groups)
+
 	page := &kb.Page{
 		Slug:  "page=recent-changes",
 		Title: "Recent Changes",
-		Story: kb.StoryFromEntries(entries),
 	}
+
+	for _, group := range groups {
+		entries, err := index.RecentChangesByGroup(10, group.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if len(entries) == 0 {
+			continue
+		}
+
+		page.Story.Append(kb.HTML("<h3>" + html.EscapeString(group.Name) + "</h3>"))
+		page.Story.Append(kb.ItemsFromEntries(entries)...)
+	}
+
 	page.WriteResponse(w)
 }

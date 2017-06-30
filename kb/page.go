@@ -80,8 +80,8 @@ func (s *Story) Prepend(item Item) {
 }
 
 // Appends adds the `item` as the last item in story
-func (s *Story) Append(item Item) {
-	*s = append(*s, item)
+func (s *Story) Append(item ...Item) {
+	*s = append(*s, item...)
 }
 
 // InsertAfter adds the `item` after the item with `id`

@@ -4,6 +4,9 @@ import (
 	"encoding/gob"
 	"errors"
 	"html/template"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -129,7 +132,8 @@ type Index interface {
 
 	ByTitle(title Slug) ([]PageEntry, error)
 
-	RecentChanges() ([]PageEntry, error)
+	RecentChanges(n int) ([]PageEntry, error)
+	RecentChangesByGroup(n int, groupID Slug) ([]PageEntry, error)
 }
 
 func init() { gob.Register(User{}) }
@@ -162,4 +166,38 @@ type Member struct {
 	Access  Rights
 }
 
-func (g *Group) IsCommunity() bool { return g.ID == g.OwnerID }
+func (group *Group) IsCommunity() bool { return group.ID == group.OwnerID }
+
+func (group *Group) Priority(user *User) int {
+	if user.Company == group.Name {
+		return 0
+	}
+
+	if strings.HasPrefix(string(group.ID), "help-") {
+		switch group.ID {
+		case "help-10-0":
+			return 10000
+		case "9-4":
+			return 9999
+		}
+		minor := strings.TrimPrefix(string(group.ID), "help-10-2-")
+		m, err := strconv.Atoi(minor)
+		if err != nil {
+			return 3
+		}
+		return 10000 - m
+	}
+
+	return 1
+}
+
+func SortGroupsByPriority(user User, groups []Group) {
+	sort.Slice(groups, func(i, j int) bool {
+		a, b := &groups[i], &groups[j]
+		ax, bx := a.Priority(&user), b.Priority(&user)
+		if ax == bx {
+			return a.ID < b.ID
+		}
+		return ax < bx
+	})
+}

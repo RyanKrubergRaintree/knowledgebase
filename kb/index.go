@@ -98,12 +98,18 @@ func StoryFromEntries(entries []PageEntry) Story {
 		story.Append(Paragraph("No pages."))
 		return story
 	}
+	story.Append(ItemsFromEntries(entries)...)
+	return story
+}
+
+func ItemsFromEntries(entries []PageEntry) []Item {
+	items := []Item{}
 	for _, entry := range entries {
-		story.Append(Entry(
+		items = append(items, Entry(
 			entry.Title,
 			entry.Synopsis,
 			entry.Slug,
 		))
 	}
-	return story
+	return items
 }

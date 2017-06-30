@@ -164,8 +164,7 @@ func (db Index) ByTitle(suffix kb.Slug) ([]kb.PageEntry, error) {
 	`, db.UserID, suffix)
 }
 
-func (db Index) RecentChanges() ([]kb.PageEntry, error) {
-	n := 30
+func (db Index) RecentChanges(n int) ([]kb.PageEntry, error) {
 	return db.pageEntries(`
 		JOIN AccessView ON OwnerID = AccessView.GroupID
 		WHERE AccessView.UserID = $1
@@ -173,4 +172,15 @@ func (db Index) RecentChanges() ([]kb.PageEntry, error) {
 		ORDER BY Modified DESC, OwnerID, Slug
 		LIMIT $2
 	`, db.UserID, n)
+}
+
+func (db Index) RecentChangesByGroup(n int, groupID kb.Slug) ([]kb.PageEntry, error) {
+	return db.pageEntries(`
+		JOIN AccessView ON OwnerID = AccessView.GroupID
+		WHERE AccessView.UserID = $1
+		  AND AccessView.Access >= 'reader'
+		  AND OwnerID = $2
+		ORDER BY Modified DESC, OwnerID, Slug
+		LIMIT $3
+	`, db.UserID, groupID, n)
 }
