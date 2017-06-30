@@ -1,7 +1,6 @@
 package tag
 
 import (
-	"html"
 	"net/http"
 	"strconv"
 	"strings"
@@ -113,10 +112,14 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.Paragraph("No results."))
 	} else {
 		for _, entry := range entries {
+			if strings.HasPrefix(entry.Name, "id/") || entry.Name == "" {
+				continue
+			}
+
 			page.Story.Append(kb.Entry(
-				html.EscapeString(entry.Name),
+				entry.Name,
 				strconv.Itoa(entry.Count)+" pages",
-				kb.Slugify("tag="+entry.Name)))
+				kb.Slugify("tag=pages/"+entry.Name)))
 		}
 	}
 
