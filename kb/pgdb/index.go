@@ -22,6 +22,7 @@ func (db Index) Search(text string) ([]kb.PageEntry, error) {
 		  AND AccessView.Access >= 'reader'
 		  AND Content @@ plainto_tsquery('english', $2)
 		ORDER BY ts_rank(Content, plainto_tsquery('english', $2)) DESC
+		LIMIT 100
 		`, db.UserID, text)
 }
 
@@ -33,6 +34,7 @@ func (db Index) SearchFilter(text, exclude, include string) ([]kb.PageEntry, err
 		  AND (OwnerID NOT LIKE $3 || '%' OR OwnerID = $4)
 		  AND Content @@ plainto_tsquery('english', $2)
 		ORDER BY ts_rank(Content, plainto_tsquery('english', $2)) DESC
+		LIMIT 100
 		`, db.UserID, text, exclude, include)
 }
 

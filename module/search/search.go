@@ -2,6 +2,8 @@ package search
 
 import (
 	"net/http"
+	"sort"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -65,6 +67,34 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	page.WriteResponse(w)
 }
 
+func ImproveSearchResults(query string, xs []kb.PageEntry) {
+	type stub struct {
+		entry   kb.PageEntry
+		quality int
+	}
+
+	stubs := make([]stub, len(xs))
+	query = strings.ToLower(query)
+	for i := range stubs {
+		entry := &xs[i]
+		stubs[i].entry = *entry
+		title := strings.ToLower(entry.Title)
+		stubs[i].quality = strings.Count(strings.ToLower(entry.Title), query)*100 +
+			strings.Count(strings.ToLower(entry.Synopsis), query)*10
+		if title == query {
+			stubs[i].quality += 1000
+		}
+	}
+
+	sort.SliceStable(stubs, func(i, j int) bool {
+		return stubs[i].quality > stubs[j].quality
+	})
+
+	for i := range xs {
+		xs[i] = stubs[i].entry
+	}
+}
+
 func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
@@ -87,6 +117,8 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	ImproveSearchResults(q, entries)
 
 	page := &kb.Page{
 		Slug:  "search=search",
