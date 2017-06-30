@@ -9,7 +9,7 @@ package("kb.item.content", function(exports) {
 	depends("Sanitize.js");
 	depends("Resolve.js");
 
-	exports.Unknown = React.createClass({
+	exports.Unknown = createReactClass({
 		displayName: "Unknown",
 		render: function() {
 			var item = this.props.item;
@@ -51,7 +51,7 @@ package("kb.item.content", function(exports) {
 		desc: "line separator"
 	}];
 
-	exports.factory = React.createClass({
+	exports.factory = createReactClass({
 		displayName: "Factory",
 		convert: function(ev) {
 			var type = GetDataAttribute(ev.currentTarget, "type");
@@ -91,7 +91,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.image = React.createClass({
+	exports.image = createReactClass({
 		displayName: "Image",
 		render: function() {
 			return React.DOM.div({
@@ -105,7 +105,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.paragraph = React.createClass({
+	exports.paragraph = createReactClass({
 		displayName: "Paragraph",
 		render: function() {
 			var stage = this.props.stage;
@@ -133,7 +133,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.html = React.createClass({
+	exports.html = createReactClass({
 		displayName: "HTML",
 		render: function() {
 			var stage = this.props.stage;
@@ -146,7 +146,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.code = React.createClass({
+	exports.code = createReactClass({
 		displayName: "Code",
 		render: function() {
 			return React.DOM.div({
@@ -155,7 +155,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.reference = React.createClass({
+	exports.reference = createReactClass({
 		displayName: "Reference",
 		render: function() {
 			var item = this.props.item;
@@ -177,7 +177,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.entry = React.createClass({
+	exports.entry = createReactClass({
 		displayName: "Entry",
 		render: function() {
 			var item = this.props.item;
@@ -204,7 +204,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.tags = React.createClass({
+	exports.tags = createReactClass({
 		displayName: "Tags",
 		render: function() {
 			var item = this.props.item;
@@ -247,7 +247,7 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	exports.separator = React.createClass({
+	exports.separator = createReactClass({
 		displayName: "Entry",
 		render: function() {
 			var item = this.props.item;

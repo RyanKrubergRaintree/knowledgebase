@@ -4,7 +4,7 @@ package("kb.boot", function(exports) {
 	depends("Auth.js");
 	depends("Login.css");
 
-	var LoginForm = React.createClass({
+	var LoginForm = createReactClass({
 		login: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -54,7 +54,7 @@ package("kb.boot", function(exports) {
 		}
 	});
 
-	var LoginButton = React.createClass({
+	var LoginButton = createReactClass({
 		click: function() {
 			this.props.provider.login();
 		},
@@ -77,7 +77,7 @@ package("kb.boot", function(exports) {
 		"google": "Employee Login:"
 	};
 
-	exports.Login = React.createClass({
+	exports.Login = createReactClass({
 		getInitialState: function() {
 			return {
 				authLoaded: false,

@@ -12,7 +12,7 @@ package("kb.boot", function(exports) {
 	depends("Site.js");
 	depends("Selection.js");
 
-	var Bootstrap = React.createClass({
+	var Bootstrap = createReactClass({
 		componentDidMount: function() {
 			var self = this;
 			if (typeof Reloader !== "undefined") {
@@ -73,7 +73,7 @@ package("kb.boot", function(exports) {
 		}
 	});
 
-	var Application = React.createClass({
+	var Application = createReactClass({
 		getInitialState: function() {
 			var session = this.props.Session;
 			var lineup = new kb.Lineup(session);

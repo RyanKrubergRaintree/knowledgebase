@@ -10,7 +10,7 @@ package("kb.item", function(exports) {
 	depends("extra/ImageMap.js");
 
 	exports.DropCanceled = null;
-	exports.View = React.createClass({
+	exports.View = createReactClass({
 		displayName: "Item",
 
 		dragStart: function(ev, node, item) {

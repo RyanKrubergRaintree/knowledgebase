@@ -119,7 +119,7 @@ package("kb.Page", function(exports) {
 		};
 	}
 
-	exports.View = React.createClass({
+	exports.View = createReactClass({
 		displayName: "Page",
 
 		createReference: function(ev) {
@@ -280,7 +280,7 @@ package("kb.Page", function(exports) {
 		}
 	});
 
-	var Story = React.createClass({
+	var Story = createReactClass({
 		displayName: "Story",
 		render: function() {
 			var stage = this.props.stage,

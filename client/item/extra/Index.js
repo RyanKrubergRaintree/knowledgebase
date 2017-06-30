@@ -3,7 +3,7 @@ package("kb.item.content", function(exports) {
 
 	depends("Index.css");
 
-	var Item = React.createClass({
+	var Item = createReactClass({
 		displayName: "IndexItem",
 		getInitialState: function() {
 			return {
@@ -117,7 +117,7 @@ package("kb.item.content", function(exports) {
 		return mknode(root);
 	}
 
-	exports["index"] = React.createClass({
+	exports["index"] = createReactClass({
 		displayName: "Index",
 		contextTypes: {
 			Lineup: React.PropTypes.object

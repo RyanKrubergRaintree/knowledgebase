@@ -3,7 +3,7 @@ package("kb.Pin", function(exports) {
 
 	depends("util/SmoothScroll.js");
 
-	var PinButtons = React.createClass({
+	var PinButtons = createReactClass({
 		displayName: "PinButtons",
 
 		close: function() {
@@ -25,7 +25,7 @@ package("kb.Pin", function(exports) {
 		}
 	});
 
-	var View = React.createClass({
+	var View = createReactClass({
 		displayName: "Pin",
 		activate: function(ev) {
 			if (typeof ev === "undefined") {

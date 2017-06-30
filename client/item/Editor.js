@@ -1,7 +1,7 @@
 package("kb.item", function(exports) {
 	"use strict";
 
-	exports.Editor = React.createClass({
+	exports.Editor = createReactClass({
 		blur: function(ev) {
 			var self = this;
 			var container = ReactDOM.findDOMNode(this);

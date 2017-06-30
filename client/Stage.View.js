@@ -7,7 +7,7 @@ package("kb.Stage", function(exports) {
 	depends("Stage.js");
 	depends("Page.View.js");
 
-	var StageButtons = React.createClass({
+	var StageButtons = createReactClass({
 		displayName: "StageButtons",
 
 		toggleWidth: function() {
@@ -82,7 +82,7 @@ package("kb.Stage", function(exports) {
 		}
 	});
 
-	var NewPage = React.createClass({
+	var NewPage = createReactClass({
 		displayName: "NewPage",
 		contextTypes: {
 			Session: React.PropTypes.object
@@ -217,7 +217,7 @@ package("kb.Stage", function(exports) {
 		}
 	});
 
-	exports.View = React.createClass({
+	exports.View = createReactClass({
 		displayName: "Stage",
 		contextTypes: {
 			CurrentSelection: React.PropTypes.object

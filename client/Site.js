@@ -4,7 +4,7 @@ package("kb", function(exports) {
 	depends("site.css");
 	depends("Lineup.View.js");
 
-	var HeaderMenu = React.createClass({
+	var HeaderMenu = createReactClass({
 		displayName: "HeaderMenu",
 		render: function() {
 			return React.DOM.div({
@@ -22,7 +22,7 @@ package("kb", function(exports) {
 		}
 	});
 
-	var Search = React.createClass({
+	var Search = createReactClass({
 		lastStageId: undefined,
 		getInitialState: function() {
 			return {
@@ -141,7 +141,7 @@ package("kb", function(exports) {
 		}
 	});
 
-	var LoginInfo = React.createClass({
+	var LoginInfo = createReactClass({
 		render: function() {
 			var infostyle = {
 				style: {
@@ -171,7 +171,7 @@ package("kb", function(exports) {
 		}
 	});
 
-	var Header = React.createClass({
+	var Header = createReactClass({
 		openHome: function(ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -236,7 +236,7 @@ package("kb", function(exports) {
 		}
 	});
 
-	var Content = React.createClass({
+	var Content = createReactClass({
 		displayName: "Content",
 		render: function() {
 			return React.DOM.div({
@@ -250,7 +250,7 @@ package("kb", function(exports) {
 		}
 	});
 
-	exports.Site = React.createClass({
+	exports.Site = createReactClass({
 		displayName: "Site",
 		render: function() {
 			return React.DOM.div(null,

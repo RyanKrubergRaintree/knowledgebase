@@ -5,7 +5,7 @@ package("kb.Lineup", function(exports) {
 	depends("Stage.View.js");
 	depends("Pin.View.js");
 
-	var SelectionStyle = React.createClass({
+	var SelectionStyle = createReactClass({
 		displayName: "SelectionStyle",
 		getInitialState: function() {
 			return {
@@ -58,7 +58,7 @@ package("kb.Lineup", function(exports) {
 		}
 	});
 
-	exports.View = React.createClass({
+	exports.View = createReactClass({
 		displayName: "Lineup",
 
 		getInitialState: function() {
@@ -104,8 +104,7 @@ package("kb.Lineup", function(exports) {
 			});
 
 			var pinned = null;
-			if(this.props.Lineup.pinned.visible)
-			{
+			if (this.props.Lineup.pinned.visible) {
 				var pin = this.props.Lineup.pinned;
 				pinned = React.createElement(kb.Pin.View, {
 					style: {
@@ -133,7 +132,7 @@ package("kb.Lineup", function(exports) {
 			this.forceUpdate();
 		},
 
-		hidePin: function(){
+		hidePin: function() {
 			this.props.Lineup.hidePin();
 		},
 		onStageWidthChanged: function() {

@@ -3,7 +3,7 @@ package("kb.item.content", function(exports) {
 
 	depends("ImageMap.css");
 
-	exports["image-map"] = React.createClass({
+	exports["image-map"] = createReactClass({
 		displayName: "ImageMap",
 		contextTypes: {
 			CurrentSelection: React.PropTypes.object

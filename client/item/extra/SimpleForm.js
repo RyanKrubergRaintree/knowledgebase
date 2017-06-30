@@ -3,7 +3,7 @@ package("kb.item.content", function(exports) {
 
 	depends("SimpleForm.css");
 
-	exports["simple-form"] = React.createClass({
+	exports["simple-form"] = createReactClass({
 		displayName: "SimpleForm",
 		contextTypes: {
 			Session: React.PropTypes.object
