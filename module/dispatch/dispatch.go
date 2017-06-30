@@ -56,8 +56,12 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	page := &kb.Page{Slug: pageID}
 	if len(entries) > 0 {
 		page.Title = entries[0].Title
-		page.Story.Append(kb.Tags(entries[0].Tags...))
-		page.Story.Append(kb.Paragraph(entries[0].Synopsis))
+		if len(entries[0].Tags) > 0 {
+			page.Story.Append(kb.Tags(entries[0].Tags...))
+		}
+		if entries[0].Synopsis != "" {
+			page.Story.Append(kb.Paragraph(entries[0].Synopsis))
+		}
 	} else {
 		page.Title = kb.SlugToTitle(titleID)
 	}
