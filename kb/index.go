@@ -95,7 +95,7 @@ func SortPageEntriesByRank(xs []PageEntry, ranking []Slug) {
 func StoryFromEntries(entries []PageEntry) Story {
 	story := Story{}
 	if len(entries) == 0 {
-		story.Append(Paragraph("No results."))
+		story.Append(Paragraph("No pages."))
 		return story
 	}
 	for _, entry := range entries {

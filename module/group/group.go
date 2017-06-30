@@ -105,6 +105,8 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 		Synopsis: info.Description,
 	}
 
+	kb.SortPageEntriesBySlug(entries)
+
 	page.Story = kb.StoryFromEntries(entries)
 	page.Story.Prepend(kb.Paragraph(info.Description))
 

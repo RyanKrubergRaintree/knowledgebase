@@ -11,6 +11,9 @@ package("kb", function(exports) {
 					className: "header-menu"
 				},
 				this.props.items.map(function(item) {
+					if (item == null) {
+						return null;
+					}
 					var props = {
 						key: item.key,
 						href: item.href,
@@ -197,6 +200,7 @@ package("kb", function(exports) {
 		},
 		displayName: "Header",
 		render: function() {
+			var company = this.props.Session.user.company || "Community";
 			return React.DOM.div({
 					id: "header"
 				},
@@ -221,7 +225,11 @@ package("kb", function(exports) {
 						key: "recent-changes",
 						href: "/page=recent-changes",
 						caption: "Recent Changes"
-					}, {
+					}, (company != "" ? {
+						key: "company",
+						href: "/group=" + company,
+						caption: company
+					} : null), {
 						key: "user",
 						href: "/user=current",
 						caption: "User"
