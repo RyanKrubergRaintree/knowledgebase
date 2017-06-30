@@ -120,7 +120,7 @@ package("kb.item.content", function(exports) {
 	exports["index"] = createReactClass({
 		displayName: "Index",
 		contextTypes: {
-			Lineup: React.PropTypes.object
+			Lineup: kb.react.object
 		},
 		getInitialState: function() {
 			return {

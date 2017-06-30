@@ -6,7 +6,7 @@ package("kb.item.content", function(exports) {
 	exports["simple-form"] = createReactClass({
 		displayName: "SimpleForm",
 		contextTypes: {
-			Session: React.PropTypes.object
+			Session: kb.react.object
 		},
 		getInitialState: function() {
 			return {

@@ -90,10 +90,10 @@ package("kb.boot", function(exports) {
 			return kb.app;
 		},
 		childContextTypes: {
-			Lineup: React.PropTypes.object,
-			Crumbs: React.PropTypes.object,
-			CurrentSelection: React.PropTypes.object,
-			Session: React.PropTypes.object
+			Lineup: kb.react.object,
+			Crumbs: kb.react.object,
+			CurrentSelection: kb.react.object,
+			Session: kb.react.object
 		},
 		getChildContext: function() {
 			return this.state;

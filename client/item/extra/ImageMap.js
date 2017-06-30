@@ -6,7 +6,7 @@ package("kb.item.content", function(exports) {
 	exports["image-map"] = createReactClass({
 		displayName: "ImageMap",
 		contextTypes: {
-			CurrentSelection: React.PropTypes.object
+			CurrentSelection: kb.react.object
 		},
 		areaHoverStart: function(ev) {
 			var id = GetDataAttribute(ev.target, "focusid");

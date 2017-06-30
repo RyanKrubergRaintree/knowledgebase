@@ -85,7 +85,7 @@ package("kb.Stage", function(exports) {
 	var NewPage = createReactClass({
 		displayName: "NewPage",
 		contextTypes: {
-			Session: React.PropTypes.object
+			Session: kb.react.object
 		},
 		tryCreate: function(ev) {
 			var stage = this.props.stage;
@@ -220,7 +220,7 @@ package("kb.Stage", function(exports) {
 	exports.View = createReactClass({
 		displayName: "Stage",
 		contextTypes: {
-			CurrentSelection: React.PropTypes.object
+			CurrentSelection: kb.react.object
 		},
 		toggleWidth: function() {
 			if (this.props.stage.wide) {
