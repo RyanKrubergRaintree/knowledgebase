@@ -162,6 +162,9 @@ package("kb", function(exports) {
 	}
 
 	function google(auth, name, data, onloaded) {
+		if (typeof gapi === "undefined") {
+			return;
+		}
 		data.view = "button";
 		data.title = "Google";
 

@@ -291,7 +291,7 @@ package("kb.Page", function(exports) {
 				},
 				story.map(function(item, i) {
 					return React.createElement(kb.item.View, {
-						key: i + "|" + item.id,
+						key: i,
 						stage: stage,
 						item: item
 					});

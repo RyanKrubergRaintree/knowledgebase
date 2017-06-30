@@ -93,7 +93,6 @@ package("kb.item", function(exports) {
 					"data-id": item.id
 				}, !isEditing ? React.DOM.a({
 					className: "item-drag",
-					title: "Move or copy item.",
 					draggable: "true",
 					tabIndex: -1,
 

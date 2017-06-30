@@ -17,13 +17,14 @@
 	min-height: 16px;
 
 	background: #fff;
-
+	/*
 	transition:
 		padding 0.1s ease-in-out,
 		margin 0.1s ease-in-out,
 		height 0.1s ease-in-out,
 		min-height 0.1s ease-in-out,
 		box-shadow 0.1s ease-in-out;
+	*/
 }
 
 .item p {
