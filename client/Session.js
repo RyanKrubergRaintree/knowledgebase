@@ -23,7 +23,7 @@ package("kb", function(exports) {
 		this.home = params.home || "Community=Welcome";
 		this.branch = params.branch || "";
 		this.token = context.token || null;
-		this.filter = params.branch || "10.2.600";
+		this.filter = params.branch || "10.2.700";
 
 		this.logoutProvider_ = logoutProvider;
 	}
@@ -103,7 +103,7 @@ package("kb", function(exports) {
 
 			xhr.open(opts.method, opts.url);
 
-			if(this.filter){
+			if (this.filter) {
 				xhr.setRequestHeader("X-Filter", this.filter);
 			}
 

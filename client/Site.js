@@ -31,13 +31,9 @@ package("kb", function(exports) {
 			return {
 				options: [
 					"All",
-					"10.2.600",
+					"10.2.700",
 					"10.2.500",
-					"10.2.400",
-					"10.2.300",
-					"10.2.200",
-					"10.2.100",
-					"9.4"
+					"10.2.400"
 				],
 				hidden: this.props.Session.branch != ""
 			};
@@ -110,6 +106,11 @@ package("kb", function(exports) {
 		},
 		render: function() {
 			var filter = this.state;
+			var defaultFilter = this.props.Session.filter;
+			var options = filter.options.slice();
+			if (options.indexOf(defaultFilter) < 0) {
+				options.push(defaultFilter);
+			}
 			return React.DOM.form({
 					className: "search",
 					onSubmit: this.search
@@ -126,9 +127,9 @@ package("kb", function(exports) {
 							display: filter.hidden ? "none" : null
 						},
 						onChange: this.updateFilter,
-						defaultValue: this.props.Session.filter
+						defaultValue: defaultFilter
 					},
-					filter.options.map(function(item) {
+					options.map(function(item) {
 						return React.DOM.option({
 							key: item,
 							value: item
