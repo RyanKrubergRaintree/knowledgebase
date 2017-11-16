@@ -41,7 +41,9 @@
 .shortcut {
 	text-decoration: underline;
 }
-
+.reportitem {
+	font-weight: bold;
+}
 
 .imagemap .imagemap-tip {
 	color: #888;
