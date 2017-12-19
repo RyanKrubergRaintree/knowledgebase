@@ -8,11 +8,13 @@ package("kb", function(exports) {
 	depends("util/ParseJSON.js");
 
 	function Editing(stage) {
+		this.edited = false;
 		this.stage = stage;
 		this.items = {};
 	}
 	Editing.prototype = {
 		start: function(id) {
+			this.edited = true;
 			this.items[id] = true;
 			this.pack();
 			this.stage.changed();

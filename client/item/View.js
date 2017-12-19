@@ -80,18 +80,19 @@ package("kb.item", function(exports) {
 
 			var view = kb.item.content[item.type] || kb.item.content.Unknown;
 			var editingClass = "";
-			var isEditing = false;
+
+			var canDrag = stage.editing.edited;
 			if (stage.editing.item(item.id)) {
 				view = kb.item.Editor;
 				editingClass = " item-editing";
-				isEditing = true;
+				canDrag = false;
 			}
 
 			return React.DOM.div({
 					className: "item" + editingClass,
 					onDoubleClick: stage.canModify() ? this.startEditing : null,
 					"data-id": item.id
-				}, !isEditing ? React.DOM.a({
+				}, canDrag ? React.DOM.a({
 					className: "item-drag",
 					draggable: "true",
 					tabIndex: -1,
