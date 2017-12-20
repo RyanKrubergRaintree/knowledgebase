@@ -112,7 +112,8 @@ type Pages interface {
 	Edit(id Slug, version int, action Action) error
 	Delete(id Slug, version int) error
 
-	BatchReplace(pages map[Slug]*Page, complete func(Slug)) error
+	BatchReplace(pages map[Slug]*Page, complete func(string, Slug)) error
+	BatchReplaceDelta(pages map[Slug]*Page, complete func(string, Slug)) error
 
 	List() ([]PageEntry, error)
 	History(id Slug) ([]PageEntry, error)

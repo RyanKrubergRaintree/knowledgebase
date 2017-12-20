@@ -1,6 +1,8 @@
 package kb
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,6 +25,19 @@ type Page struct {
 	Story    Story     `json:"story,omitempty"`
 }
 
+func (p *Page) Hash() ([]byte, error) {
+	clone := *p
+	clone.Modified = time.Time{}
+
+	data, err := json.Marshal(clone)
+	if err != nil {
+		return nil, err
+	}
+
+	hash := sha256.Sum256([]byte(data))
+	return hash[:], nil
+}
+
 func (p *Page) Write(w io.Writer) error {
 	data, err := json.Marshal(p)
 	if err != nil {
@@ -33,6 +48,16 @@ func (p *Page) Write(w io.Writer) error {
 		return io.ErrShortWrite
 	}
 	return err
+}
+
+func (p *Page) CanonicalizeIDs() {
+	slughash := sha256.Sum256([]byte(p.Slug))
+	source := rand.NewSource(int64(binary.LittleEndian.Uint64(slughash[:])))
+	r := rand.New(source)
+
+	for _, item := range p.Story {
+		item["id"] = fmt.Sprintf("%016x", r.Int63())
+	}
 }
 
 // Story is the viewable content of the page

@@ -3,15 +3,18 @@ package pgdb
 import (
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 type migration struct {
+	Name    string
 	Version int
 	Scripts []string
 }
 
 var migrations = []*migration{
 	{
+		Name:    "Initial Tables",
 		Version: 1,
 		Scripts: []string{
 			`CREATE TYPE Rights
@@ -73,6 +76,7 @@ var migrations = []*migration{
 		},
 	},
 	{
+		Name:    "Add Guest Login Table",
 		Version: 2,
 		Scripts: []string{
 			`CREATE TABLE GuestLogin (
@@ -87,6 +91,7 @@ var migrations = []*migration{
 		},
 	},
 	{
+		Name:    "Add Page Caching Column",
 		Version: 3,
 		Scripts: []string{
 			// Add caching columns
@@ -97,6 +102,7 @@ var migrations = []*migration{
 		},
 	},
 	{
+		Name:    "Add Full Text Search",
 		Version: 4,
 		Scripts: []string{
 			// add automatic lookup field update function
@@ -128,6 +134,7 @@ var migrations = []*migration{
 		},
 	},
 	{
+		Name:    "Add Access View",
 		Version: 5,
 		Scripts: []string{
 			`CREATE VIEW AccessView AS
@@ -158,6 +165,14 @@ var migrations = []*migration{
 			JOIN Users ON Users.ID = Accesses.UserID
 			GROUP BY Accesses.GroupID, Accesses.UserID, Users.ID
 			ORDER BY Accesses.GroupID, Accesses.UserID;`,
+		},
+	},
+	{
+		Name:    "Add Hash Column",
+		Version: 6,
+		Scripts: []string{
+			`ALTER TABLE Pages
+				ADD COLUMN Hash BYTEA`,
 		},
 	},
 }
@@ -197,6 +212,7 @@ func (db *Database) migrateFromOld() error {
 	}
 
 	err := db.migrate(&migration{
+		Name:    "Start migration table",
 		Version: 2,
 		Scripts: []string{
 			`DROP TRIGGER Pages_UpdateTrigger ON Pages`,
@@ -254,6 +270,8 @@ func (db *Database) Initialize() error {
 
 	for _, mig := range migrations {
 		if mig.Version > version {
+			log.Println("Running migration: ", mig.Name)
+
 			err := db.migrate(mig)
 			if err != nil {
 				return err

@@ -20,6 +20,7 @@ import (
 )
 
 var (
+	overwrite  = flag.Bool("overwrite", true, "drop all pages and re-insert")
 	configfile = flag.String("config", "kb-dita-uploader.json", "configuration file")
 	stoponerr  = flag.Bool("stop", false, "don't upload if there are problems in converting")
 	killonerr  = flag.Bool("kill", false, "don't try upload other mappings")
@@ -176,10 +177,19 @@ func Upload(name string, config *Config) error {
 
 	complete := 0
 	total := len(conversion.Pages)
-	err = DB.Context("admin").Pages(owner).BatchReplace(conversion.Pages, func(slug kb.Slug) {
-		complete++
-		log.Printf("%04d/%04d : %v\n", complete, total, slug)
-	})
+
+	pages := DB.Context("admin").Pages(owner)
+	callback := func(description string, slug kb.Slug) {
+		if description != "deleted" {
+			complete++
+		}
+		log.Printf("%04d/%04d : %-10s %v\n", complete, total, description, slug)
+	}
+	if *overwrite {
+		err = pages.BatchReplace(conversion.Pages, callback)
+	} else {
+		err = pages.BatchReplaceDelta(conversion.Pages, callback)
+	}
 
 	return err
 }
