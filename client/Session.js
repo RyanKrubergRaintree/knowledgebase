@@ -2,6 +2,7 @@ package("kb", function(exports) {
 	"use strict";
 
 	depends("util/Notifier.js");
+	depends("Convert.js");
 
 	exports.Session = Session;
 
@@ -20,10 +21,17 @@ package("kb", function(exports) {
 
 		var params = context.params || {};
 		this.pages = context.pages || [];
-		this.home = params.home || "Community=Welcome";
 		this.branch = params.branch || "";
 		this.token = context.token || null;
 		this.filter = params.branch || "10.2.700";
+		this.home = params.home;
+		if (!this.home) {
+			if (this.branch) {
+				this.home = "help-" + kb.convert.TextToSlug(this.branch) + "=Welcome-to-Raintree-Help";
+			} else {
+				this.home = "Community=Welcome";
+			}
+		}
 
 		this.logoutProvider_ = logoutProvider;
 	}

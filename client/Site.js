@@ -2,6 +2,7 @@ package("kb", function(exports) {
 	"use strict";
 
 	depends("site.css");
+	depends("Convert.js");
 	depends("Lineup.View.js");
 
 	var HeaderMenu = createReactClass({
@@ -180,7 +181,14 @@ package("kb", function(exports) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			this.props.Lineup.openPages(this.props.Session.home);
+			var session = this.props.Session;
+
+			var pages = [session.home];
+			if (session.filter) {
+				pages.push("help-" + kb.convert.TextToSlug(session.filter) + "=Index");
+			}
+
+			this.props.Lineup.openPages(pages);
 		},
 		createNewPage: function(ev) {
 			ev.preventDefault();
