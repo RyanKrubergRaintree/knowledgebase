@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	overwrite  = flag.Bool("overwrite", true, "drop all pages and re-insert")
+	overwrite  = flag.Bool("overwrite", false, "drop all pages and re-insert")
 	configfile = flag.String("config", "kb-dita-uploader.json", "configuration file")
 	stoponerr  = flag.Bool("stop", false, "don't upload if there are problems in converting")
 	killonerr  = flag.Bool("kill", false, "don't try upload other mappings")
