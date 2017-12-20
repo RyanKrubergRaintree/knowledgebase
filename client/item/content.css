@@ -25,15 +25,18 @@
 		min-height 0.1s ease-in-out,
 		box-shadow 0.1s ease-in-out;
 	*/
+
+	border-top: 2px solid transparent;
+	border-bottom: 2px solid transparent;
+}
+
+.item:hover {
+	border-top: 2px solid #eee;
+	border-bottom: 2px solid #eee;
 }
 
 .item p {
 	margin: 8px 0;
-}
-
-.item:hover {
-	background: #f8f8f8;
-	background: rgba(0,0,0,0.02);
 }
 
 .item-drag {

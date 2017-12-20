@@ -87,14 +87,32 @@ h4 { font-size: 1.1em; }
 	background: url("/client/assets/img/background.png") center bottom no-repeat;
 }
 
+table {
+	border-collapse: collapse;
+	border: 1px solid #e8e8e8;
+}
+table td, table th {
+	padding: 2px;
+}
+
 table.tight {
 	padding: 2px;
 	font-size: 13px;
 }
 
-table td {
+table > thead > tr > th {
+	text-align: left;
+}
+table > tbody > td {
 	vertical-align: top;
 }
+table > thead > tr, table > tbody > tr:nth-child(even) {
+	background: #f0f0f0;
+}
+table > tbody > tr:hover {
+	background: #e0e0e0;
+}
+
 
 ul.tight {
 	font-size: 13px;
