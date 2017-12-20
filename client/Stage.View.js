@@ -65,7 +65,7 @@ package("kb.Stage", function(exports) {
 				}) : null,
 				stage.canViewHistory() ? a({
 					className: "mdi mdi-history",
-					title: "Delete this page.",
+					title: "Page history",
 					href: stage.url + "?history=all"
 				}) : null,
 				stage.canDestroy() ? a({
