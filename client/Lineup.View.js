@@ -71,21 +71,18 @@ package("kb.Lineup", function(exports) {
 			var self = this;
 			var containerWidth = this.state.width;
 
-			// try to calculate the best sizes for normal and wide stages
-			var normal = containerWidth;
-			var wide = containerWidth;
-			if (containerWidth > 465 * 3.5) {
-				normal = containerWidth * 0.25;
-				wide = containerWidth * 0.50;
-			} else if (containerWidth > 465 * 2.5) {
-				normal = containerWidth * 0.33;
-				wide = containerWidth * 0.663;
-			} else if (containerWidth > 465 * 1.5) {
-				normal = containerWidth * 0.50;
-				wide = containerWidth * 1.00;
+			var idealWidth = 550;
+
+			var normal = idealWidth;
+			var wide = 800;
+
+			var fittedCount = containerWidth / idealWidth;
+			if (fittedCount < 1) {
+				normal = containerWidth;
+			} else if (fittedCount < 3) {
+				var targetCount = (fittedCount + 0.5) | 0 + 0.2;
+				normal = Math.min(containerWidth / targetCount, idealWidth);
 			}
-			normal = Math.min(normal, 500);
-			wide = Math.min(wide, 700);
 
 			var left = 0;
 			var stages = this.props.Lineup.stages.map(function(stage) {
