@@ -1,3 +1,10 @@
+.no-results-warning {
+	display: none;
+}
+.no-results .no-results-warning {
+	display: block;
+}
+
 .conversion-error {
 	height: 3rem;
 	line-height: 3rem;

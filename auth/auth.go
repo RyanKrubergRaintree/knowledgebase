@@ -171,10 +171,14 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, error) {
 			entries, err := index.ByTagFilter(tags, "help-", "help-"+string(filter))
 			if err == nil {
 				kb.SortPageEntriesByRank(entries, tags)
-
 				for _, entry := range entries {
 					slugs = append(slugs, entry.Slug)
 				}
+			}
+
+			if len(entries) == 0 && filter != "" {
+				slugs = append(slugs, "help-"+filter+"=welcome-to-raintree-help?class=no-results")
+				slugs = append(slugs, "help-"+filter+"=index")
 			}
 		}
 	}

@@ -61,6 +61,8 @@ package("kb", function(exports) {
 		page = page || {};
 		page.title = page.title || ref.title || "";
 
+		this.customClassName = kb.convert.URLGetQueryParam(ref.url, "className");
+
 		this.page = new kb.Page(page);
 		this.editing = new Editing(this);
 

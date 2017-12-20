@@ -230,4 +230,16 @@ package("kb.convert", function(exports) {
 		verify("/search=search?q=csdfa asdf&filter=10.2.600#alpha");
 		verify("search=search?q=csdfa asdf&filter=10.2.600#alpha");
 	});
+
+	exports.URLGetQueryParam = URLGetQueryParam;
+
+	function URLGetQueryParam(url, param) {
+		if (typeof url === "undefined") {
+			return "";
+		}
+
+		var reg = new RegExp('[^?]+?.*&?' + param + '=([^&#]*)', 'i');
+		var matches = reg.exec(url);
+		return matches ? matches[1] : "";
+	}
 });

@@ -270,8 +270,13 @@ package("kb.Stage", function(exports) {
 				);
 			}
 
+			var customClassName = this.props.stage.customClassName;
+			if (customClassName) {
+				customClassName = " " + customClassName;
+			}
+
 			return React.DOM.div({
-					className: "stage",
+					className: "stage" + customClassName,
 					onClick: this.activate,
 					"data-id": stage.id,
 
