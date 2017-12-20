@@ -125,6 +125,9 @@ package("kb", function(exports) {
 		canDestroy: function() {
 			return this.allowed.indexOf("DELETE") >= 0;
 		},
+		canViewHistory: function() {
+			return this.allowed.indexOf("OVERWRITE") >= 0;
+		},
 
 		updateStatus_: function(response) {
 			var allowed = response.xhr.getResponseHeader("Allow");

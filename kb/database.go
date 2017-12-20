@@ -106,6 +106,7 @@ type Pages interface {
 
 	Load(id Slug) (*Page, error)
 	LoadRaw(id Slug) ([]byte, error)
+	LoadRawVersion(id Slug, version int) ([]byte, error)
 
 	Overwrite(id Slug, version int, page *Page) error
 	Edit(id Slug, version int, action Action) error
@@ -114,7 +115,7 @@ type Pages interface {
 	BatchReplace(pages map[Slug]*Page, complete func(Slug)) error
 
 	List() ([]PageEntry, error)
-	Journal(id Slug) ([]Action, error)
+	History(id Slug) ([]PageEntry, error)
 }
 
 type Index interface {

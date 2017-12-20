@@ -65,7 +65,7 @@ package("kb", function(exports) {
 		},
 
 		closeLast: function() {
-			if(this.pinned.visible){
+			if (this.pinned.visible) {
 				this.hidePin();
 				return;
 			}
@@ -213,9 +213,9 @@ package("kb", function(exports) {
 				var locFrom = kb.convert.URLToLocation(stage.url);
 				var locTo = kb.convert.URLToLocation(url);
 				if (locFrom.host === "") {
-					url = locTo.path;
+					url = locTo.path + locTo.query + locTo.fragment;
 				} else {
-					url = "//" + locFrom.host + locTo.path;
+					url = "//" + locFrom.host + locTo.path + locTo.query + locTo.fragment;
 				}
 			}
 
@@ -239,22 +239,22 @@ package("kb", function(exports) {
 			}
 		},
 
-		pin: function(image){
+		pin: function(image) {
 			this.pinned.visible = true;
 			this.pinned.url = image.url;
 			this.pinned.width = image.width;
 			this.changed();
 		},
-		hidePin: function(){
+		hidePin: function() {
 			this.pinned.visible = false;
 			this.pinned.url = "";
 			this.changed();
 		},
 
-		handleClickImage: function(ev){
+		handleClickImage: function(ev) {
 			var target = ev.target;
 			var stage = this.findStageFromElement(target);
-			if(!stage){
+			if (!stage) {
 				return;
 			}
 
@@ -275,7 +275,7 @@ package("kb", function(exports) {
 
 		handleClickLink: function(ev) {
 			var t = ev.target;
-			if ((t.nodeName === "IMG") || (t.nodeName === "IMAGE")){
+			if ((t.nodeName === "IMG") || (t.nodeName === "IMAGE")) {
 				this.handleClickImage(ev);
 				return;
 			}

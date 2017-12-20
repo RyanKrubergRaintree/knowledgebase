@@ -100,6 +100,22 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	requestedVersionStr := r.URL.Query().Get("history")
+	versionedRequest := false
+	requestedVersion := -1
+	if requestedVersionStr != "" {
+		versionedRequest = true
+		if v, err := strconv.Atoi(requestedVersionStr); err == nil {
+			requestedVersion = v
+		}
+
+		if rights == Moderator {
+			allowedMethods = []string{"GET"}
+		} else {
+			allowedMethods = []string{}
+		}
+	}
+
 	w.Header().Set("Allow", strings.Join(allowedMethods, ","))
 	if !allowed(r.Method, allowedMethods) {
 		http.Error(w, "Method "+r.Method+" not allowed.", http.StatusMethodNotAllowed)
@@ -111,14 +127,42 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// reading a page
 	case "GET":
-		data, err := pages.LoadRaw(pageID)
-		if err != nil {
-			WriteResult(w, err)
-			return
-		}
+		if versionedRequest {
+			if requestedVersionStr == "all" {
+				entries, err := pages.History(pageID)
+				if err != nil {
+					WriteResult(w, err)
+					return
+				}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
+				_, title, _ := TokenizeLink3(string(pageID))
+				page := &Page{
+					Slug:  pageID,
+					Title: SlugToTitle(title) + " (history)",
+					Story: StoryFromEntries(entries),
+				}
+				page.WriteResponse(w)
+			} else {
+				data, err := pages.LoadRawVersion(pageID, requestedVersion)
+				if err != nil {
+					WriteResult(w, err)
+					return
+				}
+				// TODO: modify header
+
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(data)
+			}
+		} else {
+			data, err := pages.LoadRaw(pageID)
+			if err != nil {
+				WriteResult(w, err)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(data)
+		}
 
 	// creating/overwrite a page
 	case "PUT", "OVERWRITE":

@@ -63,6 +63,11 @@ package("kb.Stage", function(exports) {
 					},
 					onDragStart: this.createFactory
 				}) : null,
+				stage.canViewHistory() ? a({
+					className: "mdi mdi-history",
+					title: "Delete this page.",
+					href: stage.url + "?history=all"
+				}) : null,
 				stage.canDestroy() ? a({
 					className: "mdi mdi-delete",
 					title: "Delete this page.",

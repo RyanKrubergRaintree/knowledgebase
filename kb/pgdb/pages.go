@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -81,8 +82,8 @@ func (db Pages) LoadRaw(id kb.Slug) ([]byte, error) {
 	err := db.QueryRow(`
 		SELECT Data
 		FROM Pages
-		Where OwnerID = $1 AND Slug = $2
-	`, db.GroupID, id).Scan(&data)
+		Where Slug = $1
+	`, id).Scan(&data)
 	if err == sql.ErrNoRows {
 		return nil, kb.ErrPageNotExist
 	}
@@ -176,6 +177,48 @@ func (db Pages) List() ([]kb.PageEntry, error) {
 	`, db.GroupID)
 }
 
-func (db Pages) Journal(id kb.Slug) ([]kb.Action, error) {
-	return []kb.Action{}, ErrNotImplemented
+func (db Pages) LoadRawVersion(id kb.Slug, version int) ([]byte, error) {
+	var data []byte
+	err := db.QueryRow(`
+		SELECT Data
+		FROM PageJournal
+		Where Slug = $1 AND Version = $2 AND Action = 'overwrite'
+	`, id, version).Scan(&data)
+	if err == sql.ErrNoRows {
+		return nil, kb.ErrPageNotExist
+	}
+	return data, err
+}
+
+func (db Pages) History(id kb.Slug) (entries []kb.PageEntry, err error) {
+	rows, err := db.Query(`
+		SELECT Actor, Date, Version
+		FROM PageJournal
+		WHERE Slug = $1 AND Action = 'overwrite'
+		ORDER BY VERSION DESC
+	`, id)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var actor string
+		var date time.Time
+		var version int
+		err := rows.Scan(&actor, &date, &version)
+		if err != nil {
+			return nil, err
+		}
+
+		var entry kb.PageEntry
+		entry.Slug = id + "?history=" + kb.Slug(strconv.Itoa(version))
+		entry.Title = "Version " + strconv.Itoa(version)
+		entry.Modified = date
+		entry.Synopsis = "Modified by " + actor + " on " + date.Format("2006-01-02 15:04")
+		entries = append(entries, entry)
+	}
+
+	return entries, nil
 }
