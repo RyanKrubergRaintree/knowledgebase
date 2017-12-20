@@ -136,8 +136,9 @@ package("kb", function(exports) {
 		},
 
 		removeListeners: function() {
+			var self = this;
 			this.stages.map(function(stage) {
-				stage.remove(this);
+				stage.remove(self);
 			});
 		},
 		addListeners: function() {

@@ -127,7 +127,13 @@ package("kb.item.content", function(exports) {
 				root: build(this.props.item.root, this.context.Lineup.stages)
 			};
 		},
+		debounce: 0,
 		activeChanged: function() {
+			window.clearTimeout(this.debounce);
+			this.debounce = window.setTimeout(this.rebuildTree, 100);
+		},
+		rebuildTree: function() {
+			window.clearTimeout(this.debounce);
 			this.setState({
 				root: build(this.props.item.root, this.context.Lineup.stages)
 			});
@@ -136,6 +142,7 @@ package("kb.item.content", function(exports) {
 			this.context.Lineup.on("changed", this.activeChanged, this);
 		},
 		componentWillUnmount: function() {
+			window.clearTimeout(this.debounce);
 			this.context.Lineup.remove(this);
 		},
 		render: function() {

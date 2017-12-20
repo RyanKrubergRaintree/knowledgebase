@@ -5,6 +5,7 @@ package("kb.util", function(exports) {
 
 	function Notifier() {
 		this.listeners = [];
+		this.emitTimeout = 0;
 	}
 
 	Notifier.prototype = {
@@ -47,12 +48,18 @@ package("kb.util", function(exports) {
 		},
 		emit: function(event) {
 			var self = this;
-			window.setTimeout(function() {
+			window.clearTimeout(this.emitTimeout);
+			this.emitTimeout = window.setTimeout(function() {
 				self.handle(event);
-			}, 0);
+			}, 1);
 		},
 		handle: function(event) {
+			window.clearTimeout(this.emitTimeout);
+			var self = this;
 			this.listeners.map(function(listener) {
+				if (self.listeners.indexOf(listener) < 0) {
+					return;
+				}
 				if (listener.event === event.type) {
 					listener.handler.call(listener.recv, event);
 				}
