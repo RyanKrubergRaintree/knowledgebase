@@ -59,8 +59,15 @@ window.getClassList = function(el) {
 			tokens = tokens.replace(" " + token + " ", "");
 			el.className = tokens.trim();
 		},
+		toggle: function(token) {
+			if (this.contains(token)) {
+				this.remove(token);
+			} else {
+				this.add(token);
+			}
+		},
 		contains: function(token) {
-			return split(el.className).indexOf(token) >= 0;
+			return (" " + el.className + " ").indexOf(token) >= 0;
 		}
 	};
 };

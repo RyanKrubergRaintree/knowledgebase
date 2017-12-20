@@ -9,6 +9,23 @@ package("kb.item.content", function(exports) {
 	depends("Sanitize.js");
 	depends("Resolve.js");
 
+	window.ToggleCollapse = function ToggleCollapse(event) {
+		var target = event.target;
+		while (target) {
+			var classes = getClassList(target);
+			if (classes.contains("collapse")) {
+				classes.toggle("collapsed");
+				return;
+			}
+			target = target.parentNode;
+		}
+	}
+
+	function InjectToggleHandler(htmlContent) {
+		var x = htmlContent.replace("class='collapse-icon", "onclick='ToggleCollapse(event)' class='collapse-icon");
+		return x.replace("class=\"collapse-icon", "onclick='ToggleCollapse(event)' class=\"collapse-icon");
+	}
+
 	exports.Unknown = createReactClass({
 		displayName: "Unknown",
 		render: function() {
@@ -118,7 +135,7 @@ package("kb.item.content", function(exports) {
 					return React.DOM.p({
 						key: i,
 						dangerouslySetInnerHTML: {
-							__html: kb.item.Sanitize(p)
+							__html: InjectToggleHandler(kb.item.Sanitize(p))
 						}
 					});
 				}));
@@ -126,7 +143,7 @@ package("kb.item.content", function(exports) {
 				return React.DOM.p({
 					className: "item-content content-paragraph",
 					dangerouslySetInnerHTML: {
-						__html: kb.item.Sanitize(paragraphs[0])
+						__html: InjectToggleHandler(kb.item.Sanitize(paragraphs[0]))
 					}
 				});
 			}
@@ -140,7 +157,7 @@ package("kb.item.content", function(exports) {
 			return React.DOM.div({
 				className: "item-content content-html",
 				dangerouslySetInnerHTML: {
-					__html: kb.item.Sanitize(kb.item.ResolveHTML(stage, this.props.item.text))
+					__html: InjectToggleHandler(kb.item.Sanitize(kb.item.ResolveHTML(stage, this.props.item.text)))
 				}
 			});
 		}

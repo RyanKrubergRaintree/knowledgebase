@@ -191,3 +191,13 @@
 .content-html {
 	overflow: auto;
 }
+
+.collapse {}
+.collapse .collapse-icon                 { cursor: pointer; }
+.collapse .collapse-icon:hover           { cursor: pointer; background: #eee; }
+
+.collapse .collapse-opened  { display: block; }
+.collapse .collapse-closed  { display: none; }
+
+.collapse.collapsed .collapse-opened { display: none; }
+.collapse.collapsed .collapse-closed { display: block; }
