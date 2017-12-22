@@ -139,16 +139,18 @@ func (db Pages) BatchReplaceDelta(pages map[kb.Slug]*kb.Page, complete func(stri
 			return fmt.Errorf("failed to create delete statement: %v", err)
 		}
 
-		for oldslug := range oldHashes {
-			if _, stillExists := infos[oldslug]; stillExists {
+		for oldslug, oldHash := range oldHashes {
+			info, stillExists := infos[oldslug]
+			if stillExists && bytes.Equal(info.Hash, oldHash) {
 				continue
 			}
-
 			if _, err := del.Exec(oldslug); err != nil {
 				return fmt.Errorf("failed to exec del statement: %v", err)
 			}
 
-			complete("deleted", oldslug)
+			if !stillExists {
+				complete("deleted", oldslug)
+			}
 		}
 
 		if err := del.Close(); err != nil {
@@ -168,13 +170,6 @@ func (db Pages) BatchReplaceDelta(pages map[kb.Slug]*kb.Page, complete func(stri
 			$7, $8,
 			$9
 		)
-		ON CONFLICT (Slug)
-		DO UPDATE SET (
-			Data, Version,
-			Tags, TagSlugs,
-			Created, Modified,
-			Hash) = ($3, $4, $5, $6, $7, $8, $9)
-		WHERE Pages.Slug = $2;
 	`)
 	if err != nil {
 		return fmt.Errorf("failed to create insert statement: %v", err)
