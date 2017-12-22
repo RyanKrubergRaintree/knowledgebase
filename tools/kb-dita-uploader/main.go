@@ -183,6 +183,9 @@ func Upload(name string, config *Config) error {
 		if description != "deleted" {
 			complete++
 		}
+		if description == "unchanged" {
+			return
+		}
 		log.Printf("%04d/%04d : %-10s %v\n", complete, total, description, slug)
 	}
 	if *overwrite {
