@@ -91,6 +91,8 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("X-UA-Compatible", "IE=edge")
+
 	if err := ts.ExecuteTemplate(w, "index.html", nil); err != nil {
 		log.Printf("Error executing template: %s", err)
 		return
