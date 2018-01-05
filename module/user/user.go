@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"net/http"
+	"sort"
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -80,6 +81,33 @@ func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
 			<tr><td>Email</td><td>%v</td></tr>
 		</table>
 	`, user.ID, esc(user.Name), esc(user.Email))))
+
+	{
+		type keyvalue struct {
+			key    string
+			values []string
+		}
+		headers := []keyvalue{}
+		for key, value := range r.Header {
+			switch key {
+			case "Cookie", "Set-Cookie", "X-Auth-Token", "WWW-Authenticate",
+				"Authorization", "Proxy-Authenticate", "Proxy-Authorization":
+				continue
+			default:
+				headers = append(headers, keyvalue{key, value})
+			}
+		}
+		sort.Slice(headers, func(i, k int) bool { return headers[i].key < headers[k].key })
+
+		requestInfo := `<p><b>Browser info:</b></p><table>`
+		for _, header := range headers {
+			requestInfo += "<tr><td>" + esc(header.key) + "</td>" +
+				"<td>" + esc(fmt.Sprintf("%v", header.values)) + "</td></tr>"
+		}
+		requestInfo += "</table>"
+
+		page.Story.Append(kb.HTML(requestInfo))
+	}
 
 	page.WriteResponse(w)
 }
