@@ -1,28 +1,31 @@
 1. Install Postgres
-	user kbroot
+	user kbroot 
+	pwd kbroot
 	db   knowledgebase
 
 2. Get Knowledgebase
-	> git clone knowledgebase
-	> git clone ditaconvert
+    > cd %GOPATH%\src\github.com\raintreeinc\
+	> git clone https://github.com/raintreeinc/knowledgebase.git
+	> git clone https://github.com/raintreeinc/ditaconvert.git
 	// get all missing dependencies
 	> go get -u github.com/raintreeinc/knowledgebase
+
 
 3. Configure System32/drivers/etc/hosts
 	localhost doesn't work for google auth
 	127.0.0.1 example.com
 
 4. start server
-   > go\src\github.com\raintreeinc\knowledgebase\local.bat
+   > %GOPATH%\src\github.com\raintreeinc\knowledgebase\local.bat
    verify that example.com shows login screen
 
 5. create base setup
    > go run tools\kb-admin\main.go setup-groups -conf base.json
 
 5. Import Dita
-   create go\src\github.com\raintreeinc\knowledgebase\tools\kb-dita-uploader\local.json~ based on example.json 
+   create %GOPATH%\src\github.com\raintreeinc\knowledgebase\tools\kb-dita-uploader\local.json~ based on example.json 
    
-   go\src\github.com\raintreeinc\knowledgebase> go run tools\kb-dita-uploader\main.go -config tools\kb-dita-uploader\local.json~
+   %GOPATH%\src\github.com\raintreeinc\knowledgebase> go run tools\kb-dita-uploader\main.go -config tools\kb-dita-uploader\local.json~
 
 6. Client to connect localhost KB
    {$DEFINE KBDEBUG}
