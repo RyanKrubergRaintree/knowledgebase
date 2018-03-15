@@ -1,7 +1,7 @@
 .header-menu {
 	position: fixed;
 	top: 46px;
-	left: -500px;
+	left: -1000px;
 	background: #FFF;
 	padding: 0px 0;
 	transition: left 0.3s ease-in;
