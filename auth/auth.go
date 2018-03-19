@@ -177,7 +177,7 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, error) {
 			}
 
 			if len(entries) == 0 && filter != "" {
-				slugs = append(slugs, "help-"+filter+"=welcome-to-raintree-help?class=no-results")
+				slugs = append(slugs, "help-"+filter+"=welcome-to-raintree-help?className=no-results")
 				slugs = append(slugs, "help-"+filter+"=index")
 			}
 		}
