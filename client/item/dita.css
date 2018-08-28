@@ -54,7 +54,9 @@
 .option {
 	font-family: monospace;
 }
-
+.varname {
+	font-style: italic;
+}
 .imagemap .imagemap-tip {
 	color: #888;
 	font-size: 80%;
