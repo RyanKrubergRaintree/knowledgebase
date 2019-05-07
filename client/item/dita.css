@@ -26,6 +26,7 @@
 .codeblock {
 	font-family: monospace;
 	white-space: pre;
+	overflow: auto;
 }
 .codeph {
 	font-family: monospace;
