@@ -23,7 +23,7 @@ package("kb", function(exports) {
 		this.pages = context.pages || [];
 		this.branch = params.branch || "";
 		this.token = context.token || null;
-		this.filter = params.branch || "10.2.700";
+		this.filter = params.branch || "10.2.500";
 		this.home = params.home;
 		if (!this.home) {
 			if (this.branch) {
