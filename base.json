@@ -1,6 +1,13 @@
 {
 	"groups": [
 		{
+			"ID": "lms",
+			"OwnerID": "raintree",
+			"Name": "LMS",
+			"Public": true,
+			"Description": "Learning Management System"
+		},		
+		{
 			"ID": "raintree",
 			"OwnerID": "raintree",
 			"Name": "Raintree",
