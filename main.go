@@ -23,6 +23,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/module/dispatch"
 	"github.com/raintreeinc/knowledgebase/module/dita"
 	"github.com/raintreeinc/knowledgebase/module/group"
+	"github.com/raintreeinc/knowledgebase/module/lms"
 	"github.com/raintreeinc/knowledgebase/module/page"
 	"github.com/raintreeinc/knowledgebase/module/search"
 	"github.com/raintreeinc/knowledgebase/module/tag"
@@ -160,6 +161,7 @@ func main() {
 	server.AddModule(search.New(server))
 	server.AddModule(tag.New(server))
 	server.AddModule(user.New(server))
+	server.AddModule(lms.New(server))
 	server.AddModule(dispatch.New(kb.Group{
 		ID:          "help",
 		Name:        "Help",
@@ -290,5 +292,10 @@ func RDS() string {
 		return ""
 	}
 
-	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s'", user, pass, dbname, host, port)
+	sslmode := os.Getenv("RDS_SSLMODE")
+	if sslmode != "" {
+		sslmode = "sslmode=" + sslmode
+	}
+
+	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s' %s", user, pass, dbname, host, port, sslmode)
 }

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -48,6 +49,21 @@ func (server *Server) params(w http.ResponseWriter, r *http.Request) (kb.User, s
 	token, err := session.TokenFromString(r.Header.Get("X-Auth-Token"))
 	if err != nil {
 		return kb.User{}, session.ZeroToken, ErrUnauthorized
+	}
+
+	// creates session for LMS user;
+	// todo: remove token before returning response
+	lmsToken, lmsTokenExists := os.LookupEnv("LMSTOKEN")
+	if lmsTokenExists && token.String() == lmsToken && lmsToken != "" {
+		lmsUser, err1 := server.DB.Context("admin").Users().ByID(kb.Slugify("lmsuser"))
+		if err1 != nil {
+			return kb.User{}, session.ZeroToken, ErrUnauthorized
+		}
+		token, err = server.Sessions.New(lmsUser) // register the user in the store
+		if err != nil {
+			log.Println("Session failed:", err.Error())
+			return kb.User{}, session.ZeroToken, ErrUnauthorized
+		}
 	}
 
 	user, ok := server.Sessions.Load(token)

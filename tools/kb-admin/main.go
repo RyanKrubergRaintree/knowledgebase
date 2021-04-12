@@ -20,12 +20,16 @@ func RDS() string {
 	dbname := os.Getenv("RDS_DB_NAME")
 	host := os.Getenv("RDS_HOSTNAME")
 	port := os.Getenv("RDS_PORT")
+	sslmode := os.Getenv("RDS_SSLMODE")
+	if sslmode != "" {
+		sslmode = "sslmode=" + sslmode
+	}
 
 	if user == "" || pass == "" || dbname == "" || host == "" || port == "" {
 		return ""
 	}
 
-	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s'", user, pass, dbname, host, port)
+	return fmt.Sprintf("user='%s' password='%s' dbname='%s' host='%s' port='%s'  %s", user, pass, dbname, host, port, sslmode)
 }
 
 func OpenDB() kb.Database {
