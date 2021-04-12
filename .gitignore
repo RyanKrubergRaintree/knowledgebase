@@ -12,6 +12,8 @@ debug
 .deploy
 .bin
 .idea
+.vscode
+temp/
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -32,3 +34,4 @@ _testmain.go
 
 *.sublime-workspace
 *.bak
+__debug_bin
