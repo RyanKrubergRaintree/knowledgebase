@@ -78,7 +78,7 @@ package("kb", function(exports) {
 		this.patching_ = false;
 		this.patches_ = [];
 
-		this.wide = false;
+		this.wide = true;
 	}
 
 	Stage.prototype = {
