@@ -3,6 +3,8 @@ package lms
 import (
 	"archive/zip"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -10,6 +12,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,9 +23,50 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/uuid"
+	"github.com/raintreeinc/knowledgebase/kb"
 )
 
 const timeout = 60 * 60 * time.Second // max time for single upload (1h)
+
+// Uploads single video file from the server; Returns S3 path if successful
+func uploadVideoFileFromServerToS3(fileNameWithPath, clientID, environment, guid string) (error, string) {
+	year := strconv.Itoa(time.Now().Year())
+	path := "videos/" + environment + "/" + clientID + "/" + year + "/" + guid + "_" + filepath.Base(fileNameWithPath)
+
+	return uploadSingleFileToS3(path, fileNameWithPath, "rt-kb-videos")
+}
+
+// todo: return 200 / 40* / 500
+// Deletes single video file from S3
+func deleteVideoFileFromS3(key, bucket string) string {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(getEnvWithDefault("AWS_REGION", "us-east-1"))})
+	if err != nil {
+		return ""
+	}
+	svc := s3.New(sess)
+
+	if bucket == "" {
+		bucket = getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	}
+
+	prefix := "https://" + bucket + ".s3.amazonaws.com/"
+	key = strings.Replace(key, prefix, "", -1)
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)})
+	if err != nil {
+		return "Unable to delete given object"
+	}
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "Unable to delete given object"
+	}
+
+	return "OK"
+}
 
 // Uploads single file from the server; Returns S3 path if successful
 func uploadFileFromServerToS3(fileNameWithPath string) (error, string) {
@@ -30,7 +75,7 @@ func uploadFileFromServerToS3(fileNameWithPath string) (error, string) {
 	if fileExtension == ".H5P" {
 		return unzipAndUploadH5P(fileNameWithPath)
 	}
-	return uploadSingleFileToS3("", fileNameWithPath)
+	return uploadSingleFileToS3("", fileNameWithPath, "")
 }
 
 func unzipAndUploadH5P(fileNameWithPath string) (error, string) {
@@ -52,7 +97,7 @@ func unzipAndUploadH5P(fileNameWithPath string) (error, string) {
 				fileNameWithoutTempPath := strings.Replace(fileNameWithPath, getTempPath(""), "", -1)
 				s3Path := filepath.FromSlash("H5P/lessons/" + fileNameWithoutTempPath)
 				s3Path = strings.Replace(s3Path, string(filepath.Separator), "/", -1) // fix path for S3
-				err, _ := uploadSingleFileToS3(s3Path, fileNameWithPath)
+				err, _ := uploadSingleFileToS3(s3Path, fileNameWithPath, "")
 				if err != nil {
 					return err
 				}
@@ -67,16 +112,18 @@ func unzipAndUploadH5P(fileNameWithPath string) (error, string) {
 	// upload template.html as it's needed to show the H5P content
 	workingDir, _ := os.Getwd()
 	fileNameWithPath = filepath.FromSlash(workingDir + "/client/H5Ptemplate.html")
-	return uploadSingleFileToS3("H5P/lessons/"+guid+"/template.html", fileNameWithPath)
+	return uploadSingleFileToS3("H5P/lessons/"+guid+"/template.html", fileNameWithPath, "")
 }
 
 // Uploads single file from the server; Returns S3 path if successful
 // S3 full path can be specified (optional)
-func uploadSingleFileToS3(destinations3Path string, fileNameWithPath string) (error, string) {
+func uploadSingleFileToS3(destinations3Path, fileNameWithPath, bucket string) (error, string) {
 	var key *string
 	var uploadedFilePath string
 	fileName := filepath.Base(fileNameWithPath)
-	bucket := getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	if bucket == "" {
+		bucket = getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	}
 
 	if destinations3Path == "" {
 		key = aws.String(fileName) // upload to Root dir if no specific path given
@@ -91,7 +138,7 @@ func uploadSingleFileToS3(destinations3Path string, fileNameWithPath string) (er
 	if err != nil {
 		return err, ""
 	}
-	amazonFileBucket := s3.New(sess)
+	svc := s3.New(sess)
 
 	// To abort the upload if it takes more than timeout seconds
 	ctx, cancelFn := context.WithTimeout(context.Background(), timeout)
@@ -103,7 +150,7 @@ func uploadSingleFileToS3(destinations3Path string, fileNameWithPath string) (er
 	}
 	defer file.Close()
 
-	_, err = amazonFileBucket.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(bucket),
 		Key:         key,
 		Body:        file,
@@ -160,28 +207,56 @@ func getTempPath(append string) string {
 	return filepath.FromSlash(workingDir)
 }
 
-// todo: return JSON; Filter for H5PDist folder & list only uploads i.e guid/template.hmtl files; 500 response on errors
-func ListFilesFromBucket(w http.ResponseWriter) {
+func ListLessonsFromBucket(w http.ResponseWriter) {
 	bucket := getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
 	defaultRegion := getEnvWithDefault("AWS_REGION", "us-east-1")
 
 	// Init session and service. Uses ENV variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
 	sess, err1 := session.NewSession(&aws.Config{Region: aws.String(defaultRegion)})
 	if err1 != nil {
-		fmt.Fprintf(w, "Unable to list items in bucket %q, %v", bucket, err1)
+		fmt.Fprintf(w, "Unable to list items from bucket %q, %v", bucket, err1)
 		return
 	}
-	amazonFileBucket := s3.New(sess)
+	svc := s3.New(sess)
 
-	resp, err := amazonFileBucket.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)})
+	params := &s3.ListObjectsInput{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String("H5P/lessons"),
+	}
+
+	var result struct {
+		Lessons []string `json:"lessons"`
+	}
+
+	err := svc.ListObjectsPages(params,
+		func(response *s3.ListObjectsOutput, lastPage bool) bool {
+			// Match URL-s up to lesson ID
+			re := regexp.MustCompile(`^.+([/]{2}).+?([/]{1}).+?([/]{1}).+?([/]{1}).+?([/]{1})`)
+			lessonLink := ""
+
+			for _, item := range response.Contents {
+				temp := re.FindString("https://" + bucket + ".s3.amazonaws.com/" + *item.Key)
+				if lessonLink != temp {
+					lessonLink = temp
+					result.Lessons = append(result.Lessons, lessonLink+"template.html")
+				}
+			}
+			// continue with the next page
+			return true
+		})
+
 	if err != nil {
-		fmt.Fprintf(w, "Unable to list items in bucket %q, %v", bucket, err)
+		fmt.Fprintf(w, "Unable to list all items from bucket %q, %v", bucket, err)
 		return
 	}
 
-	for _, item := range resp.Contents {
-		fmt.Fprintf(w, "https://"+bucket+".s3.amazonaws.com/"+*item.Key)
+	data, err := json.Marshal(result)
+	if err != nil {
+		kb.WriteResult(w, err)
 	}
+
+	w.Write(data)
+	w.Header().Set("Content-Type", "application/json")
 }
 
 // Saves single(first) file from http request to temp folder. Expects form key to be "file".
@@ -261,4 +336,56 @@ func Unzip(src, dest string) error {
 	}
 
 	return nil
+}
+
+// todo: error out only if bucket does not exist and err. happens; i.e ignore bucket exists errors
+func createBucket(bucketName string) error {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(getEnvWithDefault("AWS_REGION", "us-east-1"))})
+	if err != nil {
+		return err
+	}
+	svc := s3.New(sess)
+
+	_, err = svc.CreateBucket(&s3.CreateBucketInput{
+		Bucket: aws.String("rt-videos-" + bucketName),
+	})
+	if err != nil {
+		return err
+	}
+
+	err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
+		Bucket: aws.String(bucketName),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getSignedLink(key, bucket string) string {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(getEnvWithDefault("AWS_REGION", "us-east-1"))})
+	if err != nil {
+		return ""
+	}
+	svc := s3.New(sess)
+
+	if bucket == "" {
+		bucket = getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	}
+
+	prefix := "https://" + bucket + ".s3.amazonaws.com/"
+	key = strings.Replace(key, prefix, "", -1)
+
+	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	urlStr, err := req.Presign(8 * 60 * time.Minute)
+
+	if err != nil {
+		return ""
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(urlStr))
 }
