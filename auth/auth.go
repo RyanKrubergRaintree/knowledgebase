@@ -231,7 +231,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err == ErrTimeSkewed {
-			http.Error(w, "Time skewed, authentiaction failed.", http.StatusUnauthorized)
+			http.Error(w, "Time skewed, authentication failed.", http.StatusUnauthorized)
 			return
 		}
 
