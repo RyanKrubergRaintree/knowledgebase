@@ -182,7 +182,7 @@ func main() {
 			return
 		}
 
-		if r.URL.Path == "/" {
+		if r.URL.Path == "/" || r.URL.Path == "/apilogin" {
 			clientServer.ServeHTTP(w, r)
 			return
 		}

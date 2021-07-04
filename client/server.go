@@ -105,9 +105,28 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filepath.Join(server.dir, "assets", "ico", "favicon.ico"))
 	case r.URL.Path == "/":
 		server.index(w, r)
+	case r.URL.Path == "/apilogin":
+		server.apiLogin(w, r)
 	case strings.HasPrefix(r.URL.Path, "/assets/"):
 		server.assets.ServeHTTP(w, r)
 	default:
 		server.client.ServeHTTP(w, r)
 	}
+}
+
+func (server *Server) apiLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	session, err := server.Login.SessionFromHeader(r)
+	if err == auth.ErrTimeSkewed {
+		http.Error(w, errTimeSkewedMessage, http.StatusUnauthorized)
+		return
+	}
+
+	if session == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	json.NewEncoder(w).Encode(session.Token)
 }
