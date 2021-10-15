@@ -119,6 +119,12 @@ div.setting > h3 {
 	margin-left: 2em;
 }
 
+.example {
+	border-style: solid;
+	border-width: thin;
+	border-color: #aaaaaa;
+	padding: 0 1em;
+}
 /* Backwards compatibility */
 
 *[data-dita="note"]:before {
