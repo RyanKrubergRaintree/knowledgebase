@@ -101,6 +101,15 @@
 	font-size: 1.5em;
 }
 
+div.figure > h2.sectiontitle {
+	font-size: 1em;
+	font-weight: normal;
+}
+
+div.figure > h2.sectiontitle::before{
+	content: "Figure: ";
+}
+
 div.note > i {
 	vertical-align: top;
 }
