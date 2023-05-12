@@ -11,6 +11,31 @@
 	<link rel="stylesheet" type="text/css" href="/client/assets/css/materialdesignicons.css" async>
 	<link href='/client/assets/roboto/all.css' rel='stylesheet' type='text/css' async>
 
+	<script>
+		// Error handling (added for IE11 back comp debugging;)
+		window.onerror = function (msg, url, lineNo, columnNo, error) {
+			var string = msg.toLowerCase();
+			var substring = 'script error';
+			if (string.indexOf(substring) > -1) {
+				console.log('Script Error: ' + string);
+			} else {
+				var message = [
+					'Message: ' + msg,
+					'URL: ' + url,
+					'Line: ' + lineNo,
+					'Column: ' + columnNo,
+					'Error object: ' + JSON.stringify(error)
+				].join(' - ');
+
+				console.log(message);
+			}
+
+			// todo: Enable error displaying once the bug is fixed
+			return true;
+		};
+	</script>
+
+
 	<script src="/client/assets/js/es5.js"></script>
 	<script src="/client/assets/js/dom.js"></script>
 	<script src="/client/assets/js/global.js?{{Site.Version}}"></script>
@@ -63,6 +88,19 @@
 		ga('send', 'pageview');
 	</script>
 	{{ end }}
+
+	<script>
+		// Delete the token param which is used by Web Client during auto-login
+		try {
+			let kbparams = new URL(document.location.href);
+			if (kbparams.searchParams.get('token') != '') {
+				kbparams.searchParams.delete('token');
+				window.history.replaceState({}, document.title, kbparams);
+			}
+		} catch (error) {
+			//
+		}
+	</script>
 </body>
 
 </html>
