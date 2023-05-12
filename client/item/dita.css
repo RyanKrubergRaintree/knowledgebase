@@ -1,200 +1,208 @@
 .no-results-warning {
-	display: none;
+  display: none;
 }
 .no-results .no-results-warning {
-	display: block;
+  display: block;
 }
 
 .conversion-error {
-	height: 3rem;
-	line-height: 3rem;
-	text-align: center;
-	background: #f88;
-	font-weight: bold;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  background: #f88;
+  font-weight: bold;
 }
 
 .key {
-	font-weight: bold;
-	background-color : #666666;
-	color : #ffffff;
-	margin-left : 2px;
-	margin-right : 2px;
-	padding-left : 3px;
-	padding-right : 3px;
+  font-weight: bold;
+  background-color: #666666;
+  color: #ffffff;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
-.secright {}
+.secright {
+}
 .codeblock {
-	font-family: monospace;
-	white-space: pre;
-	overflow: auto;
-	background: #f0f0f0;
+  font-family: monospace;
+  white-space: pre;
+  overflow: auto;
+  background: #f0f0f0;
 }
 .codeph {
-	font-family: monospace;
+  font-family: monospace;
 }
 .filepath {
-	font-family: monospace;
+  font-family: monospace;
 }
 .msgph {
-	font-family: monospace;
+  font-family: monospace;
 }
 .uicontrol {
-	font-weight: bold;
+  font-weight: bold;
 }
 .wintitle {
-	font-weight: bold;
+  font-weight: bold;
 }
 .cmdname {
-	font-family: monospace;
+  font-family: monospace;
 }
 .shortcut {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 .reportitem {
-	font-weight: bold;
+  font-weight: bold;
 }
 .option {
-	font-family: monospace;
+  font-family: monospace;
 }
 .varname {
-	font-style: italic;
+  font-style: italic;
 }
 .imagemap .imagemap-tip {
-	color: #888;
-	font-size: 80%;
-	font-style: italic;
+  color: #888;
+  font-size: 80%;
+  font-style: italic;
 }
 
 .imagemap .imagemap-layers {
-	position: relative;
-	font-size: 0;
+  position: relative;
+  font-size: 0;
 }
 
 .imagemap .imagemap-overlay {
-	position: absolute;
-	padding: 0;	margin: 0;
-	left: 0; top: 0; right: 0; bottom: 0;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .imagemap .imagemap-overlay a {
-	display: block;
-	position: absolute;
+  display: block;
+  position: absolute;
 
-	padding: 0; margin: 0;
+  padding: 0;
+  margin: 0;
 
-	/* hack-fix for IE
+  /* hack-fix for IE
 	   IE ignores events from transparent A tags,
 	   use a image to supress this behavior
 	*/
-	background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+  background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
 
-	outline: 1px dashed #00f;
-	cursor: pointer;
+  outline: 1px dashed #00f;
+  cursor: pointer;
 
-	line-height: 100%;
-	text-align: center;
+  line-height: 100%;
+  text-align: center;
 
-	text-decoration: none;
+  text-decoration: none;
 }
 
 .sectiontitle {
-	font-size: 1.5em;
+  font-size: 1.5em;
 }
 
 div.figure > h2.sectiontitle {
-	font-size: 1em;
-	font-weight: normal;
+  font-size: 1em;
+  font-weight: normal;
 }
 
-div.figure > h2.sectiontitle::before{
-	content: "Figure: ";
+div.figure > h2.sectiontitle::before {
+  content: "Figure: ";
 }
 
 div.note > i {
-	vertical-align: top;
+  vertical-align: top;
 }
 
 div.note > span {
-	display: inline-block;
-	width: calc(100% - 24px);
-	vertical-align: top;
+  display: inline-block;
+  width: calc(100% - 24px);
+  vertical-align: top;
 }
 
 div.setting > h3 {
-	font-size: 1.4em;
-	font-family: monospace;
-	font-weight: bold;
+  font-size: 1.4em;
+  font-family: monospace;
+  font-weight: bold;
 }
 
 .settingbody {
-	margin-left: 2em;
+  margin-left: 2em;
 }
 
 .example {
-	border-style: solid;
-	border-width: thin;
-	border-color: #aaaaaa;
-	padding: 0 1em;
+  border-style: solid;
+  border-width: thin;
+  border-color: #aaaaaa;
+  padding: 0 1em;
 }
 
 ol.alpha {
-	list-style-type:lower-alpha;
+  list-style-type: lower-alpha;
 }
 
 /* Backwards compatibility */
 
 *[data-dita="note"]:before {
-	content: 'Note: ';
-	font-weight: bold;
+  content: "Note: ";
+  font-weight: bold;
 }
 *[data-dita="note"][type="tip"]:before {
-	content: 'Tip: ';
-	font-weight: bold;
+  content: "Tip: ";
+  font-weight: bold;
 }
 *[data-dita="note"][type="caution"]:before {
-	content: 'Caution! ';
-	font-weight: bold;
+  content: "Caution! ";
+  font-weight: bold;
 }
-*[data-dita="info"] {}
+*[data-dita="info"] {
+}
 *[data-dita="keystroke"] {
-	font-weight: bold;
-	background-color : #666666;
-	color : #ffffff;
-	margin-left : 2px;
-	margin-right : 2px;
-	padding-left : 3px;
-	padding-right : 3px;
+  font-weight: bold;
+  background-color: #666666;
+  color: #ffffff;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
-*[data-dita="secright"] {}
+*[data-dita="secright"] {
+}
 *[data-dita="codeblock"] {
-	font-family: monospace;
-	white-space: pre;
+  font-family: monospace;
+  white-space: pre;
 }
 *[data-dita="codeph"] {
-	font-family: monospace;
+  font-family: monospace;
 }
 *[data-dita="filepath"] {
-	font-family: monospace;
+  font-family: monospace;
 }
 *[data-dita="uicontrol"] {
-	font-weight: bold;
+  font-weight: bold;
 }
 *[data-dita="wintitle"] {
-	font-weight: bold;
+  font-weight: bold;
 }
 *[data-dita="cmdname"] {
-	font-family: monospace;
+  font-family: monospace;
 }
 *[data-dita="shortcut"] {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 *[data-dita="menucascade"] span:after {
-	content: ' >';
-	font-weight: normal;
+  content: " >";
+  font-weight: normal;
 }
 *[data-dita="menucascade"] span:last-of-type:after {
-	content: '';
+  content: "";
 }
 *[data-dita="step"][importance="optional"]:before {
-	content: '(Optional) ';
+  content: "(Optional) ";
 }
