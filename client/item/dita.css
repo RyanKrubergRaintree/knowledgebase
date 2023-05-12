@@ -1,6 +1,27 @@
+b,
+strong {
+  font-weight: bolder;
+}
+
+:link {
+  color: #0066cc;
+}
+
+li {
+  list-style-type: none;
+}
+
+li:before {
+  content: "\2022";
+  font-size: 16px;
+  padding-right: 0.5em;
+  margin-left: -0.8em;
+}
+
 .no-results-warning {
   display: none;
 }
+
 .no-results .no-results-warning {
   display: block;
 }
@@ -34,7 +55,7 @@
   font-family: monospace;
 }
 .filepath {
-  font-family: monospace;
+  font-family: Courier New, monospace;
 }
 .msgph {
   font-family: monospace;

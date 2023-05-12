@@ -83,6 +83,7 @@
   height: 100%;
   padding-right: 86px;
   background-color: transparent;
+  outline: none;
 }
 
 #header .search .search-filter {
