@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -14,6 +15,7 @@ import (
 	"time"
 )
 
+var addedFiles = make(map[string]bool)
 var ZIP *zip.Writer
 
 func check(err error) {
@@ -67,6 +69,10 @@ func main() {
 
 // filename with forward slashes
 func AddFile(filename string) {
+    if addedFiles[filename] {
+        return
+    }
+
 	fmt.Printf("  %-40s", filename)
 	defer fmt.Println("+")
 
@@ -78,6 +84,7 @@ func AddFile(filename string) {
 	check(err)
 	_, err = io.Copy(w, file)
 	check(err)
+	addedFiles[filename] = true
 }
 
 // glob with forward slashes
