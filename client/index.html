@@ -1,106 +1,109 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{{ Site.Title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>{{ Site.Title }}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- styles -->
+    <link rel="stylesheet" type="text/css" href="/client/assets/css/materialdesignicons.css" async />
+    <link href="/client/assets/roboto/all.css" rel="stylesheet" type="text/css" async />
 
-	<!-- styles -->
-	<link rel="stylesheet" type="text/css" href="/client/assets/css/materialdesignicons.css" async>
-	<link href='/client/assets/roboto/all.css' rel='stylesheet' type='text/css' async>
+    <script>
+      // Error handling (added for IE11 back comp debugging;)
+      window.onerror = function (msg, url, lineNo, columnNo, error) {
+        var string = msg.toLowerCase();
+        var substring = "script error";
+        if (string.indexOf(substring) > -1) {
+          console.log("Script Error: " + string);
+        } else {
+          var message = [
+            "Message: " + msg,
+            "URL: " + url,
+            "Line: " + lineNo,
+            "Column: " + columnNo,
+            "Error object: " + JSON.stringify(error),
+          ].join(" - ");
+          console.log(message);
+        }
+        // todo: Enable error displaying once the bug is fixed
+        return true;
+      };
+    </script>
 
-	<script>
-		// Error handling (added for IE11 back comp debugging;)
-		window.onerror = function (msg, url, lineNo, columnNo, error) {
-			var string = msg.toLowerCase();
-			var substring = 'script error';
-			if (string.indexOf(substring) > -1) {
-				console.log('Script Error: ' + string);
-			} else {
-				var message = [
-					'Message: ' + msg,
-					'URL: ' + url,
-					'Line: ' + lineNo,
-					'Column: ' + columnNo,
-					'Error object: ' + JSON.stringify(error)
-				].join(' - ');
+    <script src="/client/assets/js/es5.js"></script>
+    <script src="/client/assets/js/dom.js"></script>
+    <script src="/client/assets/js/global.js?{{Site.Version}}"></script>
+    {{ if Development }}
+    <script src="/client/assets/js/react.js?{{Site.Version}}"></script>
+    <script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
+    <script src="/client/assets/js/create-react-class.js?{{Site.Version}}"></script>
+    {{ else }}
+    <script src="/client/assets/js/react.min.js?{{Site.Version}}"></script>
+    <script src="/client/assets/js/react-dom.min.js?{{Site.Version}}"></script>
+    <script src="/client/assets/js/create-react-class.js?{{Site.Version}}"></script>
+    {{ end }}
+    <script src="/client/assets/js/kb.react.js?{{Site.Version}}"></script>
 
-				console.log(message);
-			}
+    <!-- icons -->
+    <link rel="icon" type="image/png" href="/client/assets/ico/24.png" sizes="24x24" />
+    <link rel="icon" type="image/png" href="/client/assets/ico/32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/client/assets/ico/64.png" sizes="64x64" />
+    <link rel="icon" type="image/png" href="/client/assets/ico/128.png" sizes="128x128" />
+    <link rel="icon" type="image/png" href="/client/assets/ico/256.png" sizes="256x256" />
+    <link rel="icon" type="image/png" href="/client/assets/ico/512.png" sizes="512x512" />
 
-			// todo: Enable error displaying once the bug is fixed
-			return true;
-		};
-	</script>
+    <link rel="shortcut icon" href="/client/assets/ico/favicon.ico" />
+  </head>
 
+  <body>
+    <div id="boot" class="application-starting"></div>
+    <script>
+      window.InitialSession = {{ InitialSession }};
+    </script>
+    <script>
+      // prettier-ignore
+      window.Provider = {};
+      {{ range $name, $provider := LoginProviders }}
+      window.Provider["{{$name}}"] = { type: "{{ printf "%T" $provider }}"}; {{ end }}
+    </script>
+    {{range LoginProviders}}{{.Boot}}{{end}}
+    <link rel="stylesheet" href="/client/~pkg.css?{{Site.Version}}" />
+    <script src="/client/~pkg.js?{{Site.Version}}"></script>
 
-	<script src="/client/assets/js/es5.js"></script>
-	<script src="/client/assets/js/dom.js"></script>
-	<script src="/client/assets/js/global.js?{{Site.Version}}"></script>
-	{{ if Development }}
-	<script src="/client/assets/js/react.js?{{Site.Version}}"></script>
-	<script src="/client/assets/js/react-dom.js?{{Site.Version}}"></script>
-	<script src="/client/assets/js/create-react-class.js?{{Site.Version}}"></script>
-	{{ else }}
-	<script src="/client/assets/js/react.min.js?{{Site.Version}}"></script>
-	<script src="/client/assets/js/react-dom.min.js?{{Site.Version}}"></script>
-	<script src="/client/assets/js/create-react-class.js?{{Site.Version}}"></script>
-	{{ end }}
-	<script src="/client/assets/js/kb.react.js?{{Site.Version}}"></script>
+    {{ if Site.TrackingID }}
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        (i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date());
+        (a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]);
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
 
-	<!-- icons -->
-	<link rel="icon" type="image/png" href="/client/assets/ico/24.png" sizes="24x24">
-	<link rel="icon" type="image/png" href="/client/assets/ico/32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="/client/assets/ico/64.png" sizes="64x64">
-	<link rel="icon" type="image/png" href="/client/assets/ico/128.png" sizes="128x128">
-	<link rel="icon" type="image/png" href="/client/assets/ico/256.png" sizes="256x256">
-	<link rel="icon" type="image/png" href="/client/assets/ico/512.png" sizes="512x512">
+      ga("create", "{{Site.TrackingID}}", "auto");
+      ga("send", "pageview");
+    </script>
+    {{ end }}
 
-	<link rel="shortcut icon" href="/client/assets/ico/favicon.ico">
-</head>
-
-<body>
-	<div id="boot" class="application-starting"></div>
-	<script>
-		window.InitialSession = {{ InitialSession }};
-	</script>
-	<script>
-		window.Provider = {};
-		{ { range $name, $provider := LoginProviders } }
-		window.Provider["{{$name}}"] = { type: "{{ printf " % T" $provider }}"}; { { end } }
-	</script>
-	{{range LoginProviders}}{{.Boot}}{{end}}
-	<link rel="stylesheet" href="/client/~pkg.css?{{Site.Version}}">
-	<script src="/client/~pkg.js?{{Site.Version}}"></script>
-
-	{{ if Site.TrackingID }}
-	<script>
-		(function (i, s, o, g, r, a, m) {
-			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-				(i[r].q = i[r].q || []).push(arguments)
-			}, i[r].l = 1 * new Date(); a = s.createElement(o),
-				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-		})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-		ga('create', '{{Site.TrackingID}}', 'auto');
-		ga('send', 'pageview');
-	</script>
-	{{ end }}
-
-	<script>
-		// Delete the token param which is used by Web Client during auto-login
-		try {
-			let kbparams = new URL(document.location.href);
-			if (kbparams.searchParams.get('token') != '') {
-				kbparams.searchParams.delete('token');
-				window.history.replaceState({}, document.title, kbparams);
-			}
-		} catch (error) {
-			//
-		}
-	</script>
-</body>
-
+    <script>
+      // Delete the token param which is used by Web Client during auto-login
+      try {
+        let kbparams = new URL(document.location.href);
+        if (kbparams.searchParams.get("token") != "") {
+          kbparams.searchParams.delete("token");
+          window.history.replaceState({}, document.title, kbparams);
+        }
+      } catch (error) {
+        //
+      }
+    </script>
+  </body>
 </html>
