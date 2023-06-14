@@ -5,12 +5,14 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"net/url"
+	"os"
+	"strconv"
 	"time"
 )
 
 var (
 	// Maximum skew in times between servers
-	MaxRequestSkew = 4 * time.Minute
+	MaxRequestSkew = time.Duration(GetEnvInt("MAX_REQUEST_SKEW", 4)) * time.Minute
 	// Maximum authorization field size
 	MaxAuthorizationSize = 10 << 10
 )
@@ -99,4 +101,17 @@ func SerializeValues(values ...string) []byte {
 		r = append(r, '\n')
 	}
 	return r
+}
+
+func GetEnvInt(key string, defaultValue int) int {
+	value, ok := os.LookupEnv(key)
+	if !ok {
+		return defaultValue
+	}
+	result, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultValue
+	}
+
+	return result
 }
