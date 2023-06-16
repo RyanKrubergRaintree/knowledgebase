@@ -1,6 +1,7 @@
 package lms
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -51,6 +52,9 @@ func (mod *Module) init() {
 	mod.router.HandleFunc("/lms=/uploadVideo/", mod.uploadVideo).Methods("POST")
 	mod.router.HandleFunc("/lms=/uploadVideo/", mod.getSignedVideoLink).Methods("GET")
 	mod.router.HandleFunc("/lms=/deleteVideo/", mod.deleteVideo).Methods("POST")
+	mod.router.HandleFunc("/lms=/uploadImage/", mod.uploadImage).Methods("POST")     // public image for Grape JS
+	mod.router.HandleFunc("/lms=/uploadImage/", mod.getUploadedFiles).Methods("GET") // list all existing files
+	mod.router.HandleFunc("/lms=/uploadImage/", mod.deleteImage).Methods("DELETE")
 }
 
 type lessonData struct {
@@ -70,14 +74,14 @@ func (mod *Module) handler(w http.ResponseWriter, r *http.Request) {
 		<title>-</title>
 	</head>
 	<body>
-		<iframe 
-			src="{{.URI}}" 
-			width="100%" 
-			height="670px" 
-			frameborder="0" 
+		<iframe
+			src="{{.URI}}"
+			width="100%"
+			height="670px"
+			frameborder="0"
 			allowfullscreen="true"
 			referrerpolicy="same-origin">
-		</iframe >	
+		</iframe >
 	</body>
 </html>`
 	if strings.HasPrefix(r.URL.RawQuery, "id=") {
@@ -147,6 +151,22 @@ func (mod *Module) getLessonList(w http.ResponseWriter, r *http.Request) {
 	ListLessonsFromBucket(w)
 }
 
+func (mod *Module) getUploadedFiles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	customer := r.FormValue("customer")
+	database := r.FormValue("database")
+
+	if strings.TrimSpace(customer) == "" || strings.TrimSpace(database) == "" {
+		kb.WriteResult(w, errors.New("Client name or database missing"))
+		return
+	}
+
+	path := "customers/" + customer + "/" + database + "/"
+
+	ListFilesForGivenBucketAndPath("", path, w)
+}
+
 func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
 	err, fileNameWithPath := saveFileFromHttpRequestToServer(r)
 	if err != nil {
@@ -161,6 +181,33 @@ func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = os.Remove(fileNameWithPath)
+}
+
+func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	err, fileNameWithPath := saveImageFileFromHttpRequestToServer(r)
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
+	defer os.Remove(fileNameWithPath)
+
+	customer := r.PostFormValue("customer")
+	database := r.PostFormValue("database")
+	filename := r.PostFormValue("filename")
+	err, fileNameWithPathInS3 := uploadImageFromServerToS3(customer, database, filename, fileNameWithPath)
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
+	fmt.Fprintf(w, fileNameWithPathInS3)
+}
+
+func (mod *Module) deleteImage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	fmt.Fprintf(w, deleteFileFromS3(r.FormValue("link"), ""))
 }
 
 // todo: return nil if req. values are empty?

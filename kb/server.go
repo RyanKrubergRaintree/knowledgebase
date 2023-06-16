@@ -57,6 +57,16 @@ func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool)
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	// handle pre-flight request for LMS
+	// todo: configuration file for whitelisting origins?
+	if (*r).Method == "OPTIONS" && strings.HasPrefix((*r).RequestURI, "/lms=/uploadImage/") {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "X-Auth-Token")
+		return
+	}
+
 	user, ok := server.login(w, r)
 	if !ok {
 		return

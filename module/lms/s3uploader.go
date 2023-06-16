@@ -68,6 +68,38 @@ func deleteVideoFileFromS3(key, bucket string) string {
 	return "OK"
 }
 
+// todo: return 200 / 40* / 500, refactor video delete logic to use this
+// Deletes single file from S3
+func deleteFileFromS3(key, bucket string) string {
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(getEnvWithDefault("AWS_REGION", "us-east-1"))})
+	if err != nil {
+		return ""
+	}
+	svc := s3.New(sess)
+
+	if bucket == "" {
+		bucket = getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	}
+
+	prefix := "https://" + bucket + ".s3.amazonaws.com/"
+	key = strings.Replace(key, prefix, "", -1)
+
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucket), Key: aws.String(key)})
+	if err != nil {
+		return "Unable to delete given object"
+	}
+
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "Unable to delete given object"
+	}
+
+	return "OK"
+}
+
 // Uploads single file from the server; Returns S3 path if successful
 func uploadFileFromServerToS3(fileNameWithPath string) (error, string) {
 	fileExtension := strings.ToUpper(filepath.Ext(fileNameWithPath))
@@ -168,6 +200,19 @@ func uploadSingleFileToS3(destinations3Path, fileNameWithPath, bucket string) (e
 	return nil, uploadedFilePath
 }
 
+// Grape JS image uploading to [bucket]/customer/database/year/[filename];
+// Returns S3 path if request was successful
+func uploadImageFromServerToS3(clientname, database, filename, sourceFile string) (error, string) {
+	if strings.TrimSpace(clientname) == "" || strings.TrimSpace(database) == "" || strings.TrimSpace(sourceFile) == "" || strings.TrimSpace(filename) == "" {
+		return errors.New("Client name, database, file name or file data missing"), ""
+	}
+
+	year := strconv.Itoa(time.Now().Year())
+	path := "customers/" + clientname + "/" + database + "/" + year + "/" + filename
+
+	return uploadSingleFileToS3(path, sourceFile, "")
+}
+
 func getContentType(fileNameWithPath string) *string {
 
 	fileExtension := strings.ToUpper(filepath.Ext(fileNameWithPath))
@@ -207,6 +252,7 @@ func getTempPath(append string) string {
 	return filepath.FromSlash(workingDir)
 }
 
+// todo: refactor to use general func
 func ListLessonsFromBucket(w http.ResponseWriter) {
 	bucket := getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
 	defaultRegion := getEnvWithDefault("AWS_REGION", "us-east-1")
@@ -259,6 +305,55 @@ func ListLessonsFromBucket(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
+// bucket access needs to be verified; although listing files != file access
+func ListFilesForGivenBucketAndPath(bucket, path string, w http.ResponseWriter) {
+	if bucket == "" {
+		bucket = getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+	}
+
+	defaultRegion := getEnvWithDefault("AWS_REGION", "us-east-1")
+
+	// Init session and service. Uses ENV variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
+	sess, err1 := session.NewSession(&aws.Config{Region: aws.String(defaultRegion)})
+	if err1 != nil {
+		fmt.Fprintf(w, "Unable to list items from bucket %q, %v", bucket, err1)
+		return
+	}
+	svc := s3.New(sess)
+
+	params := &s3.ListObjectsInput{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(path),
+	}
+
+	var result struct {
+		Uploads []string `json:"uploads"`
+	}
+
+	err := svc.ListObjectsPages(params,
+		func(response *s3.ListObjectsOutput, lastPage bool) bool {
+
+			for _, item := range response.Contents {
+				result.Uploads = append(result.Uploads, "https://"+bucket+".s3.amazonaws.com/"+*item.Key)
+			}
+			// continue with the next page
+			return true
+		})
+
+	if err != nil {
+		fmt.Fprintf(w, "Unable to list all items from bucket %q, %v", bucket, err)
+		return
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		kb.WriteResult(w, err)
+	}
+
+	w.Write(data)
+	w.Header().Set("Content-Type", "application/json")
+}
+
 // Saves single(first) file from http request to temp folder. Expects form key to be "file".
 // on success returns full path to the received file
 // todo: return 400 in case input was invalid
@@ -284,6 +379,32 @@ func saveFileFromHttpRequestToServer(r *http.Request) (error, string) {
 	defer f.Close()
 
 	log.Println("HTTP -> Server upload complete. Received file: " + fileHeader.Filename)
+	return nil, fileNameWithPath
+}
+
+// Grape JS; TODO: simultaneous uploads with same file name?
+func saveImageFileFromHttpRequestToServer(r *http.Request) (error, string) {
+	image := r.PostFormValue("image")
+	filename := r.PostFormValue("filename")
+
+	if image == "" || filename == "" {
+		return errors.New("File name or image missing."), ""
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(image)
+	if err != nil {
+		return err, ""
+	}
+
+	fileNameWithPath := getTempPath(filename)
+
+	f, err := os.Create(fileNameWithPath)
+	defer f.Close()
+	if err != nil {
+		return err, ""
+	}
+	f.Write(decoded)
+
 	return nil, fileNameWithPath
 }
 
@@ -347,7 +468,7 @@ func createBucket(bucketName string) error {
 	svc := s3.New(sess)
 
 	_, err = svc.CreateBucket(&s3.CreateBucketInput{
-		Bucket: aws.String("rt-videos-" + bucketName),
+		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
 		return err
