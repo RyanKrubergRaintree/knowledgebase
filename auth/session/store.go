@@ -43,6 +43,7 @@ type Info struct {
 
 	Creation   time.Time
 	LastAccess time.Time
+	pages      []kb.Slug // used by Web Client (API login) to remember which page it should open after F1 is pressed
 }
 
 type Store struct {
@@ -116,4 +117,31 @@ func (store *Store) Delete(token Token) {
 	store.mu.Lock()
 	delete(store.entries, token)
 	store.mu.Unlock()
+}
+
+// could be generic in the future (set any session value by Key)
+func (store *Store) SetPageToShowAfterLogin(token Token, pages []kb.Slug) {
+	var info *Info
+
+	store.mu.Lock()
+	info, ok := store.entries[token]
+	if ok {
+		info.LastAccess = time.Now()
+		info.pages = pages
+	}
+	store.mu.Unlock()
+}
+
+func (store *Store) GetPageToShowAfterLogin(token Token) (pages []kb.Slug) {
+	var info *Info
+
+	store.mu.Lock()
+	info, ok := store.entries[token]
+	if ok {
+		info.LastAccess = time.Now()
+		pages = info.pages
+	}
+	store.mu.Unlock()
+
+	return pages
 }

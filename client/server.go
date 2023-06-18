@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"html/template"
 	"log"
@@ -100,33 +101,96 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.URL.Path == "/favicon.ico":
-		http.ServeFile(w, r, filepath.Join(server.dir, "assets", "ico", "favicon.ico"))
-	case r.URL.Path == "/":
-		server.index(w, r)
-	case r.URL.Path == "/apilogin":
-		server.apiLogin(w, r)
-	case strings.HasPrefix(r.URL.Path, "/assets/"):
-		server.assets.ServeHTTP(w, r)
-	default:
-		server.client.ServeHTTP(w, r)
+	token := strings.TrimSpace(r.FormValue("token"))
+	if token != "" {
+		server.loginUsingTokenFromURL(w, r, token)
+	} else {
+		switch {
+		case r.URL.Path == "/favicon.ico":
+			http.ServeFile(w, r, filepath.Join(server.dir, "assets", "ico", "favicon.ico"))
+		case r.URL.Path == "/":
+			server.index(w, r)
+		case r.URL.Path == "/apilogin":
+			server.apiLogin(w, r)
+		case strings.HasPrefix(r.URL.Path, "/assets/"):
+			server.assets.ServeHTTP(w, r)
+		default:
+			server.client.ServeHTTP(w, r)
+		}
 	}
 }
 
+// rtAgent requests a token that can be used to log in a Web Client session
 func (server *Server) apiLogin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	session, err := server.Login.SessionFromHeader(r)
+	sess, err := server.Login.SessionFromHeader(r)
+	if err == auth.ErrTimeSkewed {
+		http.Error(w, errTimeSkewedMessage, http.StatusUnauthorized)
+		return
+	}
+
+	if sess == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// token will be sent back via query param
+	token := base64.URLEncoding.EncodeToString([]byte(sess.Token))
+
+	json.NewEncoder(w).Encode(token)
+}
+
+// Web Client logs in with the token obtained from the agent earlier
+func (server *Server) loginUsingTokenFromURL(w http.ResponseWriter, r *http.Request, token string) {
+	base64token, err1 := base64.URLEncoding.DecodeString(token)
+	if err1 != nil {
+		http.Error(w, "Invalid token.", http.StatusUnauthorized)
+		return
+	}
+
+	r.Header.Set("X-Auth-Token", string(base64token))
+
+	session, err := server.Login.SessionFromToken(r)
 	if err == auth.ErrTimeSkewed {
 		http.Error(w, errTimeSkewedMessage, http.StatusUnauthorized)
 		return
 	}
 
 	if session == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	json.NewEncoder(w).Encode(session.Token)
+	ts, err := template.New("").Funcs(
+		template.FuncMap{
+			"Development": func() bool { return server.development },
+			"Site":        func() Info { return server.Info },
+			"InitialSession": func() template.JS {
+				if err != nil {
+					return "null"
+				}
+
+				data, _ := json.Marshal(session)
+				return template.JS(data)
+			},
+			"LoginProviders": func() interface{} {
+				return server.Login.Provider
+			},
+		},
+	).ParseGlob(server.bootstrap)
+
+	if err != nil {
+		log.Printf("Error parsing templates: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("X-UA-Compatible", "IE=edge")
+
+	if err := ts.ExecuteTemplate(w, "index.html", nil); err != nil {
+		log.Printf("Error executing template: %s", err)
+		return
+	}
+
 }

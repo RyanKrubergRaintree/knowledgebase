@@ -199,6 +199,41 @@ func (server *Server) SessionFromHeader(r *http.Request) (*SessionInfo, error) {
 		}
 	}
 
+	if r.RequestURI == "/apilogin" {
+		server.Sessions.SetPageToShowAfterLogin(token, slugs)
+	}
+
+	return &SessionInfo{
+		User:   user,
+		Token:  token.String(),
+		Pages:  slugs,
+		Params: params,
+	}, nil
+}
+
+func (server *Server) SessionFromToken(r *http.Request) (*SessionInfo, error) {
+	token, err := session.TokenFromString(r.Header.Get("X-Auth-Token"))
+	if err != nil {
+		return nil, err
+	}
+
+	user, ok := server.Sessions.Load(token)
+	if !ok {
+		return nil, errors.New("Session expired.")
+	}
+
+	slugs := server.Sessions.GetPageToShowAfterLogin(token)
+	// prevent re-using the login token by re-generating it
+	server.Sessions.Delete(token)
+	token, err = server.Sessions.New(user)
+	if err != nil {
+		return nil, errors.New("Could not re-generate the token.")
+	}
+	server.Sessions.SetPageToShowAfterLogin(token, slugs)
+	params := make(map[string]string)
+
+	slugs = server.Sessions.GetPageToShowAfterLogin(token)
+
 	return &SessionInfo{
 		User:   user,
 		Token:  token.String(),

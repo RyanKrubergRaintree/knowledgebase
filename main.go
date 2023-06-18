@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/raintreeinc/knowledgebase/auth"
@@ -182,7 +183,8 @@ func main() {
 			return
 		}
 
-		if r.URL.Path == "/" || r.URL.Path == "/apilogin" {
+		token := strings.TrimSpace(r.FormValue("token"))
+		if r.URL.Path == "/" || r.URL.Path == "/apilogin" || token != "" {
 			clientServer.ServeHTTP(w, r)
 			return
 		}
