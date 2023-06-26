@@ -8,13 +8,13 @@ strong {
   color: #0066cc;
 }
 
-li {
+ul li {
   list-style-type: none;
 }
 
-li:before {
+ul li:before {
   content: "\2022";
-  font-size: 16px;
+  font-size: 14px;
   padding-right: 0.5em;
   margin-left: -0.8em;
 }
