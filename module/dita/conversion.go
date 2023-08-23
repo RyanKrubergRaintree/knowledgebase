@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	maxPageSize         = 1 << 20 // 1MB
-	recommendedPageSize = 1 << 19 // 0.5MB
+	maxPageSize         = 1 << 21 // 2MB
+	recommendedPageSize = 1 << 20 // 1MB
 )
 
 type Conversion struct {
