@@ -11,6 +11,8 @@ import (
 
 	"github.com/raintreeinc/livepkg"
 
+	"github.com/raintreeinc/knowledgebase/kb"
+
 	"github.com/raintreeinc/knowledgebase/auth"
 )
 
@@ -101,6 +103,8 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	kb.AddCommonHeaders(w)
+
 	token := strings.TrimSpace(r.FormValue("token"))
 	if token != "" {
 		server.loginUsingTokenFromURL(w, r, token)

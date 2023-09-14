@@ -57,6 +57,7 @@ func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool)
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	AddCommonHeaders(w)
 
 	// handle pre-flight request for LMS
 	// todo: configuration file for whitelisting origins?
@@ -337,3 +338,43 @@ func (p *Page) WriteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	return p.Write(w)
 }
+
+func AddCommonHeaders(w http.ResponseWriter) {
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+	w.Header().Set("Content-Security-Policy", `
+		default-src
+			'self'
+			'unsafe-inline';
+		script-src
+			'self'
+			'unsafe-inline'
+			https://www.googletagmanager.com
+			*.google-analytics.com
+			*.google.com
+			*.googleapis.com;
+		connect-src
+			'self'
+			*.google-analytics.com
+			*.google.com
+			*.googleapis.com;
+		frame-src
+			'self'
+			*.google.com;
+		font-src
+			'self'
+			fonts.gstatic.com;
+		style-src
+			'self'
+			'unsafe-inline'
+			fonts.googleapis.com;
+		img-src
+			'self'
+			'unsafe-inline'
+			data:
+			https://*;
+		media-src
+			* blob:;
+		`)
+}
+
