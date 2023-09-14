@@ -10,5 +10,5 @@ require (
 	github.com/raintreeinc/ditaconvert v0.0.0-20220201125848-c13b88d74d0c
 	github.com/raintreeinc/livepkg v0.0.0-20161201131350-8d1ab99c52af
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/net v0.7.0 // indirect
 )
