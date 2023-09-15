@@ -359,11 +359,13 @@ func getNonce() string {
 
 func AddCSPHeader(w http.ResponseWriter) string {
 	// sha256 is for https://apis.google.com/js/platform.js
+	// 'unsafe-inline' is present for back-comp reasons (ignored by browsers supporting nonces/hashes).
     CSPTemplate := `
 		default-src
 			'self';
 		script-src
 			'self'
+			'unsafe-inline'
 			'nonce-%s'
 			'sha256-0LjTTmOvpWMJbo1V4agDu9F+Lhv28WhMGI6o7CJMsVI='
 			*.google-analytics.com
@@ -393,6 +395,8 @@ func AddCSPHeader(w http.ResponseWriter) string {
 		media-src
 			* blob:;
 		base-uri
+			'none';
+		object-src
 			'none';
 		`
 	nonce := getNonce()
