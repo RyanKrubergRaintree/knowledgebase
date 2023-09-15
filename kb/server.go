@@ -1,9 +1,11 @@
 package kb
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -340,19 +342,34 @@ func (p *Page) WriteResponse(w http.ResponseWriter) error {
 }
 
 func AddCommonHeaders(w http.ResponseWriter) {
+	w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-	w.Header().Set("Content-Security-Policy", `
+}
+
+func getNonce() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		log.Printf("Failed to generate random bytes: %v", err)
+	}
+
+	return base64.URLEncoding.EncodeToString(b)
+}
+
+func AddCSPHeader(w http.ResponseWriter) string {
+	// sha256 is for https://apis.google.com/js/platform.js
+    CSPTemplate := `
 		default-src
-			'self'
-			'unsafe-inline';
+			'self';
 		script-src
 			'self'
-			'unsafe-inline'
-			https://www.googletagmanager.com
+			'nonce-%s'
+			'sha256-0LjTTmOvpWMJbo1V4agDu9F+Lhv28WhMGI6o7CJMsVI='
 			*.google-analytics.com
 			*.google.com
-			*.googleapis.com;
+			*.googleapis.com
+			*.apis.google.com;
 		connect-src
 			'self'
 			*.google-analytics.com
@@ -375,6 +392,13 @@ func AddCommonHeaders(w http.ResponseWriter) {
 			https://*;
 		media-src
 			* blob:;
-		`)
+		base-uri
+			'none';
+		`
+	nonce := getNonce()
+	w.Header().Set("Content-Security-Policy", fmt.Sprintf(CSPTemplate, nonce))
+
+	return nonce
 }
+
 

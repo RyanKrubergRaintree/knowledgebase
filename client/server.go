@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -70,8 +71,14 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nonce := kb.AddCSPHeader(w)
+	CSPNonce := fmt.Sprintf("%s", string(nonce))
+
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
+			"CSPNonce": func() template.HTMLAttr {
+				return template.HTMLAttr(CSPNonce)
+			},
 			"Development": func() bool { return server.development },
 			"Site":        func() Info { return server.Info },
 			"InitialSession": func() template.JS {
