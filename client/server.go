@@ -173,8 +173,14 @@ func (server *Server) loginUsingTokenFromURL(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	nonce := kb.AddCSPHeader(w)
+	CSPNonce := fmt.Sprintf("%s", string(nonce))
+
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
+			"CSPNonce": func() template.HTMLAttr {
+				return template.HTMLAttr(CSPNonce)
+			},
 			"Development": func() bool { return server.development },
 			"Site":        func() Info { return server.Info },
 			"InitialSession": func() template.JS {

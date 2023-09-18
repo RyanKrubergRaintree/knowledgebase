@@ -368,6 +368,7 @@ func AddCSPHeader(w http.ResponseWriter) string {
 			'unsafe-inline'
 			'nonce-%s'
 			'sha256-0LjTTmOvpWMJbo1V4agDu9F+Lhv28WhMGI6o7CJMsVI='
+			https://*.gstatic.com
 			*.google-analytics.com
 			*.google.com
 			*.googleapis.com
