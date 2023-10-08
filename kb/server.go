@@ -398,7 +398,11 @@ func AddCSPHeader(w http.ResponseWriter) string {
 		base-uri
 			'none';
 		object-src
-			'none';
+			'self'
+			*.raintreeinc.com;
+		frame-ancestors
+			'self'
+			*.raintreeinc.com;
 		`
 	nonce := getNonce()
 	w.Header().Set("Content-Security-Policy", fmt.Sprintf(CSPTemplate, nonce))
