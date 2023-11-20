@@ -2,7 +2,6 @@ package lms
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/uuid"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -57,17 +55,13 @@ func unzipAndUploadH5P(fileNameWithPath string) (string, error) {
 
 
 func listLessonsFromBucket(w http.ResponseWriter) {
-	bucket := utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
-	defaultRegion := utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion)
-
-	// Init session and service. Uses ENV variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
-	sess, err1 := session.NewSession(&aws.Config{Region: aws.String(defaultRegion)})
-	if err1 != nil {
-		fmt.Fprintf(w, "Unable to list items from bucket %q, %v", bucket, err1)
+	s3Client, err := getS3Client()
+	if err != nil {
+		kb.WriteResult(w, err)
 		return
 	}
-	svc := s3.New(sess)
 
+	bucket := utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String("H5P/lessons"),
@@ -77,7 +71,7 @@ func listLessonsFromBucket(w http.ResponseWriter) {
 		Lessons []string `json:"lessons"`
 	}
 
-	err := svc.ListObjectsPages(params,
+	err = s3Client.ListObjectsPages(params,
 		func(response *s3.ListObjectsOutput, lastPage bool) bool {
 			// Match URL-s up to lesson ID
 			re := regexp.MustCompile(`^.+([/]{2}).+?([/]{1}).+?([/]{1}).+?([/]{1}).+?([/]{1})`)
@@ -95,7 +89,7 @@ func listLessonsFromBucket(w http.ResponseWriter) {
 		})
 
 	if err != nil {
-		fmt.Fprintf(w, "Unable to list all items from bucket %q, %v", bucket, err)
+		kb.WriteResult(w, err)
 		return
 	}
 

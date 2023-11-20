@@ -76,3 +76,16 @@ func createBucket(bucketName string) error {
 
 	return nil
 }
+
+
+// creates a new S3 client and returns it along with any error.
+func getS3Client() (*s3.S3, error) {
+	session, err := session.NewSession(&aws.Config{
+		Region: aws.String(utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion)),
+	})
+	if err != nil {
+		return nil, kb.ErrUnableToCreateS3Session
+	}
+
+	return s3.New(session), nil
+}

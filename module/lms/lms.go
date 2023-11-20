@@ -1,7 +1,6 @@
 package lms
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -37,7 +36,7 @@ func (mod *Module) Info() kb.Group {
 		ID:          "lms",
 		Name:        "LMS",
 		Public:      true,
-		Description: "Learning managament system",
+		Description: "Learning management system",
 	}
 }
 
@@ -63,10 +62,9 @@ type lessonData struct {
 	URI      string
 }
 
-// todo
+
 // Handle HTTP request to either static file server or REST server (URL start with "api/")
 func (mod *Module) handler(w http.ResponseWriter, r *http.Request) {
-	// todo: full heigh, need to wrap to div?
 	const lessonTemplate = `
 <!DOCTYPE html>
 <html>
@@ -86,7 +84,7 @@ func (mod *Module) handler(w http.ResponseWriter, r *http.Request) {
 	</body>
 </html>`
 	if strings.HasPrefix(r.URL.RawQuery, "id=") {
-		// todo: validate empty & existence, extract to func
+
 		lessonID := strings.Replace(r.URL.RawQuery, "id=", "", 1)
 		bucket := utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
 		uri := "https://" + bucket + ".s3.amazonaws.com/H5P/lessons/" + lessonID + "/template.html"
@@ -105,9 +103,6 @@ func (mod *Module) handler(w http.ResponseWriter, r *http.Request) {
 
 		err = t.Execute(w, lesson)
 		check(err)
-
-		// todo: send back iframe;
-		// start by sending back just 1 existing page from DB
 	} else {
 		// define your static file directory
 		staticFilePath := "./client/LMS.html"
@@ -149,6 +144,7 @@ func (mod *Module) Pages() []kb.PageEntry {
 
 func (mod *Module) getLessonList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
 	listLessonsFromBucket(w)
 }
 
@@ -159,7 +155,7 @@ func (mod *Module) getUploadedFiles(w http.ResponseWriter, r *http.Request) {
 	database := r.FormValue("database")
 
 	if strings.TrimSpace(customer) == "" || strings.TrimSpace(database) == "" {
-		kb.WriteResult(w, errors.New("client name or database missing"))
+		kb.WriteResult(w, kb.ErrBadRequest)
 		return
 	}
 
