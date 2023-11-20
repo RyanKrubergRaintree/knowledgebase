@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/raintreeinc/knowledgebase/kb"
+	"github.com/raintreeinc/knowledgebase/utils"
 )
 
 var _ kb.Module = &Module{}
@@ -87,7 +88,7 @@ func (mod *Module) handler(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.RawQuery, "id=") {
 		// todo: validate empty & existence, extract to func
 		lessonID := strings.Replace(r.URL.RawQuery, "id=", "", 1)
-		bucket := getEnvWithDefault("AWS_KB_BUCKET", "rt-knowledge-base-dev")
+		bucket := utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
 		uri := "https://" + bucket + ".s3.amazonaws.com/H5P/lessons/" + lessonID + "/template.html"
 
 		w.Header().Set("Content-Type", "application/json") //MIME to application/json
@@ -148,7 +149,7 @@ func (mod *Module) Pages() []kb.PageEntry {
 
 func (mod *Module) getLessonList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	ListLessonsFromBucket(w)
+	listLessonsFromBucket(w)
 }
 
 func (mod *Module) getUploadedFiles(w http.ResponseWriter, r *http.Request) {
@@ -158,26 +159,26 @@ func (mod *Module) getUploadedFiles(w http.ResponseWriter, r *http.Request) {
 	database := r.FormValue("database")
 
 	if strings.TrimSpace(customer) == "" || strings.TrimSpace(database) == "" {
-		kb.WriteResult(w, errors.New("Client name or database missing"))
+		kb.WriteResult(w, errors.New("client name or database missing"))
 		return
 	}
 
 	path := "customers/" + customer + "/" + database + "/"
 
-	ListFilesForGivenBucketAndPath("", path, w)
+	listFilesForGivenBucketAndPath("", path, w)
 }
 
 func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
-	err, fileNameWithPath := saveFileFromHttpRequestToServer(r)
+	fileNameWithPath, err := saveFileFromHttpRequestToServer(r)
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
 	}
 
-	if uploadError, uploadedFilePath := uploadFileFromServerToS3(fileNameWithPath); uploadError == nil {
-		fmt.Fprintf(w, uploadedFilePath)
+	if uploadedFilePath, uploadError := uploadFileFromServerToS3(fileNameWithPath); uploadError == nil {
+		fmt.Fprint(w, uploadedFilePath)
 	} else {
-		fmt.Fprintf(w, uploadError.Error())
+		kb.WriteResult(w, uploadError)
 	}
 
 	_ = os.Remove(fileNameWithPath)
@@ -186,7 +187,7 @@ func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
 func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	err, fileNameWithPath := saveImageFileFromHttpRequestToServer(r)
+	fileNameWithPath, err := saveImageFileFromHttpRequestToServer(r)
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
@@ -196,46 +197,46 @@ func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
 	customer := r.PostFormValue("customer")
 	database := r.PostFormValue("database")
 	filename := r.PostFormValue("filename")
-	err, fileNameWithPathInS3 := uploadImageFromServerToS3(customer, database, filename, fileNameWithPath)
+	fileNameWithPathInS3, err := uploadImageFromServerToS3(customer, database, filename, fileNameWithPath)
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
 	}
-	fmt.Fprintf(w, fileNameWithPathInS3)
+
+	fmt.Fprint(w, fileNameWithPathInS3)
 }
 
 func (mod *Module) deleteImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	fmt.Fprintf(w, deleteFileFromS3(r.FormValue("link"), ""))
+	kb.WriteResult(w, deleteFileFromS3(r.FormValue("link"), ""))
 }
 
 // todo: return nil if req. values are empty?
 func (mod *Module) uploadVideo(w http.ResponseWriter, r *http.Request) {
-	err, fileNameWithPath := saveFileFromHttpRequestToServer(r)
+	fileNameWithPath, err := saveFileFromHttpRequestToServer(r)
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
 	}
+	defer os.Remove(fileNameWithPath)
 
 	environment := r.FormValue("environment")
 	clientID := r.FormValue("clientID")
 	guid := r.FormValue("guid")
-	if uploadError, uploadedFilePath := uploadVideoFileFromServerToS3(fileNameWithPath, clientID, environment, guid); uploadError == nil {
-		fmt.Fprintf(w, uploadedFilePath)
+	if uploadedFilePath, uploadError := uploadVideoFileFromServerToS3(fileNameWithPath, clientID, environment, guid); uploadError == nil {
+		fmt.Fprint(w, uploadedFilePath)
 	} else {
-		fmt.Fprintf(w, uploadError.Error())
+		kb.WriteResult(w, uploadError)
 	}
-
-	_ = os.Remove(fileNameWithPath)
 }
 
 func (mod *Module) getSignedVideoLink(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, getSignedLink(r.FormValue("key"), "rt-kb-videos"))
+	fmt.Fprint(w, getSignedLink(r.FormValue("key"), "rt-kb-videos"))
 }
 
 func (mod *Module) deleteVideo(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, deleteVideoFileFromS3(r.FormValue("key"), "rt-kb-videos"))
+	kb.WriteResult(w, deleteFileFromS3(r.FormValue("key"), "rt-kb-videos"))
 }
 
 func check(err error) {

@@ -329,7 +329,9 @@ func WriteResult(w http.ResponseWriter, err error) {
 		w.WriteHeader(http.StatusOK)
 	case ErrPageExists:
 		http.Error(w, err.Error(), http.StatusForbidden)
-	case ErrPageNotExist:
+	case ErrBadRequest:
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	case ErrPageNotExist, ErrDoesNotExist:
 		http.Error(w, err.Error(), http.StatusNotFound)
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
