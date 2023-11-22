@@ -205,6 +205,12 @@ func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
 
 func (mod *Module) deleteImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if r.FormValue("link") == "" {
+		kb.WriteResult(w, kb.ErrDoesNotExist)
+		return
+	}
+
 	kb.WriteResult(w, deleteFileFromS3(r.FormValue("link"), ""))
 }
 
