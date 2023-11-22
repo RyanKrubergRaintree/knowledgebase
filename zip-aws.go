@@ -41,7 +41,7 @@ func run(name string, args ...string) error {
 func build() {
 	check(run("go", "build", "-v", "-o", filepath.Join(".bin", "run"), "."))
 	AddDir(".bin")
-	AddDir(".ebextensions")
+	AddDir(".platform")
 
 	AddGlob("*.json")
 	AddGlob("Docker*")
