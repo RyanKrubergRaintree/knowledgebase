@@ -2,6 +2,7 @@ package lms
 
 import (
 	"encoding/base64"
+	"net/http"
 	"strings"
 	"time"
 
@@ -12,12 +13,11 @@ import (
 	"github.com/raintreeinc/knowledgebase/utils"
 )
 
-func getSignedLink(key, bucket string) string {
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion))})
+func getSignedLink(key, bucket string,  w http.ResponseWriter) (string, error) {
+	s3Client, err := getS3Client()
 	if err != nil {
-		return ""
+		return "", err
 	}
-	svc := s3.New(sess)
 
 	if bucket == "" {
 		bucket = utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
@@ -26,17 +26,17 @@ func getSignedLink(key, bucket string) string {
 	prefix := "https://" + bucket + ".s3.amazonaws.com/"
 	key = strings.Replace(key, prefix, "", -1)
 
-	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
+	req, _ := s3Client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
 	urlStr, err := req.Presign(8 * 60 * time.Minute)
 
 	if err != nil {
-		return ""
+		return "", err
 	}
 
-	return base64.StdEncoding.EncodeToString([]byte(urlStr))
+	return base64.StdEncoding.EncodeToString([]byte(urlStr)), nil
 }
 
 func doesFileExistsInS3(s3Client *s3.S3, bucket string, key string) bool {
@@ -54,20 +54,19 @@ func doesFileExistsInS3(s3Client *s3.S3, bucket string, key string) bool {
 
 // todo: error out only if bucket does not exist and err. happens; i.e ignore bucket exists errors
 func createBucket(bucketName string) error {
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion))})
+	s3Client, err := getS3Client()
 	if err != nil {
-		return err
+		return  err
 	}
-	svc := s3.New(sess)
 
-	_, err = svc.CreateBucket(&s3.CreateBucketInput{
+	_, err = s3Client.CreateBucket(&s3.CreateBucketInput{
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
 		return err
 	}
 
-	err = svc.WaitUntilBucketExists(&s3.HeadBucketInput{
+	err = s3Client.WaitUntilBucketExists(&s3.HeadBucketInput{
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {

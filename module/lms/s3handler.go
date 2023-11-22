@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,7 +12,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/raintreeinc/knowledgebase/kb"
 	"github.com/raintreeinc/knowledgebase/utils"
@@ -29,13 +27,14 @@ func uploadVideoFileFromServerToS3(fileNameWithPath, clientID, environment, guid
 	return uploadSingleFileToS3(path, fileNameWithPath, "rt-kb-videos")
 }
 
+
 // Deletes single file from S3
 func deleteFileFromS3(key, bucket string) error {
-	session, err := session.NewSession(&aws.Config{Region: aws.String(utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion))})
+	s3Client, err := getS3Client()
 	if err != nil {
-		return kb.ErrUnableToCreateS3Session
+		return err
 	}
-	s3Client := s3.New(session)
+
 
 	if bucket == "" {
 		bucket = utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
@@ -65,6 +64,7 @@ func deleteFileFromS3(key, bucket string) error {
 	return nil
 }
 
+
 // Uploads single file from the server; Returns S3 path if successful
 func uploadFileFromServerToS3(fileNameWithPath string) (string, error) {
 	fileExtension := strings.ToUpper(filepath.Ext(fileNameWithPath))
@@ -93,13 +93,10 @@ func uploadSingleFileToS3(destinations3Path, fileNameWithPath, bucket string) (s
 	}
 	uploadedFilePath = "https://" + bucket + ".s3.amazonaws.com/" + *key
 
-	defaultRegion := utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion)
-	// Init session and service. Uses ENV variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
-	session, err := session.NewSession(&aws.Config{Region: aws.String(defaultRegion)})
+	s3Client, err := getS3Client()
 	if err != nil {
 		return "", err
 	}
-	svc := s3.New(session)
 
 	// To abort the upload if it takes more than timeout seconds
 	ctx, cancelFn := context.WithTimeout(context.Background(), timeout)
@@ -111,7 +108,7 @@ func uploadSingleFileToS3(destinations3Path, fileNameWithPath, bucket string) (s
 	}
 	defer file.Close()
 
-	_, err = svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(bucket),
 		Key:         key,
 		Body:        file,
@@ -125,15 +122,16 @@ func uploadSingleFileToS3(destinations3Path, fileNameWithPath, bucket string) (s
 	return uploadedFilePath, nil
 }
 
+
 // Grape JS image uploading to [bucket]/customer/database/year/[filename];
 // Returns S3 path if request was successful
-func uploadImageFromServerToS3(clientname, database, filename, sourceFile string) (string, error) {
-	if strings.TrimSpace(clientname) == "" || strings.TrimSpace(database) == "" || strings.TrimSpace(sourceFile) == "" || strings.TrimSpace(filename) == "" {
+func uploadImageFromServerToS3(clientName, database, filename, sourceFile string) (string, error) {
+	if strings.TrimSpace(clientName) == "" || strings.TrimSpace(database) == "" || strings.TrimSpace(sourceFile) == "" || strings.TrimSpace(filename) == "" {
 		return "", errors.New("client name, database, file name or file data missing")
 	}
 
 	year := strconv.Itoa(time.Now().Year())
-	path := "customers/" + clientname + "/" + database + "/" + year + "/" + filename
+	path := "customers/" + clientName + "/" + database + "/" + year + "/" + filename
 
 	return uploadSingleFileToS3(path, sourceFile, "")
 }
@@ -145,16 +143,11 @@ func listFilesForGivenBucketAndPath(bucket, path string, w http.ResponseWriter) 
 		bucket = utils.GetEnvWithDefault("AWS_KB_BUCKET", kb.DefaultBucketName)
 	}
 
-	defaultRegion := utils.GetEnvWithDefault("AWS_REGION", kb.DefaultRegion)
-
-	// Init session and service. Uses ENV variables AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY
-	session, err1 := session.NewSession(&aws.Config{Region: aws.String(defaultRegion)})
-	if err1 != nil {
-		fmt.Fprintf(w, "Unable to list items from bucket %q, %v", bucket, err1)
-		kb.WriteResult(w, err1)
+	s3Client, err := getS3Client()
+	if err != nil {
+		kb.WriteResult(w, err)
 		return
 	}
-	svc := s3.New(session)
 
 	params := &s3.ListObjectsInput{
 		Bucket: aws.String(bucket),
@@ -165,7 +158,7 @@ func listFilesForGivenBucketAndPath(bucket, path string, w http.ResponseWriter) 
 		Uploads []string `json:"uploads"`
 	}
 
-	err := svc.ListObjectsPages(params,
+	err = s3Client.ListObjectsPages(params,
 		func(response *s3.ListObjectsOutput, lastPage bool) bool {
 
 			for _, item := range response.Contents {
@@ -176,7 +169,6 @@ func listFilesForGivenBucketAndPath(bucket, path string, w http.ResponseWriter) 
 		})
 
 	if err != nil {
-		fmt.Fprintf(w, "Unable to list all items from bucket %q, %v", bucket, err)
 		kb.WriteResult(w, err)
 		return
 	}

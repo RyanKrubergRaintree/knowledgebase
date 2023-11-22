@@ -45,6 +45,7 @@ func (mod *Module) init() {
 	path, _ := os.Getwd()
 	_ = os.Mkdir(filepath.FromSlash(path+"/temp/"), 666)
 	mod.createUser()
+	imageEndpoint := "/lms=/uploadImage/"
 
 	mod.router.HandleFunc("/lms=lesson", mod.handler).Methods("GET")
 	mod.router.HandleFunc("/lms=/uploadContent/", mod.getLessonList).Methods("GET")  // list all existing lessons
@@ -52,9 +53,9 @@ func (mod *Module) init() {
 	mod.router.HandleFunc("/lms=/uploadVideo/", mod.uploadVideo).Methods("POST")
 	mod.router.HandleFunc("/lms=/uploadVideo/", mod.getSignedVideoLink).Methods("GET")
 	mod.router.HandleFunc("/lms=/deleteVideo/", mod.deleteVideo).Methods("POST")
-	mod.router.HandleFunc("/lms=/uploadImage/", mod.uploadImage).Methods("POST")     // public image for Grape JS
-	mod.router.HandleFunc("/lms=/uploadImage/", mod.getUploadedFiles).Methods("GET") // list all existing files
-	mod.router.HandleFunc("/lms=/uploadImage/", mod.deleteImage).Methods("DELETE")
+	mod.router.HandleFunc(imageEndpoint, mod.uploadImage).Methods("POST")     // public image for Grape JS
+	mod.router.HandleFunc(imageEndpoint, mod.getUploadedFiles).Methods("GET") // list all existing files
+	mod.router.HandleFunc(imageEndpoint, mod.deleteImage).Methods("DELETE")
 }
 
 type lessonData struct {
@@ -166,6 +167,8 @@ func (mod *Module) getUploadedFiles(w http.ResponseWriter, r *http.Request) {
 
 func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
 	fileNameWithPath, err := saveFileFromHttpRequestToServer(r)
+	defer os.Remove(fileNameWithPath)
+
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
@@ -176,19 +179,17 @@ func (mod *Module) uploadContent(w http.ResponseWriter, r *http.Request) {
 	} else {
 		kb.WriteResult(w, uploadError)
 	}
-
-	_ = os.Remove(fileNameWithPath)
 }
 
 func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	fileNameWithPath, err := saveImageFileFromHttpRequestToServer(r)
+	defer os.Remove(fileNameWithPath)
 	if err != nil {
 		kb.WriteResult(w, err)
 		return
 	}
-	defer os.Remove(fileNameWithPath)
 
 	customer := r.PostFormValue("customer")
 	database := r.PostFormValue("database")
@@ -204,11 +205,9 @@ func (mod *Module) uploadImage(w http.ResponseWriter, r *http.Request) {
 
 func (mod *Module) deleteImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	kb.WriteResult(w, deleteFileFromS3(r.FormValue("link"), ""))
 }
 
-// todo: return nil if req. values are empty?
 func (mod *Module) uploadVideo(w http.ResponseWriter, r *http.Request) {
 	fileNameWithPath, err := saveFileFromHttpRequestToServer(r)
 	if err != nil {
@@ -228,7 +227,13 @@ func (mod *Module) uploadVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mod *Module) getSignedVideoLink(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, getSignedLink(r.FormValue("key"), "rt-kb-videos"))
+	link, err := getSignedLink(r.FormValue("key"), "rt-kb-videos", w)
+	if err != nil {
+		kb.WriteResult(w, err)
+		return
+	}
+
+	fmt.Fprint(w, link)
 }
 
 func (mod *Module) deleteVideo(w http.ResponseWriter, r *http.Request) {
