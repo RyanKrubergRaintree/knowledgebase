@@ -65,6 +65,10 @@ func main() {
 	ZIP = zip.NewWriter(file)
 	build()
 	ZIP.Close()
+
+	fmt.Println(" ")
+	fmt.Println("Remember to run tests before deployment!")
+	fmt.Println("go test ./... | findstr FAIL")
 }
 
 // filename with forward slashes

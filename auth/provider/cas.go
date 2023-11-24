@@ -4,6 +4,8 @@ import (
 	"errors"
 	"html/template"
 	"net/url"
+	"os"
+	"strings"
 
 	"github.com/raintreeinc/knowledgebase/auth/provider/trust"
 	"github.com/raintreeinc/knowledgebase/kb"
@@ -28,8 +30,8 @@ func (conf *CAS) Verify(params, code string) (kb.User, error) {
 	}
 
 	user := p.Get("user")
-	company := p.Get("company")
-	companyid := p.Get("companyid")
+	company, companyid := getCompanyIdRedirect(p.Get("company"), p.Get("companyid"))
+
 	if company+"="+user != id {
 		return kb.User{}, errors.New("invalid id provided")
 	}
@@ -45,4 +47,16 @@ func (conf *CAS) Verify(params, code string) (kb.User, error) {
 
 		MaxAccess: kb.Moderator,
 	}, nil
+}
+
+// use different ID for a company if there is a redirect set up in the environment variables
+func getCompanyIdRedirect(company, companyid string) (string, string) {
+	key := strings.ToUpper(strings.Replace(company, " ", "_", -1))
+
+	idRedirect, exists := os.LookupEnv(key)
+	if exists {
+		return company, idRedirect
+	}
+
+	return company, companyid
 }
