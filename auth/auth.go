@@ -54,11 +54,7 @@ func (server *Server) params(w http.ResponseWriter, r *http.Request) (kb.User, s
 
 	// creates session for LMS user;
 	lmsToken, lmsTokenExists := os.LookupEnv("LMSTOKEN")
-	if lmsTokenExists && lmsToken != "" {
-
-		if subtle.ConstantTimeCompare([]byte(token.String()), []byte(lmsToken)) != 1 {
-			return kb.User{}, session.ZeroToken, ErrUnauthorized
-		}
+	if lmsTokenExists && lmsToken != "" && subtle.ConstantTimeCompare([]byte(token.String()), []byte(lmsToken)) == 1 {
 
 		lmsUser, err1 := server.DB.Context("admin").Users().ByID(kb.Slugify("lmsuser"))
 		if err1 != nil {
