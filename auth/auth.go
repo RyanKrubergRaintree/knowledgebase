@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"html/template"
@@ -52,13 +53,18 @@ func (server *Server) params(w http.ResponseWriter, r *http.Request) (kb.User, s
 	}
 
 	// creates session for LMS user;
-	// todo: remove token before returning response
 	lmsToken, lmsTokenExists := os.LookupEnv("LMSTOKEN")
-	if lmsTokenExists && token.String() == lmsToken && lmsToken != "" {
+	if lmsTokenExists && lmsToken != "" {
+
+		if subtle.ConstantTimeCompare([]byte(token.String()), []byte(lmsToken)) != 1 {
+			return kb.User{}, session.ZeroToken, ErrUnauthorized
+		}
+
 		lmsUser, err1 := server.DB.Context("admin").Users().ByID(kb.Slugify("lmsuser"))
 		if err1 != nil {
 			return kb.User{}, session.ZeroToken, ErrUnauthorized
 		}
+
 		token, err = server.Sessions.New(lmsUser) // register the user in the store
 		if err != nil {
 			log.Println("Session failed:", err.Error())
