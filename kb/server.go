@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -51,11 +52,27 @@ func (server *Server) login(w http.ResponseWriter, r *http.Request) (User, bool)
 	user, err := server.Auth.Verify(w, r)
 	if err != nil {
 		w.Header().Add("WWW-Authenticate", "X-Auth-Token")
-		//TODO: serve correct error message
-		http.Error(w, "Session expired!", http.StatusUnauthorized)
+		server.doRedirectIfNecessary(w, r)
 		return User{}, false
 	}
 	return user, true
+}
+
+// Semi-permanent workaround to redirect invalid links to correct links & force login
+// e.g http://kb.local/guests=test gets redirected to http://kb.local/#/guests=test
+func (server *Server) doRedirectIfNecessary(w http.ResponseWriter, r *http.Request)  {
+
+	// match "/something=" patterns
+	re := regexp.MustCompile(`(?i)^/[^/]+=`)
+
+	// in case KB content was requested and user was not logged in - redirect to the login page while keeping the requested page in the URL
+	if matches := re.FindStringSubmatch(r.URL.Path); len(matches) > 0 {
+	 	http.Redirect(w, r, "#/"+r.URL.Path, http.StatusTemporaryRedirect)
+	} else {
+		// Either session has expired or it was a brand new request.
+		http.Error(w, "Session expired!", http.StatusUnauthorized)
+	}
+
 }
 
 func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
