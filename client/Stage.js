@@ -53,10 +53,15 @@ package("kb", function(exports) {
 		this.id = GenerateID();
 
 		this.creating = (ref.url === null) || (ref.url === "");
-		this.url = ref.url;
 		this.link = ref.link;
 		this.title = ref.title;
 		this.allowed = ["GET", "HEAD"];
+
+		if (ref.url !== null) {
+			this.url = ref.url.replace("/#", "");
+		} else {
+			this.url = ref.url;
+		}
 
 		page = page || {};
 		page.title = page.title || ref.title || "";
