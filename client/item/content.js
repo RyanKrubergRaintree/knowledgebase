@@ -1,4 +1,4 @@
-package("kb.item.content", function(exports) {
+package("kb.item.content", function (exports) {
 	"use strict";
 
 	depends("dita.css");
@@ -19,25 +19,32 @@ package("kb.item.content", function(exports) {
 			}
 			target = target.parentNode;
 		}
-	}
+	};
 
 	function InjectToggleHandler(htmlContent) {
-		var x = htmlContent.replace("class='collapse-icon", "onclick='ToggleCollapse(event)' class='collapse-icon");
-		return x.replace("class=\"collapse-icon", "onclick='ToggleCollapse(event)' class=\"collapse-icon");
+		var x = htmlContent.replace(
+			"class='collapse-icon",
+			"onclick='ToggleCollapse(event)' class='collapse-icon"
+		);
+		return x.replace('class="collapse-icon', "onclick='ToggleCollapse(event)' class=\"collapse-icon");
 	}
 
 	exports.Unknown = createReactClass({
 		displayName: "Unknown",
-		render: function() {
+		render: function () {
 			var item = this.props.item;
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-content content-unknown"
 				},
-				React.DOM.span({
-					style: {
-						"float": "right"
-					}
-				}, item.type),
+				React.DOM.span(
+					{
+						style: {
+							float: "right"
+						}
+					},
+					item.type
+				),
 				React.DOM.p({}, item.text),
 				React.DOM.div({
 					className: "clear-fix"
@@ -46,31 +53,37 @@ package("kb.item.content", function(exports) {
 		}
 	});
 
-	var ContentTypes = [{
-		name: "Text",
-		type: "paragraph",
-		desc: "simple text paragraph"
-	}, {
-		name: "HTML",
-		type: "html",
-		desc: "a subset of html for more advanced content"
-	}, {
-		name: "Code",
-		type: "code",
-		desc: "item especially designed for code"
-	}, {
-		name: "Tags",
-		type: "tags",
-		desc: "tags for the page"
-	}, {
-		name: "Separator",
-		type: "separator",
-		desc: "line separator"
-	}];
+	var ContentTypes = [
+		{
+			name: "Text",
+			type: "paragraph",
+			desc: "simple text paragraph"
+		},
+		{
+			name: "HTML",
+			type: "html",
+			desc: "a subset of html for more advanced content"
+		},
+		{
+			name: "Code",
+			type: "code",
+			desc: "item especially designed for code"
+		},
+		{
+			name: "Tags",
+			type: "tags",
+			desc: "tags for the page"
+		},
+		{
+			name: "Separator",
+			type: "separator",
+			desc: "line separator"
+		}
+	];
 
 	exports.factory = createReactClass({
 		displayName: "Factory",
-		convert: function(ev) {
+		convert: function (ev) {
 			var type = GetDataAttribute(ev.currentTarget, "type");
 			var stage = this.props.stage,
 				item = this.props.item;
@@ -88,21 +101,25 @@ package("kb.item.content", function(exports) {
 			stage.editing.start(item.id);
 		},
 
-		render: function() {
+		render: function () {
 			var self = this;
 			var item = this.props.item;
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-content content-factory"
 				},
 				React.DOM.p({}, item.text || "Create new "),
-				ContentTypes.map(function(item) {
-					return React.DOM.button({
-						key: item.type,
-						className: "factory-item",
-						"data-type": item.type,
-						title: item.desc,
-						onClick: self.convert
-					}, item.name);
+				ContentTypes.map(function (item) {
+					return React.DOM.button(
+						{
+							key: item.type,
+							className: "factory-item",
+							"data-type": item.type,
+							title: item.desc,
+							onClick: self.convert
+						},
+						item.name
+					);
 				})
 			);
 		}
@@ -110,8 +127,9 @@ package("kb.item.content", function(exports) {
 
 	exports.image = createReactClass({
 		displayName: "Image",
-		render: function() {
-			return React.DOM.div({
+		render: function () {
+			return React.DOM.div(
+				{
 					className: "item-content content-image"
 				},
 				React.DOM.img({
@@ -124,21 +142,24 @@ package("kb.item.content", function(exports) {
 
 	exports.paragraph = createReactClass({
 		displayName: "Paragraph",
-		render: function() {
+		render: function () {
 			var stage = this.props.stage;
 			var resolved = kb.item.Resolve(stage, this.props.item.text);
 			var paragraphs = resolved.split("\n\n");
 			if (paragraphs.length > 1) {
-				return React.DOM.div({
-					className: "item-content content-paragraph"
-				}, paragraphs.map(function(p, i) {
-					return React.DOM.p({
-						key: i,
-						dangerouslySetInnerHTML: {
-							__html: InjectToggleHandler(kb.item.Sanitize(p))
-						}
-					});
-				}));
+				return React.DOM.div(
+					{
+						className: "item-content content-paragraph"
+					},
+					paragraphs.map(function (p, i) {
+						return React.DOM.p({
+							key: i,
+							dangerouslySetInnerHTML: {
+								__html: InjectToggleHandler(kb.item.Sanitize(p))
+							}
+						});
+					})
+				);
 			} else {
 				return React.DOM.p({
 					className: "item-content content-paragraph",
@@ -152,12 +173,14 @@ package("kb.item.content", function(exports) {
 
 	exports.html = createReactClass({
 		displayName: "HTML",
-		render: function() {
+		render: function () {
 			var stage = this.props.stage;
 			return React.DOM.div({
 				className: "item-content content-html",
 				dangerouslySetInnerHTML: {
-					__html: InjectToggleHandler(kb.item.Sanitize(kb.item.ResolveHTML(stage, this.props.item.text)))
+					__html: InjectToggleHandler(
+						kb.item.Sanitize(kb.item.ResolveHTML(stage, this.props.item.text))
+					)
 				}
 			});
 		}
@@ -165,30 +188,36 @@ package("kb.item.content", function(exports) {
 
 	exports.code = createReactClass({
 		displayName: "Code",
-		render: function() {
-			return React.DOM.div({
-				className: "item-content content-code"
-			}, this.props.item.text);
+		render: function () {
+			return React.DOM.div(
+				{
+					className: "item-content content-code"
+				},
+				this.props.item.text
+			);
 		}
 	});
 
 	exports.reference = createReactClass({
 		displayName: "Reference",
-		render: function() {
+		render: function () {
 			var item = this.props.item;
 			var url = item.url;
 			var loc = kb.convert.URLToLocation(url);
-			var external = (loc.host !== "") &&
-				(loc.host !== window.location.host);
+			var external = loc.host !== "" && loc.host !== window.location.host;
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-content content-reference"
 				},
-				React.DOM.a({
-					className: external ? "external-link" : "",
-					target: external ? "_blank" : "",
-					href: url
-				}, item.title),
+				React.DOM.a(
+					{
+						className: external ? "external-link" : "",
+						target: external ? "_blank" : "",
+						href: url
+					},
+					item.title
+				),
 				React.DOM.p({}, this.props.item.text)
 			);
 		}
@@ -196,21 +225,28 @@ package("kb.item.content", function(exports) {
 
 	exports.entry = createReactClass({
 		displayName: "Entry",
-		render: function() {
+		render: function () {
 			var item = this.props.item;
 			var ref = kb.convert.LinkToReference(item.link);
 			var url = ref.url;
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-content content-entry"
 				},
-				React.DOM.a({
-					className: "entry-title",
-					title: url,
-					href: url
-				}, item.title),
-				React.DOM.div({
-					className: "entry-owner"
-				}, ref.owner),
+				React.DOM.a(
+					{
+						className: "entry-title",
+						title: url,
+						href: url
+					},
+					item.title
+				),
+				React.DOM.div(
+					{
+						className: "entry-owner"
+					},
+					ref.owner
+				),
 				React.DOM.p({
 					className: "entry-synopsis",
 					dangerouslySetInnerHTML: {
@@ -223,7 +259,7 @@ package("kb.item.content", function(exports) {
 
 	exports.tags = createReactClass({
 		displayName: "Tags",
-		render: function() {
+		render: function () {
 			var item = this.props.item;
 
 			var text = typeof item.text === "undefined" ? "" : item.text.trim();
@@ -231,32 +267,38 @@ package("kb.item.content", function(exports) {
 			if (text !== "") {
 				tags = text.split(",");
 			}
-			tags = tags.map(function(tag) {
+			tags = tags
+				.map(function (tag) {
 					return tag.trim();
 				})
-				.filter(function(tag) {
+				.filter(function (tag) {
 					return tag !== "";
 				});
 
 			var hasValidTag = tags.length > 0;
 
-			tags = tags.filter(function(tag) {
+			tags = tags.filter(function (tag) {
 				// hide tags starting with id/...
-				return !(/^id\//.test(tag));
+				return !/^id\//.test(tag);
 			});
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-contet content-tags"
 				},
-				hasValidTag ?
-				tags.map(function(tag, i) {
-					tag = tag.trim();
-					return React.DOM.a({
-						className: "tag",
-						key: i,
-						href: "/tag=pages/" + kb.convert.TextToSlug(tag)
-					}, tag);
-				}) : React.DOM.p({}, "Double click here to add page tags."),
+				hasValidTag
+					? tags.map(function (tag, i) {
+							tag = tag.trim();
+							return React.DOM.a(
+								{
+									className: "tag",
+									key: i,
+									href: "/tag=pages/" + kb.convert.TextToSlug(tag)
+								},
+								tag
+							);
+						})
+					: React.DOM.p({}, "Double click here to add page tags."),
 				React.DOM.div({
 					className: "clear-fix"
 				})
@@ -266,34 +308,42 @@ package("kb.item.content", function(exports) {
 
 	exports.separator = createReactClass({
 		displayName: "Entry",
-		render: function() {
+		render: function () {
 			var item = this.props.item;
 
 			if (item.text === "") {
-				return React.DOM.div({
+				return React.DOM.div(
+					{
 						className: "item-content content-separator"
 					},
 					React.DOM.hr(null)
 				);
 			}
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item-content content-separator"
 				},
-				React.DOM.table({
+				React.DOM.table(
+					{
 						style: {
 							width: "100%"
 						}
 					},
-					React.DOM.tbody(null,
-						React.DOM.tr(null,
+					React.DOM.tbody(
+						null,
+						React.DOM.tr(
+							null,
 							React.DOM.td(null, React.DOM.hr(null)),
-							React.DOM.td({
-								style: {
-									width: "1px",
-									padding: "0 10px",
-									whiteSpace: "nowrap"
-								}
-							}, this.props.item.text),
+							React.DOM.td(
+								{
+									style: {
+										width: "1px",
+										padding: "0 10px",
+										whiteSpace: "nowrap"
+									}
+								},
+								this.props.item.text
+							),
 							React.DOM.td(null, React.DOM.hr(null))
 						)
 					)
@@ -301,5 +351,4 @@ package("kb.item.content", function(exports) {
 			);
 		}
 	});
-
 });

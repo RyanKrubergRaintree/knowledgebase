@@ -1,4 +1,4 @@
-package("kb.boot", function(exports) {
+package("kb.boot", function (_exports) {
 	"use strict";
 
 	depends("boot.css");
@@ -13,10 +13,10 @@ package("kb.boot", function(exports) {
 	depends("Selection.js");
 
 	var Bootstrap = createReactClass({
-		componentDidMount: function() {
+		componentDidMount: function () {
 			var self = this;
 			if (typeof Reloader !== "undefined") {
-				Reloader.onchange = function() {
+				Reloader.onchange = function () {
 					self.forceUpdate();
 				};
 			}
@@ -30,7 +30,7 @@ package("kb.boot", function(exports) {
 				});
 			}
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			kb.Auth.remove(this);
 			var session = this.state.Session;
 			if (session !== null) {
@@ -38,26 +38,26 @@ package("kb.boot", function(exports) {
 			}
 		},
 
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				Session: null,
 				sessionError: ""
 			};
 		},
-		sessionFinished: function(ev) {
+		sessionFinished: function (ev) {
 			this.setState({
 				Session: null,
 				sessionError: ev.error
 			});
 		},
-		loginSuccess: function(event) {
+		loginSuccess: function (event) {
 			var session = event.session;
 			session.on("session-finished", this.sessionFinished, this);
 			this.setState({
 				Session: session
 			});
 		},
-		render: function() {
+		render: function () {
 			var session = this.state.Session;
 			if (session === null) {
 				return React.createElement(kb.boot.Login, {
@@ -74,7 +74,7 @@ package("kb.boot", function(exports) {
 	});
 
 	var Application = createReactClass({
-		getInitialState: function() {
+		getInitialState: function () {
 			var session = this.props.Session;
 			var lineup = new kb.Lineup(session);
 			var crumbs = new kb.Crumbs(lineup);
@@ -95,18 +95,19 @@ package("kb.boot", function(exports) {
 			CurrentSelection: kb.react.object,
 			Session: kb.react.object
 		},
-		getChildContext: function() {
+		getChildContext: function () {
 			return this.state;
 		},
 
-		keydown: function(ev) {
+		keydown: function (ev) {
 			ev = ev || event;
 
 			function elementIsEditable(elem) {
-				return elem && (
-					((elem.nodeName === "INPUT") && (elem.type === "text")) ||
-					(elem.nodeName === "TEXTAREA") ||
-					(elem.contentEditable === "true")
+				return (
+					elem &&
+					((elem.nodeName === "INPUT" && elem.type === "text") ||
+						elem.nodeName === "TEXTAREA" ||
+						elem.contentEditable === "true")
 				);
 			}
 
@@ -119,24 +120,22 @@ package("kb.boot", function(exports) {
 				ev.stopPropagation();
 			}
 		},
-		click: function(ev) {
+		click: function (ev) {
 			this.state.Lineup.handleClickLink(ev || event);
 		},
 
-		highlight: function(ev) {
+		highlight: function (ev) {
 			this.state.CurrentSelection.highlightTarget(ev || event);
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			document.onkeydown = this.keydown;
 			document.onclick = this.click;
 
 			document.onmouseover = this.highlight;
 
-			this.state.Crumbs.attach(
-				this.state.Session.pages,
-				this.state.Session.home);
+			this.state.Crumbs.attach(this.state.Session.pages, this.state.Session.home);
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			if (document.onkeydown === this.keydown) {
 				document.onkeydown = null;
 			}
@@ -145,7 +144,7 @@ package("kb.boot", function(exports) {
 			}
 			this.state.Crumbs.detach();
 		},
-		render: function() {
+		render: function () {
 			return React.createElement(kb.Site, this.state);
 		}
 	});

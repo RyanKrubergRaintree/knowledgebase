@@ -1,0 +1,55 @@
+{
+  "root": true,
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "ga": "readonly",
+    "React": "readonly",
+    "ReactDOM": "readonly",
+    "kb": "readonly",
+    "depends": "readonly",
+    "package": "readonly",
+    "GenerateID": "readonly",
+    "GetDataAttribute": "readonly",
+    "TestCase": "readonly",
+    "getClassList": "readonly",
+    // from https://accounts.google.com/gsi/client
+    "google": "readonly",
+    "createReactClass": "readonly",
+    "Reloader": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "script"
+  },
+  "plugins": [
+    "prettier"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "useTabs": true,
+        "trailingComma": "none", // IE does not support trailing comma
+        "endOfLine": "auto"
+      }
+    ],
+    "no-redeclare": "warn",
+    "no-undef": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-shadow": "warn"
+  },
+  "ignorePatterns": [
+    "client/assets/**/*"
+  ]
+}

@@ -1,4 +1,4 @@
-package("kb.Lineup", function(exports) {
+package("kb.Lineup", function (exports) {
 	"use strict";
 
 	depends("Lineup.js");
@@ -7,42 +7,53 @@ package("kb.Lineup", function(exports) {
 
 	var SelectionStyle = createReactClass({
 		displayName: "SelectionStyle",
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				selected: this.props.CurrentSelection.selected,
 				highlighted: this.props.CurrentSelection.highlighted
 			};
 		},
-		update: function(ev) {
+		update: function (ev) {
 			this.setState({
 				selected: ev.selected,
 				highlighted: ev.highlighted
 			});
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.props.CurrentSelection.on("changed", this.update, this);
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			this.props.CurrentSelection.remove(this);
 		},
 
-		render: function() {
+		render: function () {
 			var state = this.state;
 
 			var style = "";
+			var id;
 			if (state.highlighted !== "") {
-				var id = state.highlighted;
-				style += "[data-id=\"" + id + "\"], " +
-					"[data-focusid=\"" + id + "\"]" +
+				id = state.highlighted;
+				style +=
+					'[data-id="' +
+					id +
+					'"], ' +
+					'[data-focusid="' +
+					id +
+					'"]' +
 					"{" +
 					"outline: 1px dashed #22F !important;" +
 					"background: rgba(127,127,255,0.1) !important;" +
 					"}";
 			}
 			if (state.selected !== "") {
-				var id = state.selected;
-				style += "[data-id=\"" + id + "\"], " +
-					"[data-focusid=\"" + id + "\"]" +
+				id = state.selected;
+				style +=
+					'[data-id="' +
+					id +
+					'"], ' +
+					'[data-focusid="' +
+					id +
+					'"]' +
 					"{" +
 					"outline: 1px dashed #22F !important;" +
 					"background: rgba(127,127,255,0.1) !important;" +
@@ -61,13 +72,13 @@ package("kb.Lineup", function(exports) {
 	exports.View = createReactClass({
 		displayName: "Lineup",
 
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				width: window.clientWidth
 			};
 		},
 
-		render: function() {
+		render: function () {
 			var self = this;
 			var containerWidth = this.state.width;
 
@@ -80,12 +91,12 @@ package("kb.Lineup", function(exports) {
 			if (fittedCount < 1) {
 				normal = containerWidth;
 			} else if (fittedCount < 3) {
-				var targetCount = (fittedCount + 0.5) | 0 + 0.2;
+				var targetCount = (fittedCount + 0.5) | (0 + 0.2);
 				normal = Math.min(containerWidth / targetCount, idealWidth);
 			}
 
 			var left = 0;
-			var stages = this.props.Lineup.stages.map(function(stage) {
+			var stages = this.props.Lineup.stages.map(function (stage) {
 				var width = stage.wide ? wide : normal;
 				var r = React.createElement(kb.Stage.View, {
 					style: {
@@ -115,7 +126,8 @@ package("kb.Lineup", function(exports) {
 				});
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "lineup"
 				},
 				React.createElement(SelectionStyle, this.props),
@@ -125,37 +137,36 @@ package("kb.Lineup", function(exports) {
 		},
 
 		// bindings to Lineup
-		changed: function() {
+		changed: function () {
 			this.forceUpdate();
 		},
 
-		hidePin: function() {
+		hidePin: function () {
 			this.props.Lineup.hidePin();
 		},
-		onStageWidthChanged: function() {
+		onStageWidthChanged: function () {
 			this.forceUpdate();
 		},
-		resized: function() {
+		resized: function () {
 			this.setState({
 				width: ReactDOM.findDOMNode(this).clientWidth
 			});
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.props.Lineup.on("changed", this.changed, this);
 			window.onresize = this.resized;
 
 			this.setState({
 				width: ReactDOM.findDOMNode(this).clientWidth
 			});
-
 		},
-		componentWillReceiveProps: function(nextprops) {
+		componentWillReceiveProps: function (nextprops) {
 			if (this.props.Lineup !== nextprops.Lineup) {
 				this.props.Lineup.remove(this);
 				nextprops.Lineup.on("changed", this.changed, this);
 			}
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			window.onresize = null;
 			this.props.Lineup.remove(this);
 		}

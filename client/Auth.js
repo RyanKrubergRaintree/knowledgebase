@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	/*
@@ -39,12 +39,12 @@ package("kb", function(exports) {
 
 		this.currentSession = null;
 		if (initialSessionInfo) {
-			this.currentSession = new kb.Session(initialSessionInfo, function() {});
+			this.currentSession = new kb.Session(initialSessionInfo, function () {});
 		}
 	}
 
 	Auth.prototype = {
-		init: function() {
+		init: function () {
 			var self = this;
 			var toload = 1;
 
@@ -62,7 +62,7 @@ package("kb", function(exports) {
 			}
 
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				toload++;
@@ -73,7 +73,7 @@ package("kb", function(exports) {
 			loaded();
 		},
 
-		loginSuccess: function(response) {
+		loginSuccess: function (response) {
 			if (!response.ok) {
 				this.notifier_.handle({
 					type: "login-error",
@@ -83,10 +83,7 @@ package("kb", function(exports) {
 				return;
 			}
 
-			var session = new kb.Session(
-				response.json,
-				this.logoutProviders.bind(this)
-			);
+			var session = new kb.Session(response.json, this.logoutProviders.bind(this));
 
 			this.currentSession = session;
 			this.notifier_.handle({
@@ -94,7 +91,7 @@ package("kb", function(exports) {
 				session: session
 			});
 		},
-		loginError: function(error) {
+		loginError: function (error) {
 			this.logoutProviders();
 			this.notifier_.handle({
 				type: "login-error",
@@ -102,20 +99,20 @@ package("kb", function(exports) {
 			});
 		},
 
-		loginTo: function(url, user, code) {
+		loginTo: function (url, user, code) {
 			kb.Session.fetch({
 				url: url,
 				ondone: this.loginSuccess.bind(this),
 				onerror: this.loginError.bind(this),
 				body: {
-					"user": user,
-					"code": code
+					user: user,
+					code: code
 				}
 			});
 		},
-		tryAutoLogin: function() {
+		tryAutoLogin: function () {
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				var provider = this.providers[name];
@@ -125,7 +122,7 @@ package("kb", function(exports) {
 			}
 		},
 
-		logout: function() {
+		logout: function () {
 			if (this.currentSession) {
 				this.currentSession.logout();
 			} else {
@@ -134,9 +131,9 @@ package("kb", function(exports) {
 		},
 
 		// logs out from provider sessions, not from the session
-		logoutProviders: function() {
+		logoutProviders: function () {
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				var provider = this.providers[name];
@@ -154,7 +151,7 @@ package("kb", function(exports) {
 	};
 
 	function cas(auth, name, data, onloaded) {
-		data.login = function(user, code) {
+		data.login = function (user, code) {
 			auth.loginTo("/system/auth/" + name, user, code);
 		};
 
@@ -168,16 +165,17 @@ package("kb", function(exports) {
 		data.view = "button";
 		data.title = "Google";
 
-		gapi.load("auth2", function() {
+		// eslint-disable-next-line no-undef
+		gapi.load("auth2", function () {
 			if (typeof gapi === "undefined") {
 				console.error("Google authentication unavailable.");
 
-				data.login = function() {
+				data.login = function () {
 					console.error("Google authentication unavailable.");
-				}
-				data.logout = function() {
+				};
+				data.logout = function () {
 					console.error("Google authentication unavailable.");
-				}
+				};
 
 				data.errored = true;
 				onloaded();
@@ -186,49 +184,45 @@ package("kb", function(exports) {
 
 			var hosted_domain = null;
 			if (typeof GoogleHostedDomain !== "undefined") {
+				// eslint-disable-next-line no-undef
 				hosted_domain = GoogleHostedDomain;
 			}
 
+			// eslint-disable-next-line no-undef
 			var auth2 = gapi.auth2.init({
 				hosted_domain: hosted_domain,
 				authuser: -1
 			});
 
-			var trylogin = function() {
+			var trylogin = function () {
 				if (auth2.isSignedIn.get() === true) {
 					// check if not logged in
 					var user = auth2.currentUser.get();
 					var profile = user.getBasicProfile();
 					var token = user.getAuthResponse().id_token;
 
-					auth.loginTo("/system/auth/" + name,
-						profile.getEmail(),
-						token
-					);
+					auth.loginTo("/system/auth/" + name, profile.getEmail(), token);
 				}
 			};
 			auth2.isSignedIn.listen(trylogin);
 
-			data.autologin = function() {
+			data.autologin = function () {
 				trylogin();
 			};
 
-			data.login = function() {
+			data.login = function () {
 				if (auth2.isSignedIn.get() === true) {
 					trylogin();
 				} else {
-					auth2.signIn().then(
-						null,
-						auth.loginError.bind(auth)
-					);
+					auth2.signIn().then(null, auth.loginError.bind(auth));
 				}
 			};
 
-			data.logout = function() {
+			data.logout = function () {
 				try {
 					auth2.signOut();
 				} catch (ex) {
-
+					/* empty */
 				}
 			};
 
@@ -238,7 +232,7 @@ package("kb", function(exports) {
 
 	function form(auth, name, data, onloaded) {
 		data.view = "form";
-		data.login = function(user, password) {
+		data.login = function (user, password) {
 			auth.loginTo("/system/auth/" + name, user, password);
 		};
 

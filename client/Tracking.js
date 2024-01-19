@@ -1,7 +1,7 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
-	exports.TrackPageView = function(url, title) {
+	exports.TrackPageView = function (url, title) {
 		if (typeof ga !== "undefined") {
 			ga("set", {
 				page: url,

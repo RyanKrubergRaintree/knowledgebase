@@ -1,4 +1,4 @@
-package("kb.item", function(exports) {
+package("kb.item", function (exports) {
 	"use strict";
 
 	depends("Editor.js");
@@ -13,7 +13,7 @@ package("kb.item", function(exports) {
 	exports.View = createReactClass({
 		displayName: "Item",
 
-		dragStart: function(ev, node, item) {
+		dragStart: function (ev, node, item) {
 			kb.item.DropCanceled = false;
 			var stage = this.props.stage,
 				item = this.props.item;
@@ -44,8 +44,8 @@ package("kb.item", function(exports) {
 				};
 			}
 		},
-		drag: function() {},
-		dragEnd: function(ev) {
+		drag: function () {},
+		dragEnd: function (ev) {
 			if (kb.item.DropCanceled) {
 				ev.preventDefault();
 				return;
@@ -64,7 +64,7 @@ package("kb.item", function(exports) {
 			ev.stopPropagation();
 		},
 
-		startEditing: function(ev) {
+		startEditing: function (ev) {
 			var stage = this.props.stage,
 				item = this.props.item;
 
@@ -74,7 +74,7 @@ package("kb.item", function(exports) {
 			ev.stopPropagation();
 		},
 
-		render: function() {
+		render: function () {
 			var stage = this.props.stage,
 				item = this.props.item;
 
@@ -88,25 +88,29 @@ package("kb.item", function(exports) {
 				canDrag = false;
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "item" + editingClass,
 					onDoubleClick: stage.canModify() ? this.startEditing : null,
 					"data-id": item.id
-				}, canDrag ? React.DOM.a({
-					className: "item-drag",
-					draggable: "true",
-					tabIndex: -1,
+				},
+				canDrag
+					? React.DOM.a({
+							className: "item-drag",
+							draggable: "true",
+							tabIndex: -1,
 
-					href: "#",
-					onClick: function(ev) {
-						ev = ev || window.event;
-						ev.preventDefault();
-					},
+							href: "#",
+							onClick: function (ev) {
+								ev = ev || window.event;
+								ev.preventDefault();
+							},
 
-					onDragStart: this.dragStart,
-					onDrag: this.drag,
-					onDragEnd: this.dragEnd
-				}) : null,
+							onDragStart: this.dragStart,
+							onDrag: this.drag,
+							onDragEnd: this.dragEnd
+						})
+					: null,
 				React.createElement(view, {
 					stage: stage,
 					item: item

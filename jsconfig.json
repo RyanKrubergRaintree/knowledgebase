@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "UMD",
+    "target": "ES5",
+    // uncommented below was used as a hackfix for tsconfig.json
+    // "allowJs": true,
+    // "outDir": "arbitrary", 
+    // "checkJs": true,
+    // "allowUmdGlobalAccess": true
+  },
+  "exclude": ["node_modules"],
+}

@@ -1,4 +1,4 @@
-package("kb.item.content", function(exports) {
+package("kb.item.content", function (exports) {
 	"use strict";
 
 	depends("SimpleForm.css");
@@ -8,14 +8,14 @@ package("kb.item.content", function(exports) {
 		contextTypes: {
 			Session: kb.react.object
 		},
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				error: "",
 				message: ""
 			};
 		},
 
-		done: function(ev) {
+		done: function (ev) {
 			var xhr = ev.currentTarget;
 			if (xhr.readyState !== 4) {
 				return;
@@ -38,14 +38,14 @@ package("kb.item.content", function(exports) {
 			});
 			this.props.stage.refresh();
 		},
-		errored: function() {
+		errored: function () {
 			this.setState({
 				message: "",
 				error: "Unknown error."
 			});
 		},
 
-		click: function(ev) {
+		click: function (ev) {
 			this.setState({
 				error: "",
 				message: "processing..."
@@ -54,7 +54,7 @@ package("kb.item.content", function(exports) {
 			var items = this.props.item.items || [];
 			var body = {};
 			var self = this;
-			items.map(function(item) {
+			items.map(function (item) {
 				var id = item.id || item.label;
 				var node = self.refs[id];
 				if (typeof node !== "undefined") {
@@ -73,7 +73,7 @@ package("kb.item.content", function(exports) {
 			});
 		},
 
-		render: function() {
+		render: function () {
 			var item = this.props.item,
 				message = this.state.message,
 				error = this.state.error;
@@ -81,20 +81,31 @@ package("kb.item.content", function(exports) {
 			var self = this;
 
 			var items = item.items || [];
-			return React.DOM.form({
+			return React.DOM.form(
+				{
 					className: "item-content content-simple-form",
-					onSubmit: function(ev) {
+					onSubmit: function (ev) {
 						ev.preventDefault();
 					}
 				},
 				item.text ? React.DOM.p({}, item.text) : null,
-				message !== "" ? React.DOM.p({
-					className: "message"
-				}, message) : null,
-				error !== "" ? React.DOM.p({
-					className: "error"
-				}, error) : null,
-				items.map(function(item, i) {
+				message !== ""
+					? React.DOM.p(
+							{
+								className: "message"
+							},
+							message
+						)
+					: null,
+				error !== ""
+					? React.DOM.p(
+							{
+								className: "error"
+							},
+							error
+						)
+					: null,
+				items.map(function (item, i) {
 					switch (item.type) {
 						case "field":
 							return React.DOM.input({
@@ -104,22 +115,31 @@ package("kb.item.content", function(exports) {
 								placeholder: item.label
 							});
 						case "button":
-							return React.DOM.button({
-								key: i,
-								"data-action": item.action,
-								onClick: self.click
-							}, item.caption);
-						case "option":
-							return React.DOM.select({
-								key: i,
-								ref: item.id,
-								name: item.id
-							}, item.values.map(function(value, i) {
-								return React.DOM.option({
+							return React.DOM.button(
+								{
 									key: i,
-									value: value
-								}, value);
-							}));
+									"data-action": item.action,
+									onClick: self.click
+								},
+								item.caption
+							);
+						case "option":
+							return React.DOM.select(
+								{
+									key: i,
+									ref: item.id,
+									name: item.id
+								},
+								item.values.map(function (value, i) {
+									return React.DOM.option(
+										{
+											key: i,
+											value: value
+										},
+										value
+									);
+								})
+							);
 					}
 				})
 			);

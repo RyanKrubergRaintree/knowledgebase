@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	// Page corresponds to the knowledgebase page structure
@@ -13,43 +13,43 @@ package("kb", function(exports) {
 		this.story = data.story || [];
 		this.journal = data.journal || [];
 		this.version = data.version || 0;
-		this.modified = data.modified || (new Date()).toISOString();
+		this.modified = data.modified || new Date().toISOString();
 	}
 
 	Page.prototype = {
-		clone: function() {
+		clone: function () {
 			return new Page(JSON.stringify(this));
 		},
 
-		indexOf_: function(id) {
+		indexOf_: function (id) {
 			var story = this.story;
 			for (var i = 0; i < story.length; i += 1) {
 				if (story[i].id === id) {
 					return i;
 				}
 			}
-			throw new Error("Item \"" + id + "\" does not exist.");
+			throw new Error('Item "' + id + '" does not exist.');
 		},
 
-		itemById: function(id) {
+		itemById: function (id) {
 			return this.story[this.indexOf_(id)];
 		},
 
-		apply: function(op) {
+		apply: function (op) {
 			var fn = OP[op.type];
 			if (fn) {
 				fn(this, this.story, op);
 				this.version += 1;
 				this.journal.push(op);
-				this.modified = (new Date()).valueOf();
+				this.modified = new Date().valueOf();
 				return;
 			}
-			throw new Error("Unknown operation \"" + op.type + "\"");
+			throw new Error('Unknown operation "' + op.type + '"');
 		}
 	};
 
 	var OP = {};
-	OP.add = function(page, story, op) {
+	OP.add = function (page, story, op) {
 		if (op.after) {
 			var i = page.indexOf_(op.after);
 			story.splice(i + 1, 0, op.item);
@@ -58,17 +58,17 @@ package("kb", function(exports) {
 		}
 	};
 
-	OP.remove = function(page, story, op) {
+	OP.remove = function (page, story, op) {
 		var i = page.indexOf_(op.id);
 		story.splice(i, 1);
 	};
 
-	OP.edit = function(page, story, op) {
+	OP.edit = function (page, story, op) {
 		var i = page.indexOf_(op.id);
 		story[i] = op.item;
 	};
 
-	OP.move = function(page, story, op) {
+	OP.move = function (page, story, op) {
 		var from = page.indexOf_(op.id),
 			item = story.splice(from, 1)[0];
 		if (op.after) {

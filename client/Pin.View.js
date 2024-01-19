@@ -1,4 +1,4 @@
-package("kb.Pin", function(exports) {
+package("kb.Pin", function (exports) {
 	"use strict";
 
 	depends("util/SmoothScroll.js");
@@ -6,14 +6,15 @@ package("kb.Pin", function(exports) {
 	var PinButtons = createReactClass({
 		displayName: "PinButtons",
 
-		close: function() {
+		close: function () {
 			this.props.onHide();
 		},
 
-		render: function() {
-			var stage = this.props.stage;
+		render: function () {
+			// var stage = this.props.stage;
 			var a = React.DOM.a;
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "stage-buttons"
 				},
 				a({
@@ -27,7 +28,7 @@ package("kb.Pin", function(exports) {
 
 	var View = createReactClass({
 		displayName: "Pin",
-		activate: function(ev) {
+		activate: function (ev) {
 			if (typeof ev === "undefined") {
 				var node = ReactDOM.findDOMNode(this);
 				kb.util.SmoothScroll.to(node);
@@ -36,25 +37,28 @@ package("kb.Pin", function(exports) {
 				kb.util.SmoothScroll.to(node);
 			}
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.activate();
 		},
-		render: function() {
-			var stage = this.props.stage,
-				story = this.props.story;
+		render: function () {
+			// var stage = this.props.stage,
+			// 	story = this.props.story;
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "stage pin",
 					onClick: this.activate,
-					style: this.props.style,
+					style: this.props.style
 				},
 				React.createElement(PinButtons, {
 					onHide: this.props.onHide
 				}),
-				React.DOM.div({
+				React.DOM.div(
+					{
 						className: "stage-scroll round-scrollbar"
 					},
-					React.DOM.div({
+					React.DOM.div(
+						{
 							className: "page page-full"
 						},
 						React.DOM.img({

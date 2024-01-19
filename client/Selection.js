@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("util/Notifier.js");
@@ -14,24 +14,24 @@ package("kb", function(exports) {
 	}
 
 	Selection.prototype = {
-		changed: function() {
+		changed: function () {
 			this.notifier.emit({
 				type: "changed",
 				highlighted: this.highlighted,
 				selected: this.selected
 			});
 		},
-		select: function(id) {
+		select: function (id) {
 			this.selected = id;
 			this.changed();
 		},
-		unselect: function(id) {
+		unselect: function (id) {
 			if (this.selected === id) {
 				this.selected = "";
 				this.changed();
 			}
 		},
-		toggleSelect: function(id) {
+		toggleSelect: function (id) {
 			if (this.selected !== id) {
 				this.selected = id;
 			} else {
@@ -39,27 +39,26 @@ package("kb", function(exports) {
 			}
 			this.changed();
 		},
-		highlight: function(id) {
+		highlight: function (id) {
 			if (this.highlighted === id) {
 				return;
 			}
 			this.highlighted = id;
 			this.changed();
 		},
-		unhighlight: function(id) {
+		unhighlight: function (id) {
 			if (this.highlighted === id) {
 				this.highlighted = "";
 				this.changed();
 			}
 		},
 
-
-		_targetId: function(ev) {
-			if ((!ev) || (!ev.target)) {
+		_targetId: function (ev) {
+			if (!ev || !ev.target) {
 				return;
 			}
 			if (ev.target.nodeName !== "A") {
-				return
+				return;
 			}
 			var id = GetDataAttribute(ev.target, "focusid");
 			if (id == null) {
@@ -68,7 +67,7 @@ package("kb", function(exports) {
 			return id;
 		},
 
-		highlightTarget: function(ev) {
+		highlightTarget: function (ev) {
 			var id = this._targetId(ev);
 			if (id) {
 				this.highlight(id);

@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("site.css");
@@ -7,11 +7,12 @@ package("kb", function(exports) {
 
 	var HeaderMenu = createReactClass({
 		displayName: "HeaderMenu",
-		render: function() {
-			return React.DOM.div({
+		render: function () {
+			return React.DOM.div(
+				{
 					className: "header-menu"
 				},
-				this.props.items.map(function(item) {
+				this.props.items.map(function (item) {
 					if (item == null) {
 						return null;
 					}
@@ -28,18 +29,13 @@ package("kb", function(exports) {
 
 	var Search = createReactClass({
 		lastStageId: undefined,
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
-				options: [
-					"All",
-					"10.2.700",
-					"10.2.500",
-					"10.2.400"
-				],
+				options: ["All", "10.2.700", "10.2.500", "10.2.400"],
 				hidden: this.props.Session.branch != ""
 			};
 		},
-		updateFilter: function(ev) {
+		updateFilter: function (_ev) {
 			var filter = this.refs.filter.value;
 			if (filter !== "All") {
 				this.props.Session.filter = filter;
@@ -47,7 +43,7 @@ package("kb", function(exports) {
 				this.props.Session.filter = "";
 			}
 		},
-		search: function(ev) {
+		search: function (ev) {
 			var Lineup = this.props.Lineup;
 			var query = this.refs.query.value.trim();
 			if (ev.shiftKey) {
@@ -58,14 +54,15 @@ package("kb", function(exports) {
 
 			this.lastStageId = Lineup.open({
 				url: "/search=search?" + param,
-				title: "\"" + query + "\"",
+				title: '"' + query + '"',
 				insteadOf: this.lastStageId
 			});
 			ev.preventDefault();
 		},
-		keyDown: function(ev) {
+		keyDown: function (ev) {
 			var Lineup = this.props.Lineup;
-			if (ev.keyCode === 27) { // esc
+			if (ev.keyCode === 27) {
+				// esc
 				Lineup.closeLast();
 				return;
 			}
@@ -105,14 +102,15 @@ package("kb", function(exports) {
 					break;
 			}
 		},
-		render: function() {
+		render: function () {
 			var filter = this.state;
 			var defaultFilter = this.props.Session.filter;
 			var options = filter.options.slice();
 			if (options.indexOf(defaultFilter) < 0) {
 				options.push(defaultFilter);
 			}
-			return React.DOM.form({
+			return React.DOM.form(
+				{
 					className: "search",
 					onSubmit: this.search
 				},
@@ -121,7 +119,8 @@ package("kb", function(exports) {
 					placeholder: "Search...",
 					onKeyDown: this.keyDown
 				}),
-				React.DOM.select({
+				React.DOM.select(
+					{
 						className: "search-filter",
 						ref: "filter",
 						style: {
@@ -130,11 +129,14 @@ package("kb", function(exports) {
 						onChange: this.updateFilter,
 						defaultValue: defaultFilter
 					},
-					options.map(function(item) {
-						return React.DOM.option({
-							key: item,
-							value: item
-						}, item);
+					options.map(function (item) {
+						return React.DOM.option(
+							{
+								key: item,
+								value: item
+							},
+							item
+						);
 					})
 				),
 				React.DOM.button({
@@ -147,7 +149,7 @@ package("kb", function(exports) {
 	});
 
 	var LoginInfo = createReactClass({
-		render: function() {
+		render: function () {
 			var infostyle = {
 				style: {
 					fontSize: "smaller"
@@ -157,7 +159,8 @@ package("kb", function(exports) {
 			var username = this.props.username;
 			if (username.indexOf("=") >= 0) {
 				var tokens = username.split("=");
-				return React.DOM.div({
+				return React.DOM.div(
+					{
 						className: "background-info"
 					},
 					React.DOM.div(infostyle, "logged in as:"),
@@ -167,7 +170,8 @@ package("kb", function(exports) {
 				);
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "background-info"
 				},
 				React.DOM.div(infostyle, "logged in as:"),
@@ -177,7 +181,7 @@ package("kb", function(exports) {
 	});
 
 	var Header = createReactClass({
-		openHome: function(ev) {
+		openHome: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -190,7 +194,7 @@ package("kb", function(exports) {
 
 			this.props.Lineup.openPages(pages);
 		},
-		createNewPage: function(ev) {
+		createNewPage: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -201,16 +205,17 @@ package("kb", function(exports) {
 				title: ""
 			});
 		},
-		logout: function(ev) {
+		logout: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
 			this.props.Session.logout();
 		},
 		displayName: "Header",
-		render: function() {
+		render: function () {
 			var company = this.props.Session.user.company || "Community";
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					id: "header"
 				},
 				React.DOM.a({
@@ -221,33 +226,42 @@ package("kb", function(exports) {
 				}),
 				React.createElement(Search, this.props),
 				React.createElement(HeaderMenu, {
-					items: [{
-						key: "new-page",
-						href: "#",
-						onClick: this.createNewPage,
-						caption: "New Page"
-					}, {
-						key: "index",
-						href: "/help=index",
-						caption: "Index"
-					}, {
-						key: "recent-changes",
-						href: "/page=recent-changes",
-						caption: "Recent Changes"
-					}, (company != "" ? {
-						key: "company",
-						href: "/group=" + company,
-						caption: company
-					} : null), {
-						key: "user",
-						href: "/user=current",
-						caption: "User"
-					}, {
-						key: "logout",
-						href: "#",
-						onClick: this.logout,
-						caption: "Logout"
-					}]
+					items: [
+						{
+							key: "new-page",
+							href: "#",
+							onClick: this.createNewPage,
+							caption: "New Page"
+						},
+						{
+							key: "index",
+							href: "/help=index",
+							caption: "Index"
+						},
+						{
+							key: "recent-changes",
+							href: "/page=recent-changes",
+							caption: "Recent Changes"
+						},
+						company != ""
+							? {
+									key: "company",
+									href: "/group=" + company,
+									caption: company
+								}
+							: null,
+						{
+							key: "user",
+							href: "/user=current",
+							caption: "User"
+						},
+						{
+							key: "logout",
+							href: "#",
+							onClick: this.logout,
+							caption: "Logout"
+						}
+					]
 				})
 			);
 		}
@@ -255,8 +269,9 @@ package("kb", function(exports) {
 
 	var Content = createReactClass({
 		displayName: "Content",
-		render: function() {
-			return React.DOM.div({
+		render: function () {
+			return React.DOM.div(
+				{
 					id: "content"
 				},
 				React.createElement(LoginInfo, {
@@ -269,8 +284,9 @@ package("kb", function(exports) {
 
 	exports.Site = createReactClass({
 		displayName: "Site",
-		render: function() {
-			return React.DOM.div(null,
+		render: function () {
+			return React.DOM.div(
+				null,
 				React.createElement(Header, this.props),
 				React.createElement(Content, this.props)
 			);
