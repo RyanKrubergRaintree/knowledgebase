@@ -94,9 +94,26 @@ package("kb.boot", function (exports) {
 		}
 	});
 
+	var googleLoginWrapper = createReactClass({
+		render: function () {
+			return React.DOM.div({
+				id: "gsi-wrapper"
+			});
+		},
+		componentDidMount: function () {
+			var domNode = ReactDOM.findDOMNode(this);
+			google.accounts.id.renderButton(domNode, {
+				logo_alignment: "center",
+				size: "medium",
+				width: 338
+			});
+		}
+	});
+
 	var loginView = {
 		form: LoginForm,
-		button: LoginButton
+		button: LoginButton,
+		"google-button": googleLoginWrapper
 	};
 
 	//TODO: move this logic to server conf

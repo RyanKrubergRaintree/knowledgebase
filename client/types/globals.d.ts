@@ -20,6 +20,38 @@ interface getClassListResult {
 }
 
 /**
+ * Google sign in information that comes from the server
+ *
+ * {@link https://github.com/raintreeinc/knowledgebase/blob/master/auth/provider/google.go}
+ */
+export interface GoogleSignInInformation {
+	hd: string;
+	client_id: string;
+	login_uri: string;
+}
+
+/**
+ * {@link https://developers.google.com/identity/gsi/web/reference/js-reference#credential}
+ */
+export interface ParsedJwtCredentials {
+	iss: string;
+	azp: string;
+	aud: string;
+	sub: string;
+	hd: string;
+	email: string;
+	email_verified: boolean;
+	nbf: number;
+	name: string;
+	picture: string;
+	given_name: string;
+	family_name: string;
+	locale: string;
+	iat: number;
+	exp: number;
+	jti: string;
+}
+/**
  * Reloads files on change
  * https://github.com/raintreeinc/livepkg/blob/master/reloader.js.go
  */

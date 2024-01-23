@@ -406,7 +406,8 @@ func AddCSPHeader(w http.ResponseWriter) string {
 		style-src
 			'self'
 			'unsafe-inline'
-			fonts.googleapis.com;
+			fonts.googleapis.com
+			*.google.com;
 		img-src
 			'self'
 			'unsafe-inline'

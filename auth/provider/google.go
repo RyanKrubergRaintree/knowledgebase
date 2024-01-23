@@ -15,14 +15,31 @@ type Google struct {
 	ClientID     string
 	ClientSecret string
 	HostedDomain string
+	Host         string
 }
 
 func (conf *Google) Boot() template.HTML {
+	client_id := template.JSEscapeString(conf.ClientID)
+	login_uri := template.JSEscapeString(conf.Host)
+	hd := template.JSEscapeString(conf.HostedDomain)
+
+	if login_uri != "" {
+		login_uri = "https://" + login_uri
+	}
+	login_uri += "/system/auth/google"
+
 	var head string
-	head += `<script src="https://apis.google.com/js/platform.js"></script>`
-	head += `<meta name="google-signin-client_id" content="` +
-		template.JSEscapeString(conf.ClientID) + `">`
-	head += `<script>var GoogleHostedDomain="` + template.JSEscapeString(conf.HostedDomain) + `"</script>`
+	// https://developers.google.com/identity/gsi/web/guides/client-library
+	head += `<script src="https://accounts.google.com/gsi/client"></script>`
+	head += `
+		<script id="gsi_information" type="application/json">
+			{
+				"hd": "` + hd + `",
+				"client_id": "` + client_id + `",
+				"login_uri": "` + login_uri + `"
+			}
+		</script>
+	`
 	return template.HTML(head)
 }
 
@@ -33,7 +50,7 @@ func (conf *Google) Verify(user, code string) (kb.User, error) {
 	const tokinfo = "https://www.googleapis.com/oauth2/v3/tokeninfo"
 	r, err := http.Get(tokinfo + "?id_token=" + url.QueryEscape(token))
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Failed to get response for user \"%v\": %v", user, err)
+		return kb.User{}, fmt.Errorf("failed to get response for user \"%v\": %v", user, err)
 	}
 
 	var result struct {
@@ -49,22 +66,22 @@ func (conf *Google) Verify(user, code string) (kb.User, error) {
 	}
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Failed to read result for user \"%v\": %v", user, err)
+		return kb.User{}, fmt.Errorf("failed to read result for user \"%v\": %v", user, err)
 	}
 
 	err = json.Unmarshal(data, &result)
 	if err != nil {
-		return kb.User{}, fmt.Errorf("Invalid JSON for user \"%v\": %v", user, err)
+		return kb.User{}, fmt.Errorf("invalid JSON for user \"%v\": %v", user, err)
 	}
 
 	if r.StatusCode != http.StatusOK {
-		return kb.User{}, fmt.Errorf("Failed to authenticate with Google user \"%v\": %s", user, r.Status)
+		return kb.User{}, fmt.Errorf("failed to authenticate with Google user \"%v\": %s", user, r.Status)
 	}
 
 	if result.EmailVerified != "true" ||
 		result.Audience != conf.ClientID ||
 		result.Email != user {
-		return kb.User{}, fmt.Errorf("Invalid token for \"%v\"", user)
+		return kb.User{}, fmt.Errorf("invalid token for \"%v\"", user)
 	}
 
 	return kb.User{

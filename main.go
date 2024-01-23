@@ -123,6 +123,7 @@ func main() {
 			ClientID:     key,
 			ClientSecret: os.Getenv("GPLUS_SECRET"),
 			HostedDomain: os.Getenv("GPLUS_HOSTED_DOMAIN"),
+			Host:         *domain,
 		}
 	}
 	if caskey := os.Getenv("CASKEY"); caskey != "" {

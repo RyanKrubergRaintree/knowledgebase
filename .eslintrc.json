@@ -4,20 +4,21 @@
     "browser": true
   },
   "globals": {
+    "gsi_information": "readonly",
+    "Reloader": "readonly",
     "ga": "readonly",
+    "kb": "readonly",
     "React": "readonly",
     "ReactDOM": "readonly",
-    "kb": "readonly",
+    "createReactClass": "readonly",
     "depends": "readonly",
     "package": "readonly",
+    // from https://accounts.google.com/gsi/client
+    "google": "readonly",
     "GenerateID": "readonly",
     "GetDataAttribute": "readonly",
     "TestCase": "readonly",
-    "getClassList": "readonly",
-    // from https://accounts.google.com/gsi/client
-    "google": "readonly",
-    "createReactClass": "readonly",
-    "Reloader": "readonly"
+    "getClassList": "readonly"
   },
   "parserOptions": {
     "ecmaVersion": 5,
