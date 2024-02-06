@@ -22,12 +22,13 @@ jobs:
         with:
           go-version: "1.21"
           cache: false
-      - name: install go dependencies
-        run: go mod download
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
+      # golangci-lint seems to also lint dependancies if this is used before
+      - name: install go dependencies
+        run: go mod download
 
       - name: set up node
         uses: actions/setup-node@v4
