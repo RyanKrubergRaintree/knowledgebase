@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is running production deployment
 on:
   push:
     branches:
-      - "main"
+      - "master"
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION != '' && vars.AWS_REGION || 'us-east-1' }}
