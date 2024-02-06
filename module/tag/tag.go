@@ -88,6 +88,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request, tag kb.Slug) {
 		Story: kb.StoryFromEntries(entries),
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -123,6 +124,7 @@ func (mod *Module) tags(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 

@@ -55,5 +55,6 @@ func main() {
 	fmt.Fprintf(&buf, "\n\t];\n")
 	fmt.Fprintf(&buf, "});\n")
 
+	//nolint:errcheck
 	ioutil.WriteFile("identifier.js", buf.Bytes(), 0755)
 }

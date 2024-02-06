@@ -59,6 +59,7 @@ func saveFileFromHttpRequestToServer(r *http.Request) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	//nolint:errcheck
 	io.Copy(f, file)
 	defer f.Close()
 
@@ -87,6 +88,7 @@ func saveImageFileFromHttpRequestToServer(r *http.Request) (string, error) {
 		return "", err
 	}
 	defer f.Close()
+	//nolint:errcheck
 	f.Write(decoded)
 
 	return fileNameWithPath, nil

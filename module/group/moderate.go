@@ -10,7 +10,9 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb/items/simpleform"
 )
 
-var esc = html.EscapeString
+// it is used feel free to use regex `[\S]{0}esc\(`g
+// example use in module\group\group.go
+var esc = html.EscapeString //nolint:unused
 
 func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 	context, groupID, ok := mod.server.GroupContext(w, r, kb.Moderator)
@@ -57,6 +59,7 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			//nolint:errcheck
 			switch r.Method {
 			case "add-user":
 				w.Write([]byte("user added"))
@@ -135,5 +138,6 @@ func (mod *Module) moderate(w http.ResponseWriter, r *http.Request) {
 	el += "</ul>"
 	page.Story.Append(kb.HTML(el))
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }

@@ -224,6 +224,7 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		if matched && err == nil {
 			createUserIfNeeded()
 			for _, group := range groups {
+				//nolint:errcheck
 				context.Access().AddUser(group, user.ID)
 			}
 		}
@@ -235,6 +236,7 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		gid := kb.Slugify(user.Company)
 		_, err := context.Groups().ByID(gid)
 		if err == kb.ErrGroupNotExist {
+			//nolint:errcheck
 			context.Groups().Create(kb.Group{
 				ID:          gid,
 				OwnerID:     gid,
@@ -242,8 +244,10 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 				Public:      false,
 				Description: "Private group for " + user.Company,
 			})
+			//nolint:errcheck
 			context.Access().CommunityAdd("community", gid, kb.Editor)
 		}
+		//nolint:errcheck
 		context.Access().AddUser(gid, user.ID)
 	}
 
@@ -251,6 +255,7 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 		if prov == user.AuthProvider {
 			createUserIfNeeded()
 			for _, group := range groups {
+				//nolint:errcheck
 				context.Access().AddUser(group, user.ID)
 			}
 		}
@@ -258,6 +263,7 @@ func (rs *RuleSet) Login(user kb.User, db kb.Database) error {
 
 	for _, admin := range rs.Admins {
 		if user.ID == admin {
+			//nolint:errcheck
 			context.Access().SetAdmin(user.ID, true)
 		}
 	}

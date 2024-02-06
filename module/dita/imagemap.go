@@ -45,10 +45,12 @@ func (conversion *PageConversion) ConvertImageMap(context *ditaconvert.Context, 
 
 	emitStart := func(tag string, attrs ...xml.Attr) {
 		//context.check(context.Encoder.WriteStart(tag, attrs...))
+		//nolint:errcheck
 		context.Encoder.WriteStart(tag, attrs...)
 	}
 	emitEnd := func(tag string) {
 		//context.check(context.Encoder.WriteEnd(tag))
+		//nolint:errcheck
 		context.Encoder.WriteEnd(tag)
 	}
 
@@ -58,6 +60,7 @@ func (conversion *PageConversion) ConvertImageMap(context *ditaconvert.Context, 
 	defer func() {
 		emitStart("div",
 			attr("class", "imagemap-tip"))
+		//nolint:errcheck
 		context.Encoder.WriteRaw("Click any highlighted region for details.")
 		emitEnd("div")
 	}()

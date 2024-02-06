@@ -72,6 +72,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.Story = kb.StoryFromEntries(entries)
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -114,5 +115,6 @@ func (mod *Module) recentChanges(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.ItemsFromEntries(entries)...)
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }

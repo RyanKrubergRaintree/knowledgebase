@@ -109,6 +109,7 @@ func (mod *Module) current(w http.ResponseWriter, r *http.Request) {
 		page.Story.Append(kb.HTML(requestInfo))
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -144,5 +145,6 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	//nolint:errcheck
 	w.Write(data)
 }

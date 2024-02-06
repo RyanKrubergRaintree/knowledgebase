@@ -17,6 +17,7 @@ func init() {
 }
 
 func ListUsers(DB kb.Database, fs *flag.FlagSet, args []string) {
+	//nolint:errcheck
 	fs.Parse(args)
 
 	users, err := DB.Context("admin").Users().List()

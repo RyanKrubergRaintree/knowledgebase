@@ -19,7 +19,7 @@ func init() {
 
 func SetupGroups(DB kb.Database, fs *flag.FlagSet, args []string) {
 	conf := fs.String("conf", "", "configuration file to be loaded")
-	fs.Parse(args)
+	fs.Parse(args) //nolint:errcheck
 
 	if *conf == "" {
 		fmt.Println("Configuration file should be supplied")

@@ -222,7 +222,9 @@ func (db *Database) migrateFromOld() error {
 		},
 	})
 	if err != nil {
-		db.Exec("DROP TABLE Versions")
+		// TODO: in go >= 1.20 use `err = errors.Join(err, tableDropError)`
+		//   instead of ignoring
+		db.Exec("DROP TABLE Versions") //nolint:errcheck
 	}
 	return err
 }
@@ -232,7 +234,7 @@ func (db *Database) migrate(mig *migration) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback() //nolint:errcheck
 
 	for i, q := range mig.Scripts {
 		if _, err := tx.Exec(q); err != nil {

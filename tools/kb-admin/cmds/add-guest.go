@@ -20,7 +20,12 @@ func AddGuest(DB kb.Database, fs *flag.FlagSet, args []string) {
 	name := fs.String("name", "", "name for the login")
 	email := fs.String("email", "", "email for the login")
 	password := fs.String("password", "", "password for the login")
-	fs.Parse(args)
+
+	err := fs.Parse(args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	if *name == "" || *password == "" {
 		fmt.Println("username and password must be specified")
@@ -29,7 +34,7 @@ func AddGuest(DB kb.Database, fs *flag.FlagSet, args []string) {
 	}
 
 	guest := DB.Context("admin").GuestLogin()
-	err := guest.Add(*name, *email, *password)
+	err = guest.Add(*name, *email, *password)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

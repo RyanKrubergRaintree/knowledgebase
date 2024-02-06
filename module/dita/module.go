@@ -64,6 +64,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/")
 	slug := kb.Slugify(path)
 	if data, ok := cache.Raw[slug]; ok {
+		//nolint:errcheck
 		w.Write(data)
 		return
 	}
@@ -119,6 +120,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		content += "</ul>"
 
 		page.Story.Append(kb.HTML(content))
+		//nolint:errcheck
 		page.WriteResponse(w)
 		return
 
@@ -130,6 +132,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		page.Story.Append(index.New("index", cache.Nav))
+		//nolint:errcheck
 		page.WriteResponse(w)
 		return
 	}
@@ -150,6 +153,7 @@ func (mod *Module) monitor() {
 	modified := time.Now()
 	mod.reload()
 	for range time.Tick(3 * time.Second) {
+		//nolint:errcheck
 		filepath.Walk(filepath.Dir(mod.ditamap),
 			func(_ string, info os.FileInfo, err error) error {
 				if err != nil {
