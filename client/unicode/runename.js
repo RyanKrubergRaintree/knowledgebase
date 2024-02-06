@@ -1,4 +1,4 @@
-package("kb.unicode", function(exports) {
+package("kb.unicode", function (exports) {
 	"use strict";
 
 	exports.RuneName = {

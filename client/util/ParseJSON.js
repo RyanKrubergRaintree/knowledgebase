@@ -1,4 +1,4 @@
-package("kb.util", function(exports) {
+package("kb.util", function (exports) {
 	"use strict";
 
 	exports.ParseJSON = ParseJSON;

@@ -43,7 +43,8 @@ func (mod *Module) Info() kb.Group {
 func (mod *Module) init() {
 	// create temp folder for uploads
 	path, _ := os.Getwd()
-	_ = os.Mkdir(filepath.FromSlash(path+"/temp/"), 666)
+	//nolint:errcheck
+	_ = os.Mkdir(filepath.FromSlash(path+"/temp/"), 0666)
 	mod.createUser()
 	imageEndpoint := "/lms=/uploadImage/"
 

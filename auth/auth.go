@@ -107,6 +107,7 @@ func (server *Server) info(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	//nolint:errcheck
 	json.NewEncoder(w).Encode(&SessionInfo{
 		Token: token.String(),
 		User:  user,
@@ -277,6 +278,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	//nolint:errcheck
 	json.NewEncoder(w).Encode(&SessionInfo{
 		Token: token.String(),
 		User:  user,

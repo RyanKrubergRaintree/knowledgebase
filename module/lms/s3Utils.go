@@ -13,7 +13,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/utils"
 )
 
-func getSignedLink(key, bucket string,  w http.ResponseWriter) (string, error) {
+func getSignedLink(key, bucket string, w http.ResponseWriter) (string, error) {
 	s3Client, err := getS3Client()
 	if err != nil {
 		return "", err
@@ -40,23 +40,20 @@ func getSignedLink(key, bucket string,  w http.ResponseWriter) (string, error) {
 }
 
 func doesFileExistsInS3(s3Client *s3.S3, bucket string, key string) bool {
-    _, err := s3Client.HeadObject(&s3.HeadObjectInput{
-        Bucket: aws.String(bucket),
-        Key:    aws.String(key),
-    })
+	_, err := s3Client.HeadObject(&s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
 
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil;
 }
 
 // todo: error out only if bucket does not exist and err. happens; i.e ignore bucket exists errors
+//nolint:unused // decide if to remove later
 func createBucket(bucketName string) error {
 	s3Client, err := getS3Client()
 	if err != nil {
-		return  err
+		return err
 	}
 
 	_, err = s3Client.CreateBucket(&s3.CreateBucketInput{
@@ -75,7 +72,6 @@ func createBucket(bucketName string) error {
 
 	return nil
 }
-
 
 // creates a new S3 client and returns it along with any error.
 func getS3Client() (*s3.S3, error) {

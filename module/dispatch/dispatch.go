@@ -82,5 +82,6 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }

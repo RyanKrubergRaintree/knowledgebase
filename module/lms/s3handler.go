@@ -179,8 +179,9 @@ func listFilesForGivenBucketAndPath(bucket, path string, w http.ResponseWriter) 
 		return
 	}
 
-	w.Write(data)
 	w.Header().Set("Content-Type", "application/json")
+	//nolint:errcheck
+	w.Write(data)
 }
 
 

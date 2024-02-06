@@ -11,6 +11,7 @@ import (
 	"github.com/raintreeinc/knowledgebase/kb/items/simpleform"
 )
 
+//nolint:unused
 var esc = html.EscapeString
 
 func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +51,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 				kb.WriteResult(w, err)
 				return
 			}
+			//nolint:errcheck
 			w.Write([]byte("group created"))
 			return
 		case "add-user":
@@ -68,6 +70,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 				kb.WriteResult(w, err)
 				return
 			}
+			//nolint:errcheck
 			w.Write([]byte("user added"))
 			return
 		default:
@@ -113,6 +116,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 		simpleform.Button("add-user", "Add"),
 	))
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 

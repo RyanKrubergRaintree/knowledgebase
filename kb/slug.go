@@ -99,9 +99,7 @@ func Slugify(s string) Slug {
 }
 
 func TokenizeLink(link string) (owner, page Slug) {
-	if strings.HasPrefix(link, "/") {
-		link = link[1:]
-	}
+	link = strings.TrimPrefix(link, "/")
 	slug := Slugify(link)
 
 	i := strings.Index(string(slug), "=")
@@ -112,9 +110,7 @@ func TokenizeLink(link string) (owner, page Slug) {
 }
 
 func TokenizeLink3(link string) (owner, title, page Slug) {
-	if strings.HasPrefix(link, "/") {
-		link = link[1:]
-	}
+	link = strings.TrimPrefix(link, "/")
 	slug := Slugify(link)
 
 	i := strings.Index(string(slug), "=")

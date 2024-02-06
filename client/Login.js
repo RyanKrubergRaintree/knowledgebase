@@ -1,95 +1,140 @@
-package("kb.boot", function(exports) {
+package("kb.boot", function (exports) {
 	"use strict";
 
 	depends("Auth.js");
 	depends("Login.css");
 
 	var LoginForm = createReactClass({
-		login: function(ev) {
+		login: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
-			this.props.provider.login(
-				this.refs.username.value,
-				this.refs.password.value
-			);
+			this.props.provider.login(this.refs.username.value, this.refs.password.value);
 		},
-		render: function() {
-			return React.DOM.form({
+		render: function () {
+			return React.DOM.form(
+				{
 					className: "logins",
 					onSubmit: this.login
 				},
-				React.DOM.table(null, React.DOM.tbody(null,
-					React.DOM.tr(null,
-						React.DOM.td(null, React.DOM.label({
-							htmlFor: "username"
-						}, "Username:")),
-						React.DOM.td(null, React.DOM.input({
-							ref: "username",
-							name: "username",
-							tabIndex: 1
-						})),
-						React.DOM.td({
-								rowSpan: 2
-							},
-							React.DOM.input({
-								className: "button",
-								type: "submit",
-								value: "Login",
-								tabIndex: 3
-							}))
-					), React.DOM.tr(null,
-						React.DOM.td(null, React.DOM.label({
-							htmlFor: "password"
-						}, "Password:")),
-						React.DOM.td(null, React.DOM.input({
-							ref: "password",
-							name: "password",
-							type: "password",
-							tabIndex: 2
-						}))
+				React.DOM.table(
+					null,
+					React.DOM.tbody(
+						null,
+						React.DOM.tr(
+							null,
+							React.DOM.td(
+								null,
+								React.DOM.label(
+									{
+										htmlFor: "username"
+									},
+									"Username:"
+								)
+							),
+							React.DOM.td(
+								null,
+								React.DOM.input({
+									ref: "username",
+									name: "username",
+									tabIndex: 1
+								})
+							),
+							React.DOM.td(
+								{
+									rowSpan: 2
+								},
+								React.DOM.input({
+									className: "button",
+									type: "submit",
+									value: "Login",
+									tabIndex: 3
+								})
+							)
+						),
+						React.DOM.tr(
+							null,
+							React.DOM.td(
+								null,
+								React.DOM.label(
+									{
+										htmlFor: "password"
+									},
+									"Password:"
+								)
+							),
+							React.DOM.td(
+								null,
+								React.DOM.input({
+									ref: "password",
+									name: "password",
+									type: "password",
+									tabIndex: 2
+								})
+							)
+						)
 					)
-				))
+				)
 			);
 		}
 	});
 
 	var LoginButton = createReactClass({
-		click: function() {
+		click: function () {
 			this.props.provider.login();
 		},
-		render: function() {
+		render: function () {
+			return React.DOM.div(
+				{
+					className: "button",
+					onClick: this.click
+				},
+				this.props.provider.title
+			);
+		}
+	});
+
+	var googleLoginWrapper = createReactClass({
+		render: function () {
 			return React.DOM.div({
-				className: "button",
-				onClick: this.click
-			}, this.props.provider.title);
+				id: "gsi-wrapper"
+			});
+		},
+		componentDidMount: function () {
+			var domNode = ReactDOM.findDOMNode(this);
+			google.accounts.id.renderButton(domNode, {
+				logo_alignment: "center",
+				size: "medium",
+				width: 338
+			});
 		}
 	});
 
 	var loginView = {
-		"form": LoginForm,
-		"button": LoginButton
+		form: LoginForm,
+		button: LoginButton,
+		"google-button": googleLoginWrapper
 	};
 
 	//TODO: move this logic to server conf
 	var loginTitle = {
-		"guest": "Customer Login:",
-		"google": "Employee Login:"
+		guest: "Customer Login:",
+		google: "Employee Login:"
 	};
 
 	exports.Login = createReactClass({
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				authLoaded: false,
 				error: this.props.initialError
 			};
 		},
-		loaded: function() {
+		loaded: function () {
 			this.setState({
 				authLoaded: true
 			});
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			if (kb.Auth.loaded) {
 				this.loaded();
 			} else {
@@ -98,18 +143,19 @@ package("kb.boot", function(exports) {
 
 			kb.Auth.on("login-error", this.updateError, this);
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			kb.Auth.remove(this);
 		},
-		updateError: function(event) {
+		updateError: function (event) {
 			this.setState({
 				error: event.message
 			});
 		},
-		render: function() {
+		render: function () {
 			var failure = null;
 			if (this.state.error !== "") {
-				failure = new React.DOM.div({
+				failure = new React.DOM.div(
+					{
 						className: "login-failed"
 					},
 					React.DOM.h2(null, "Login failed"),
@@ -121,7 +167,7 @@ package("kb.boot", function(exports) {
 			if (this.state.authLoaded) {
 				var providers = kb.Auth.providers;
 				for (var name in providers) {
-					if (!providers.hasOwnProperty(name)) {
+					if (!Object.prototype.hasOwnProperty.call(providers, name)) {
 						continue;
 					}
 
@@ -135,33 +181,48 @@ package("kb.boot", function(exports) {
 						continue;
 					}
 
-					logins.push(React.DOM.h2({
-						key: "header-" + name
-					}, loginTitle[name]));
+					logins.push(
+						React.DOM.h2(
+							{
+								key: "header-" + name
+							},
+							loginTitle[name]
+						)
+					);
 
-					logins.push(React.createElement(view, {
-						key: name,
-						name: name,
-						provider: provider
-					}));
+					logins.push(
+						React.createElement(view, {
+							key: name,
+							name: name,
+							provider: provider
+						})
+					);
 				}
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					id: "login"
 				},
-				React.DOM.div({
-					id: "header"
-				}, "Knowledge Base"),
-				React.DOM.div({
-					id: "content"
-				}, React.DOM.div({
-						className: "modal"
+				React.DOM.div(
+					{
+						id: "header"
 					},
+					"Knowledge Base"
+				),
+				React.DOM.div(
+					{
+						id: "content"
+					},
+					React.DOM.div(
+						{
+							className: "modal"
+						},
 
-					failure,
-					logins
-				))
+						failure,
+						logins
+					)
+				)
 			);
 		}
 	});

@@ -87,7 +87,7 @@ func Upload(name string, config *Config) error {
 	}
 
 	if p == nil {
-		return fmt.Errorf("no mapping named ", name)
+		return errors.New("no mapping named " + name)
 	}
 
 	log.Println()

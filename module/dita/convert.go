@@ -121,6 +121,7 @@ func (conversion *PageConversion) ToSlug(context *ditaconvert.Context, dec *xml.
 		if title == "" {
 			context.Errors = append(context.Errors, fmt.Errorf("unable to find title for %v", href))
 		}
+		//nolint:errcheck
 		context.Encoder.WriteRaw(html.EscapeString(title))
 	}
 	return context.Encoder.WriteEnd("a")
@@ -134,6 +135,7 @@ func (conversion *PageConversion) InlineImage(context *ditaconvert.Context, dec 
 	placement := getAttr(&start, "placement")
 	setAttr(&start, "placement", "")
 	if placement == "break" {
+		//nolint:errcheck
 		context.Encoder.WriteStart("p",
 			xml.Attr{Name: xml.Name{Local: "class"}, Value: "image"})
 	}
@@ -141,6 +143,7 @@ func (conversion *PageConversion) InlineImage(context *ditaconvert.Context, dec 
 	err := context.EmitWithChildren(dec, start)
 
 	if placement == "break" {
+		//nolint:errcheck
 		context.Encoder.WriteEnd("p")
 	}
 

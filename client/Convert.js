@@ -1,4 +1,4 @@
-package("kb.convert", function(exports) {
+package("kb.convert", function (exports) {
 	"use strict";
 
 	depends("unicode/identifier.js");
@@ -13,7 +13,7 @@ package("kb.convert", function(exports) {
 		return link.trim();
 	}
 
-	TestCase("trimProtocol", function(assert) {
+	TestCase("trimProtocol", function (assert) {
 		assert.equal(trimProtocol(""), "");
 		assert.equal(trimProtocol("http://xyz"), "//xyz");
 		assert.equal(trimProtocol("https://xyz/zwy"), "//xyz/zwy");
@@ -27,12 +27,11 @@ package("kb.convert", function(exports) {
 		return link;
 	}
 
-	TestCase("trimLeadingSlashes", function(assert) {
+	TestCase("trimLeadingSlashes", function (assert) {
 		assert.equal(trimLeadingSlashes(""), "");
 		assert.equal(trimLeadingSlashes("xyz"), "xyz");
 		assert.equal(trimLeadingSlashes("///xyz/zwy"), "xyz/zwy");
 	});
-
 
 	// TextToSlug converts text to a slug
 	//
@@ -66,13 +65,13 @@ package("kb.convert", function(exports) {
 				cutdash = false;
 				continue;
 			}
-			if ((r === "/") || (r === "=")) {
-				if ((slug.length === 0) || (slug[slug.length - 1] !== r)) {
+			if (r === "/" || r === "=") {
+				if (slug.length === 0 || slug[slug.length - 1] !== r) {
 					slug += r;
 				}
 				emitdash = false;
 				cutdash = true;
-			} else if ((r === "-") || (r === ",") || (r === ".") || (r === " ") || (r === "_")) {
+			} else if (r === "-" || r === "," || r === "." || r === " " || r === "_") {
 				emitdash = true;
 			} else {
 				var name = kb.unicode.RuneName[r];
@@ -94,7 +93,7 @@ package("kb.convert", function(exports) {
 		return slug;
 	}
 
-	TestCase("TextToSlug", function(assert) {
+	TestCase("TextToSlug", function (assert) {
 		assert.equal(TextToSlug(""), "-");
 		assert.equal(TextToSlug("&Hello_世界/+!"), "amp-hello-世界/plus-excl");
 		assert.equal(TextToSlug("Hello  World  ////  Test"), "hello-world/test");
@@ -113,7 +112,7 @@ package("kb.convert", function(exports) {
 		link = trimProtocol(link);
 		// External site:
 		// "//kb.example.com/example"
-		if ((link[0] === "/") && (link[1] === "/")) {
+		if (link[0] === "/" && link[1] === "/") {
 			return {
 				link: URLToReadable(link),
 				url: link,
@@ -165,13 +164,13 @@ package("kb.convert", function(exports) {
 
 	function URLToReadable(url) {
 		var loc = URLToLocation(url);
-		if ((loc.host === "") || (loc.host === window.location.host)) {
+		if (loc.host === "" || loc.host === window.location.host) {
 			return loc.path + loc.query + loc.fragment;
 		} else {
 			return "//" + loc.host + loc.path + loc.query + loc.fragment;
 		}
 	}
-	TestCase("URLToReadable", function(assert) {
+	TestCase("URLToReadable", function (assert) {
 		assert.equal(URLToReadable(""), "/");
 		assert.equal(URLToReadable("/hello-world"), "/hello-world");
 		assert.equal(URLToReadable("/hello-world/test#"), "/hello-world/test");
@@ -219,7 +218,7 @@ package("kb.convert", function(exports) {
 		};
 	}
 
-	TestCase("URLToLocation", function(assert) {
+	TestCase("URLToLocation", function (assert) {
 		function verify(url) {
 			var loc = URLToLocation(url);
 			assert.equal(loc.scheme, "");
@@ -238,7 +237,7 @@ package("kb.convert", function(exports) {
 			return "";
 		}
 
-		var reg = new RegExp('[^?]+?.*&?' + param + '=([^&#]*)', 'i');
+		var reg = new RegExp("[^?]+?.*&?" + param + "=([^&#]*)", "i");
 		var matches = reg.exec(url);
 		return matches ? matches[1] : "";
 	}

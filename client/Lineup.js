@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("util/Notifier.js");
@@ -20,14 +20,14 @@ package("kb", function(exports) {
 	}
 
 	Lineup.prototype = {
-		changed: function() {
+		changed: function () {
 			this.notifier.emit({
 				type: "changed",
 				lineup: this
 			});
 		},
 
-		stageById: function(id) {
+		stageById: function (id) {
 			for (var i = 0; i < this.stages.length; i += 1) {
 				if (this.stages[i].id === id) {
 					return this.stages[i];
@@ -35,7 +35,7 @@ package("kb", function(exports) {
 			}
 			return undefined;
 		},
-		indexOf_: function(id) {
+		indexOf_: function (id) {
 			if (typeof id === "undefined") {
 				return -1;
 			}
@@ -47,7 +47,7 @@ package("kb", function(exports) {
 			return -1;
 		},
 
-		trim_: function(id) {
+		trim_: function (id) {
 			this.hidePin();
 			if (typeof id === "undefined") {
 				return;
@@ -58,13 +58,13 @@ package("kb", function(exports) {
 			}
 		},
 
-		clear: function() {
+		clear: function () {
 			this.removeListeners();
 			this.stages = [];
 			this.changed();
 		},
 
-		closeLast: function() {
+		closeLast: function () {
 			if (this.pinned.visible) {
 				this.hidePin();
 				return;
@@ -74,7 +74,7 @@ package("kb", function(exports) {
 			}
 		},
 
-		changeRef: function(id, stage) {
+		changeRef: function (id, stage) {
 			var i = this.indexOf_(id);
 			if (i >= 0) {
 				var ref = this.stages[i];
@@ -90,7 +90,7 @@ package("kb", function(exports) {
 		// link
 		// after, optional
 		// insteadOf, optional
-		open: function(props) {
+		open: function (props) {
 			this.trim_(props.after);
 			var stage = new kb.Stage(this.session_, props);
 
@@ -108,11 +108,11 @@ package("kb", function(exports) {
 			return stage.id;
 		},
 
-		openLink: function(link) {
+		openLink: function (link) {
 			this.open(kb.convert.LinkToReference(link));
 		},
 
-		openPages: function(pages) {
+		openPages: function (pages) {
 			this.hidePin();
 
 			this.clear();
@@ -125,43 +125,45 @@ package("kb", function(exports) {
 			}
 		},
 
-		handleClose: function(ev) {
-			this.stages = this.stages.filter(function(stage) {
+		handleClose: function (ev) {
+			this.stages = this.stages.filter(function (stage) {
 				return stage !== ev.stage;
 			});
 			this.changed();
 		},
-		handleURLChanged: function( /*ev*/ ) {
+		handleURLChanged: function (/*ev*/) {
 			this.changed();
 		},
 
-		removeListeners: function() {
+		removeListeners: function () {
 			var self = this;
-			this.stages.map(function(stage) {
+			this.stages.map(function (stage) {
 				stage.remove(self);
 			});
 		},
-		addListeners: function() {
+		addListeners: function () {
 			var self = this;
-			this.stages.map(function(stage) {
+			this.stages.map(function (stage) {
 				stage.on("closed", self.handleClose, self);
 				stage.on("urlChanged", self.handleURLChanged, self);
 			});
 		},
 
-		updateRefs: function(refs) {
+		updateRefs: function (refs) {
 			var self = this;
-			this.updateStages(refs.map(function(ref) {
-				return new kb.Stage(self.session_, ref);
-			}));
+			this.updateStages(
+				refs.map(function (ref) {
+					return new kb.Stage(self.session_, ref);
+				})
+			);
 		},
-		updateStages: function(nextstages) {
+		updateStages: function (nextstages) {
 			this.removeListeners();
 
 			var stages = this.stages.slice();
 			var changed = false;
 
-			var newstages = nextstages.map(function(stage) {
+			var newstages = nextstages.map(function (stage) {
 				var prev = stages.shift();
 
 				if (prev) {
@@ -186,7 +188,7 @@ package("kb", function(exports) {
 			this.addListeners();
 		},
 
-		findStageFromElement: function(el) {
+		findStageFromElement: function (el) {
 			for (var i = 0; i < 64; i += 1) {
 				if (el === null) {
 					return null;
@@ -200,7 +202,7 @@ package("kb", function(exports) {
 			return undefined;
 		},
 
-		handleOpenLink: function(ev) {
+		handleOpenLink: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -220,8 +222,7 @@ package("kb", function(exports) {
 				}
 			}
 
-			var link = GetDataAttribute(target, "link");
-			var link = link || ref.link;
+			var link = GetDataAttribute(target, "link") || ref.link;
 			var title = target.innerText;
 
 			if (ev.ctrlKey) {
@@ -240,19 +241,19 @@ package("kb", function(exports) {
 			}
 		},
 
-		pin: function(image) {
+		pin: function (image) {
 			this.pinned.visible = true;
 			this.pinned.url = image.url;
 			this.pinned.width = image.width;
 			this.changed();
 		},
-		hidePin: function() {
+		hidePin: function () {
 			this.pinned.visible = false;
 			this.pinned.url = "";
 			this.changed();
 		},
 
-		handleClickImage: function(ev) {
+		handleClickImage: function (ev) {
 			var target = ev.target;
 			var stage = this.findStageFromElement(target);
 			if (!stage) {
@@ -274,9 +275,9 @@ package("kb", function(exports) {
 			this.changed();
 		},
 
-		handleClickLink: function(ev) {
+		handleClickLink: function (ev) {
 			var t = ev.target;
-			if ((t.nodeName === "IMG") || (t.nodeName === "IMAGE")) {
+			if (t.nodeName === "IMG" || t.nodeName === "IMAGE") {
 				this.handleClickImage(ev);
 				return;
 			}
@@ -286,7 +287,7 @@ package("kb", function(exports) {
 			if (getClassList(t).contains("external-link")) {
 				return;
 			}
-			if ((t.onclick != null) || (t.onmousedown != null) || (t.onmouseup != null)) {
+			if (t.onclick != null || t.onmousedown != null || t.onmouseup != null) {
 				return;
 			}
 
@@ -307,7 +308,7 @@ package("kb", function(exports) {
 				return;
 			}
 			var path = href.value;
-			if ((path === "") || (path === "/") || (path === "#")) {
+			if (path === "" || path === "/" || path === "#") {
 				return;
 			}
 

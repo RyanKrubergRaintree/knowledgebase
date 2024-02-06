@@ -24,7 +24,6 @@ func GetTempPath(append string) string {
 	return filepath.FromSlash(workingDir)
 }
 
-
 func Unzip(src, dest string) error {
 	r, err := zip.OpenReader(src)
 	if err != nil {
@@ -32,27 +31,34 @@ func Unzip(src, dest string) error {
 	}
 	defer r.Close()
 
-	os.MkdirAll(dest, 0644)
+	err = os.MkdirAll(dest, 0644)
+	if err != nil {
+		return err
+	}
 
 	// Closure to address file descriptors issue with all the deferred .Close() methods
-	extractAndWriteFile := func(f *zip.File) error {
-		rc, err := f.Open()
+	extractAndWriteFile := func(zipfile *zip.File) error {
+		rc, err := zipfile.Open()
 		if err != nil {
 			return err
 		}
 		defer rc.Close()
 
-		path := filepath.Join(dest, f.Name)
+		path := filepath.Join(dest, zipfile.Name)
 		// Check for ZipSlip (Directory traversal)
 		if !strings.HasPrefix(path, filepath.Clean(dest)+string(os.PathSeparator)) {
 			return fmt.Errorf("illegal file path: %s", path)
 		}
 
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(path, f.Mode())
+		if zipfile.FileInfo().IsDir() {
+			return os.MkdirAll(path, zipfile.Mode())
 		} else {
-			os.MkdirAll(filepath.Dir(path), f.Mode())
-			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			err := os.MkdirAll(filepath.Dir(path), zipfile.Mode())
+			if err != nil {
+				return err
+			}
+
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zipfile.Mode())
 			if err != nil {
 				return err
 			}

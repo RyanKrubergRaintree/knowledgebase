@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("util/Notifier.js");
@@ -35,12 +35,12 @@ package("kb", function(exports) {
 
 		this.logoutProvider_ = logoutProvider;
 	}
-	Session.fetch = function(opts) {
-		(new Session()).fetch(opts);
+	Session.fetch = function (opts) {
+		new Session().fetch(opts);
 	};
 
 	Session.prototype = {
-		logout: function() {
+		logout: function () {
 			this.fetch({
 				url: "/system/auth/logout"
 			});
@@ -51,14 +51,14 @@ package("kb", function(exports) {
 				error: ""
 			});
 		},
-		fetch: function(opts) {
+		fetch: function (opts) {
 			if (typeof opts.url === "undefined") {
 				throw new Error("No url defined.");
 			}
 
 			opts.method = opts.method || "POST";
-			opts.ondone = opts.ondone || function() {};
-			opts.onerror = opts.onerror || function() {};
+			opts.ondone = opts.ondone || function () {};
+			opts.onerror = opts.onerror || function () {};
 
 			opts.headers = opts.headers || {};
 			if (this.token) {
@@ -72,7 +72,7 @@ package("kb", function(exports) {
 			var self = this;
 
 			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = function() {
+			xhr.onreadystatechange = function () {
 				if (xhr.readyState !== 4) {
 					return;
 				}
@@ -105,7 +105,7 @@ package("kb", function(exports) {
 				}
 			};
 
-			xhr.onerror = function(err) {
+			xhr.onerror = function (err) {
 				opts.onerror(err);
 			};
 
@@ -116,23 +116,21 @@ package("kb", function(exports) {
 			}
 
 			for (var name in opts.headers) {
-				if (!opts.headers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(opts.headers, name)) {
 					continue;
 				}
 				xhr.setRequestHeader(name, opts.headers[name]);
 			}
 
-			if ((typeof opts.body === "undefined") || (opts.body === null)) {
+			if (typeof opts.body === "undefined" || opts.body === null) {
 				xhr.send();
 			} else if (typeof opts.body === "string") {
 				xhr.send(opts.body);
 			} else {
 				var pairs = [];
 				for (name in opts.body) {
-					if (opts.body.hasOwnProperty(name)) {
-						pairs.push(
-							encodeURIComponent(name) + "=" +
-							encodeURIComponent(opts.body[name]));
+					if (Object.prototype.hasOwnProperty.call(opts.body, name)) {
+						pairs.push(encodeURIComponent(name) + "=" + encodeURIComponent(opts.body[name]));
 					}
 				}
 

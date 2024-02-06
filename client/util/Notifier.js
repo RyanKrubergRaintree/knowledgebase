@@ -1,4 +1,4 @@
-package("kb.util", function(exports) {
+package("kb.util", function (exports) {
 	"use strict";
 
 	exports.Notifier = Notifier;
@@ -9,54 +9,46 @@ package("kb.util", function(exports) {
 	}
 
 	Notifier.prototype = {
-		mixto: function(obj) {
+		mixto: function (obj) {
 			var self = this;
-			obj.on = function(event, handler, recv) {
+			obj.on = function (event, handler, recv) {
 				self.on(event, handler, recv);
 			};
-			obj.off = function(event, handler, recv) {
+			obj.off = function (event, handler, recv) {
 				self.off(event, handler, recv);
 			};
-			obj.remove = function(recv) {
+			obj.remove = function (recv) {
 				self.remove(recv);
 			};
 		},
-		on: function(event, handler, recv) {
+		on: function (event, handler, recv) {
 			this.listeners.push({
 				event: event,
 				handler: handler,
 				recv: recv
 			});
 		},
-		off: function(event, handler, recv) {
-			this.listeners = this.listeners.filter(
-				function(listener) {
-					return !(
-						(listener.event === event) &&
-						(listener.handler === handler) &&
-						(listener.recv === recv)
-					);
-				}
-			);
+		off: function (event, handler, recv) {
+			this.listeners = this.listeners.filter(function (listener) {
+				return !(listener.event === event && listener.handler === handler && listener.recv === recv);
+			});
 		},
-		remove: function(recv) {
-			this.listeners = this.listeners.filter(
-				function(listener) {
-					return listener.recv !== recv;
-				}
-			);
+		remove: function (recv) {
+			this.listeners = this.listeners.filter(function (listener) {
+				return listener.recv !== recv;
+			});
 		},
-		emit: function(event) {
+		emit: function (event) {
 			var self = this;
 			window.clearTimeout(this.emitTimeout);
-			this.emitTimeout = window.setTimeout(function() {
+			this.emitTimeout = window.setTimeout(function () {
 				self.handle(event);
 			}, 1);
 		},
-		handle: function(event) {
+		handle: function (event) {
 			window.clearTimeout(this.emitTimeout);
 			var self = this;
-			this.listeners.map(function(listener) {
+			this.listeners.map(function (listener) {
 				if (self.listeners.indexOf(listener) < 0) {
 					return;
 				}

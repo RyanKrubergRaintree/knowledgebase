@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -71,8 +70,7 @@ func (server *Server) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nonce := kb.AddCSPHeader(w)
-	CSPNonce := fmt.Sprintf("%s", string(nonce))
+	CSPNonce := string(kb.AddCSPHeader(w))
 
 	ts, err := template.New("").Funcs(
 		template.FuncMap{
@@ -149,6 +147,7 @@ func (server *Server) apiLogin(w http.ResponseWriter, r *http.Request) {
 	// token will be sent back via query param
 	token := base64.URLEncoding.EncodeToString([]byte(sess.Token))
 
+	//nolint:errcheck
 	json.NewEncoder(w).Encode(token)
 }
 
@@ -173,8 +172,7 @@ func (server *Server) loginUsingTokenFromURL(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	nonce := kb.AddCSPHeader(w)
-	CSPNonce := fmt.Sprintf("%s", string(nonce))
+	CSPNonce := string(kb.AddCSPHeader(w))
 
 	ts, err := template.New("").Funcs(
 		template.FuncMap{

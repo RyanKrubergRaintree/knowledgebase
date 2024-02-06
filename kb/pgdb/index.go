@@ -112,6 +112,7 @@ func (db Index) readable() (groups []kb.Group, err error) {
 
 	for rows.Next() {
 		var group kb.Group
+		//nolint:errcheck
 		rows.Scan(&group.ID, &group.OwnerID, &group.Name, &group.Public, &group.Description)
 		groups = append(groups, group)
 	}
@@ -142,6 +143,7 @@ func (db Index) Groups(min kb.Rights) (groups []kb.Group, err error) {
 
 	for rows.Next() {
 		var group kb.Group
+		//nolint:errcheck
 		rows.Scan(&group.ID, &group.OwnerID, &group.Name, &group.Public, &group.Description)
 		groups = append(groups, group)
 	}

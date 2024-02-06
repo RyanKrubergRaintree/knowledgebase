@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("util/Notifier.js");
@@ -13,19 +13,19 @@ package("kb", function(exports) {
 		this.items = {};
 	}
 	Editing.prototype = {
-		start: function(id) {
+		start: function (id) {
 			this.edited = true;
 			this.items[id] = true;
 			this.pack();
 			this.stage.changed();
 		},
-		stop: function(id) {
+		stop: function (id) {
 			delete this.items[id];
 			this.pack();
 			this.stage.changed();
 		},
 		// removes all non-existing items
-		pack: function() {
+		pack: function () {
 			var t = {};
 			var page = this.stage.page;
 			for (var i = 0; i < page.story.length; i++) {
@@ -36,11 +36,11 @@ package("kb", function(exports) {
 			}
 			this.items = t;
 		},
-		clear: function() {
+		clear: function () {
 			this.items = {};
 			this.changed();
 		},
-		item: function(id) {
+		item: function (id) {
 			return this.items[id];
 		}
 	};
@@ -52,7 +52,7 @@ package("kb", function(exports) {
 		this.session_ = session;
 		this.id = GenerateID();
 
-		this.creating = (ref.url === null) || (ref.url === "");
+		this.creating = ref.url === null || ref.url === "";
 		this.link = ref.link;
 		this.title = ref.title;
 		this.allowed = ["GET", "HEAD"];
@@ -87,59 +87,59 @@ package("kb", function(exports) {
 	}
 
 	Stage.prototype = {
-		close: function() {
+		close: function () {
 			this.changed();
 			this.notifier.handle({
 				type: "closed",
 				stage: this
 			});
 		},
-		changed: function(loaded) {
+		changed: function (loaded) {
 			this.notifier.emit({
 				type: "changed",
 				stage: this,
 				loaded: loaded === true
 			});
 		},
-		urlChanged: function() {
+		urlChanged: function () {
 			this.notifier.emit({
 				type: "urlChanged",
 				stage: this
 			});
 		},
 
-		wideChanged: function() {
+		wideChanged: function () {
 			this.notifier.emit({
 				type: "widthChanged",
 				stage: this
 			});
 		},
-		expand: function() {
+		expand: function () {
 			this.wide = true;
 			this.wideChanged();
 		},
-		collapse: function() {
+		collapse: function () {
 			this.wide = false;
 			this.wideChanged();
 		},
 
-		canCreate: function() {
+		canCreate: function () {
 			return this.allowed.indexOf("PUT") >= 0;
 		},
-		canModify: function() {
+		canModify: function () {
 			return this.allowed.indexOf("POST") >= 0;
 		},
-		canDestroy: function() {
+		canDestroy: function () {
 			return this.allowed.indexOf("DELETE") >= 0;
 		},
-		canViewHistory: function() {
+		canViewHistory: function () {
 			return this.allowed.indexOf("OVERWRITE") >= 0;
 		},
 
-		updateStatus_: function(response) {
+		updateStatus_: function (response) {
 			var allowed = response.xhr.getResponseHeader("Allow");
 			if (typeof allowed === "string") {
-				this.allowed = allowed.split(",").map(function(v) {
+				this.allowed = allowed.split(",").map(function (v) {
 					return v.trim();
 				});
 			}
@@ -165,8 +165,8 @@ package("kb", function(exports) {
 			return response.ok;
 		},
 
-		patch: function(op) {
-			if ((this.url === null) || (this.url === "")) {
+		patch: function (op) {
+			if (this.url === null || this.url === "") {
 				return;
 			}
 
@@ -178,7 +178,7 @@ package("kb", function(exports) {
 
 			this.changed(true);
 		},
-		nextPatch_: function() {
+		nextPatch_: function () {
 			if (this.patching_) {
 				return;
 			}
@@ -191,14 +191,14 @@ package("kb", function(exports) {
 					ondone: this.patchDone_.bind(this),
 					onerror: this.patchError_.bind(this),
 					headers: {
-						"Accept": "application/json",
+						Accept: "application/json",
 						"Content-Type": "application/json"
 					},
 					body: JSON.stringify(patch)
 				});
 			}
 		},
-		patchDone_: function(response) {
+		patchDone_: function (response) {
 			this.patching_ = false;
 
 			if (!this.updateStatus_(response)) {
@@ -210,17 +210,17 @@ package("kb", function(exports) {
 			}
 			this.nextPatch_();
 		},
-		patchError_: function( /* ev */ ) {
+		patchError_: function (/* ev */) {
 			this.patches_ = [];
 			this.patching_ = false;
 			this.pull();
 		},
 
-		refresh: function() {
+		refresh: function () {
 			this.pull();
 		},
-		pull: function() {
-			if ((this.url === null) || (this.url === "")) {
+		pull: function () {
+			if (this.url === null || this.url === "") {
 				return;
 			}
 
@@ -233,11 +233,11 @@ package("kb", function(exports) {
 				ondone: this.pullDone_.bind(this),
 				onerror: this.pullError_.bind(this),
 				headers: {
-					"Accept": "application/json"
+					Accept: "application/json"
 				}
 			});
 		},
-		pullDone_: function(response) {
+		pullDone_: function (response) {
 			if (!this.updateStatus_(response)) {
 				this.changed(true);
 				return;
@@ -258,7 +258,7 @@ package("kb", function(exports) {
 			var niceurl = kb.convert.URLToReadable(this.url);
 			kb.TrackPageView(niceurl, this.page.title);
 		},
-		pullError_: function( /* ev */ ) {
+		pullError_: function (/* ev */) {
 			this.state = "failed";
 			this.lastStatus = "failed";
 			this.lastStatusText = "";
@@ -266,7 +266,7 @@ package("kb", function(exports) {
 			this.changed(false);
 		},
 
-		create: function() {
+		create: function () {
 			if (!this.creating) {
 				return;
 			}
@@ -279,25 +279,28 @@ package("kb", function(exports) {
 				ondone: this.createDone_.bind(this),
 				onerror: this.createError_.bind(this),
 				headers: {
-					"Accept": "application/json",
+					Accept: "application/json",
 					"Content-Type": "application/json"
 				},
 				body: JSON.stringify({
 					title: this.title,
 					slug: this.link,
-					story: [{
-						id: GenerateID(),
-						type: "tags"
-					}, {
-						id: GenerateID(),
-						type: "factory"
-					}]
+					story: [
+						{
+							id: GenerateID(),
+							type: "tags"
+						},
+						{
+							id: GenerateID(),
+							type: "factory"
+						}
+					]
 				})
 			});
 
 			this.changed(false);
 		},
-		createDone_: function(xhr) {
+		createDone_: function (xhr) {
 			if (!this.updateStatus_(xhr)) {
 				this.changed();
 				return;
@@ -306,7 +309,7 @@ package("kb", function(exports) {
 			this.state = "created";
 			this.refresh();
 		},
-		createError_: function( /* ev */ ) {
+		createError_: function (/* ev */) {
 			this.state = "failed";
 			this.lastStatus = "failed";
 			this.lastStatusText = "";
@@ -314,8 +317,8 @@ package("kb", function(exports) {
 			this.changed(false);
 		},
 
-		destroy: function() {
-			if ((this.url === null) || (this.url === "")) {
+		destroy: function () {
+			if (this.url === null || this.url === "") {
 				return;
 			}
 
@@ -326,12 +329,12 @@ package("kb", function(exports) {
 				onerror: this.destroyError_.bind(this)
 			});
 		},
-		destroyDone_: function(response) {
+		destroyDone_: function (response) {
 			this.updateStatus_(response);
 			this.changed(false);
 			this.pull();
 		},
-		destroyError_: function( /* ev */ ) {
+		destroyError_: function (/* ev */) {
 			this.state = "failed";
 			this.lastStatus = "failed";
 			this.lastStatusText = "";

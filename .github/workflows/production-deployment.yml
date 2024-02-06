@@ -1,0 +1,62 @@
+name: Production Deployment
+run-name: ${{ github.actor }} is running production deployment
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION != '' && vars.AWS_REGION || 'us-east-1' }}
+  DEPLOY_ZIP_NAME: "deploy.zip"
+
+jobs:
+  pull-request-checks:
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Node Lint
+        run: npm run lint
+
+      - name: Package the project
+        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} .bin .platform client Dockerrun.aws.json Dockerfile rules.json .ebextensions
+
+      - name: Configure AWS Credentials for DEV account to install packages
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActionSession
+          role-chaining: true
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ steps.creds.outputs.aws-access-key-id }}
+          aws_secret_key: ${{ steps.creds.outputs.aws-secret-access-key }}
+          application_name: ${{ vars.EB_APPLICATION_NAME }}
+          environment_name: ${{ vars.EB_ENVIRONMENT_NAME }}
+          version_label: GitHub-${{ github.SHA }}
+          region: ${{ env.AWS_REGION }}
+
+          aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
+          deployment_package: ${{ env.DEPLOY_ZIP_NAME }}
+          version_description: GitHub SHA "${{ github.SHA }}"
+          existing_bucket_name: ${{ vars.EB_AWS_BUCKET }}

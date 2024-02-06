@@ -19,7 +19,7 @@ type CAS struct {
 func (conf *CAS) Boot() template.HTML { return "" }
 
 func (conf *CAS) Verify(params, code string) (kb.User, error) {
-	id, err := trust.Peer{conf.Key}.Verify(code)
+	id, err := trust.Peer{Key: conf.Key}.Verify(code)
 	if err != nil {
 		return kb.User{}, err
 	}

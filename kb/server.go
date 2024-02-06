@@ -125,7 +125,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case Moderator:
 		allowedMethods = []string{"GET", "POST", "PUT", "OVERWRITE", "DELETE"}
 	default:
-		log.Println("Invalid rights returned for user %s got %d.", user.ID, rights)
+		log.Printf("Invalid rights returned for user %s got %s.", user.ID, rights)
 		http.Error(w, "Invalid rights.", http.StatusInternalServerError)
 		return
 	}
@@ -171,6 +171,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					Title: SlugToTitle(title) + " (history)",
 					Story: StoryFromEntries(entries),
 				}
+				//nolint:errcheck
 				page.WriteResponse(w)
 			} else {
 				data, err := pages.LoadRawVersion(pageID, requestedVersion)
@@ -178,9 +179,9 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					WriteResult(w, err)
 					return
 				}
-				// TODO: modify header
 
 				w.Header().Set("Content-Type", "application/json")
+				//nolint:errcheck
 				w.Write(data)
 			}
 		} else {
@@ -191,6 +192,7 @@ func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			w.Header().Set("Content-Type", "application/json")
+			//nolint:errcheck
 			w.Write(data)
 		}
 
@@ -406,7 +408,8 @@ func AddCSPHeader(w http.ResponseWriter) string {
 		style-src
 			'self'
 			'unsafe-inline'
-			fonts.googleapis.com;
+			fonts.googleapis.com
+			*.google.com;
 		img-src
 			'self'
 			'unsafe-inline'

@@ -46,6 +46,7 @@ func (mod *Module) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mod.router.ServeHTTP(w, r)
 }
 
+//nolint:unused // vsc does not find reference
 func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	_, index, ok := mod.server.IndexContext(w, r)
 	if !ok {
@@ -64,6 +65,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page.Story = kb.StoryFromEntries(entries)
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -125,5 +127,6 @@ func (mod *Module) search(w http.ResponseWriter, r *http.Request) {
 		Title: "Search \"" + q + "\"",
 		Story: kb.StoryFromEntries(entries),
 	}
+	//nolint:errcheck
 	page.WriteResponse(w)
 }

@@ -38,10 +38,12 @@ func main() {
 
 			data := download(url)
 			filename := fmt.Sprintf("font.%v.woff2", index)
+			//nolint:errcheck
 			ioutil.WriteFile(filename, data, 0777)
 			index++
 
 			return "url(" + filename + ")"
 		})
+	//nolint:errcheck
 	ioutil.WriteFile("all.css", []byte(css), 0777)
 }

@@ -59,7 +59,7 @@ func (db Pages) BatchReplace(pages map[kb.Slug]*kb.Page, complete func(string, k
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback() //nolint:errcheck
 
 	// remove old data
 	if _, err := tx.Exec("DELETE FROM Pages WHERE OwnerID = $1", db.GroupID); err != nil {
@@ -109,7 +109,7 @@ func (db Pages) BatchReplaceDelta(pages map[kb.Slug]*kb.Page, complete func(stri
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback() //nolint:errcheck
 
 	oldHashes := map[kb.Slug][]byte{}
 	{

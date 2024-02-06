@@ -1,22 +1,23 @@
-package("kb.drop", function(exports) {
+package("kb.drop", function (exports) {
 	"use strict";
 
 	depends("Convert.js");
-	var rxCode = /[=><;{}\[\]]/;
+	var rxCode = /[=><;{}[\]]/;
 
 	exports.Item = undefined;
 	exports.Allowed = "";
 	exports.Effect = "";
 
-	exports.SetAllowed = function(ev, allowed){
+	exports.SetAllowed = function (ev, allowed) {
 		exports.Allowed = allowed;
 		try {
 			ev.dataTransfer.allowedEffect = allowed;
 		} catch (e) {
+			/* empty */
 		}
 	};
 
-	exports.GetAllowed = function(ev){
+	exports.GetAllowed = function (ev) {
 		var result = "copy";
 		try {
 			result = ev.dataTransfer.allowedEffect;
@@ -26,14 +27,17 @@ package("kb.drop", function(exports) {
 		return result;
 	};
 
-	exports.SetEffect = function(ev, effect){
+	exports.SetEffect = function (ev, effect) {
 		exports.Effect = effect;
 		try {
+			// TODO: understand if this is supposed to be undefined or something else
 			ev.dataTransfer.dropEffect = dropEffect;
-		} catch (e) {}
+		} catch (e) {
+			/* empty */
+		}
 	};
 
-	exports.GetEffect = function(ev){
+	exports.GetEffect = function (ev) {
 		var result = "copy";
 		try {
 			result = ev.dataTransfer.dropEffect;
@@ -43,8 +47,7 @@ package("kb.drop", function(exports) {
 		return result;
 	};
 
-	exports.EffectFor = function(ev){
-		var effect = "copy";
+	exports.EffectFor = function (ev) {
 		var effect = exports.GetAllowed(ev);
 		if (effect === "copy") {
 			return "copy";
@@ -53,16 +56,18 @@ package("kb.drop", function(exports) {
 			return "copy";
 		}
 		return "move";
-	}
+	};
 
-	exports.SetItem = function(ev, item){
+	exports.SetItem = function (ev, item) {
 		exports.Item = JSON.stringify(item);
 		try {
 			ev.dataTransfer.setData("Text", JSON.stringify(item));
-		} catch(e) {}
+		} catch (e) {
+			/* empty */
+		}
 	};
 
-	exports.GetItem = function(ev){
+	exports.GetItem = function (ev) {
 		var result = null;
 		try {
 			var data = ev.dataTransfer.getData("Text");
@@ -74,13 +79,15 @@ package("kb.drop", function(exports) {
 		return result;
 	};
 
-	exports.SetDragImage = function(ev, node, x, y) {
+	exports.SetDragImage = function (ev, node, x, y) {
 		try {
 			if (ev.dataTransfer.setDragImage) {
 				ev.dataTransfer.setDragImage(node, x, y);
 			}
-		} catch (e) { }
-	}
+		} catch (e) {
+			/* empty */
+		}
+	};
 
 	function getImage(dataTransfer) {
 		var acceptedImages = {
@@ -104,7 +111,7 @@ package("kb.drop", function(exports) {
 			MaxHeight = 1024;
 
 		var image = new Image();
-		image.onload = function() {
+		image.onload = function () {
 			var canvas = document.createElement("canvas");
 			if (image.height > MaxHeight) {
 				image.width *= MaxHeight / image.height;
@@ -152,8 +159,8 @@ package("kb.drop", function(exports) {
 
 			// do delayed loading
 			var reader = new FileReader();
-			reader.onload = function(ev) {
-				resizeImage(ev.target.result, function(data) {
+			reader.onload = function (ev) {
+				resizeImage(ev.target.result, function (data) {
 					stage.patch({
 						type: "edit",
 						id: item.id,

@@ -1,4 +1,4 @@
-package("kb.Stage", function(exports) {
+package("kb.Stage", function (exports) {
 	"use strict";
 
 	depends("util/SmoothScroll.js");
@@ -10,14 +10,14 @@ package("kb.Stage", function(exports) {
 	var StageButtons = createReactClass({
 		displayName: "StageButtons",
 
-		toggleWidth: function() {
+		toggleWidth: function () {
 			this.props.onToggleWidth();
 		},
-		close: function() {
+		close: function () {
 			this.props.stage.close();
 		},
 
-		createFactory: function(ev) {
+		createFactory: function (ev) {
 			var item = {
 				id: GenerateID(),
 				type: "factory",
@@ -30,9 +30,11 @@ package("kb.Stage", function(exports) {
 			});
 		},
 
-		deletePage: function() {
+		deletePage: function () {
 			var stage = this.props.stage;
-			var check = window.prompt("Delete this page?\nType the page link \"" + stage.link + "\" to confirm:");
+			var check = window.prompt(
+				'Delete this page?\nType the page link "' + stage.link + '" to confirm:'
+			);
 			if (check === null) {
 				return;
 			}
@@ -43,36 +45,43 @@ package("kb.Stage", function(exports) {
 			stage.destroy();
 		},
 
-		render: function() {
+		render: function () {
 			var stage = this.props.stage;
 			var a = React.DOM.a;
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "stage-buttons"
 				},
-				stage.canModify() ? React.DOM.a({
-					className: "mdi mdi-playlist-plus",
-					title: "Drag to page to add an item.",
-					style: {
-						cursor: "move"
-					},
-					draggable: "true",
-					href: "#",
-					onClick: function(ev) {
-						ev = ev || window.event;
-						ev.preventDefault();
-					},
-					onDragStart: this.createFactory
-				}) : null,
-				stage.canViewHistory() ? a({
-					className: "mdi mdi-history",
-					title: "Page history",
-					href: stage.url + "?history=all"
-				}) : null,
-				stage.canDestroy() ? a({
-					className: "mdi mdi-delete",
-					title: "Delete this page.",
-					onClick: this.deletePage
-				}) : null,
+				stage.canModify()
+					? React.DOM.a({
+							className: "mdi mdi-playlist-plus",
+							title: "Drag to page to add an item.",
+							style: {
+								cursor: "move"
+							},
+							draggable: "true",
+							href: "#",
+							onClick: function (ev) {
+								ev = ev || window.event;
+								ev.preventDefault();
+							},
+							onDragStart: this.createFactory
+						})
+					: null,
+				stage.canViewHistory()
+					? a({
+							className: "mdi mdi-history",
+							title: "Page history",
+							href: stage.url + "?history=all"
+						})
+					: null,
+				stage.canDestroy()
+					? a({
+							className: "mdi mdi-delete",
+							title: "Delete this page.",
+							onClick: this.deletePage
+						})
+					: null,
 				a({
 					className: "mdi " + (this.props.isWide ? "mdi-arrow-collapse" : "mdi-arrow-expand"),
 					title: "Toggle page width.",
@@ -92,7 +101,7 @@ package("kb.Stage", function(exports) {
 		contextTypes: {
 			Session: kb.react.object
 		},
-		tryCreate: function(ev) {
+		tryCreate: function (ev) {
 			var stage = this.props.stage;
 
 			stage.title = this.state.title;
@@ -105,7 +114,7 @@ package("kb.Stage", function(exports) {
 
 		checkTitleInterval: null,
 
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				title: this.props.stage.title,
 				owner: kb.convert.LinkToOwner(this.props.stage.link) || "",
@@ -113,7 +122,7 @@ package("kb.Stage", function(exports) {
 			};
 		},
 
-		groupsReceived: function(response) {
+		groupsReceived: function (response) {
 			if (response.ok) {
 				var info = response.json || {};
 				this.setState({
@@ -122,63 +131,68 @@ package("kb.Stage", function(exports) {
 			}
 		},
 
-		componentDidMount: function() {
-			this.checkTitleInterval = window.setInterval(
-				this.checkTitleChanges,
-				100
-			);
+		componentDidMount: function () {
+			this.checkTitleInterval = window.setInterval(this.checkTitleChanges, 100);
 			this.context.Session.fetch({
 				method: "GET",
 				url: "/user=editor-groups",
 				ondone: this.groupsReceived,
 				headers: {
-					"Accept": "application/json"
+					Accept: "application/json"
 				}
 			});
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			window.clearInterval(this.checkTitleInterval);
 		},
 
-		ownerChanged: function(ev) {
+		ownerChanged: function (ev) {
 			this.setState({
 				owner: ev.currentTarget.value
 			});
 		},
 
-		checkTitleChanges: function() {
+		checkTitleChanges: function () {
 			if (this.refs.title) {
 				if (this.state.title !== this.refs.title.value) {
 					this.titleChanged();
 				}
 			}
 		},
-		titleChanged: function() {
+		titleChanged: function () {
 			this.setState({
 				title: this.refs.title.value
 			});
 		},
 
-		render: function() {
+		render: function () {
 			var self = this;
 			var stage = this.props.stage;
 			var title = this.state.title,
 				owner = this.state.owner,
 				link = kb.convert.TextToSlug(owner + "=" + title);
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "page new-page"
 				},
-				React.DOM.form({
+				React.DOM.form(
+					{
 						onSubmit: this.tryCreate
 					},
 					React.DOM.label({}, "Link"),
-					React.DOM.span({
-						className: "link"
-					}, link),
-					React.DOM.label({
-						htmlFor: "new-page-title"
-					}, "Title"),
+					React.DOM.span(
+						{
+							className: "link"
+						},
+						link
+					),
+					React.DOM.label(
+						{
+							htmlFor: "new-page-title"
+						},
+						"Title"
+					),
 					React.DOM.input({
 						id: "new-page-title",
 						className: "title",
@@ -189,34 +203,40 @@ package("kb.Stage", function(exports) {
 						autoFocus: true
 					}),
 					React.DOM.label({}, "Owner"),
-					React.DOM.div({
+					React.DOM.div(
+						{
 							className: "group"
 						},
-						this.state.groups.map(function(group) {
+						this.state.groups.map(function (group) {
 							var checked = owner === group;
-							return (
-								React.DOM.div({
-										key: group,
-										className: checked ? "checked" : ""
-									},
-									React.DOM.input({
-										id: "group-" + group,
-										type: "radio",
-										name: "group",
-										value: group,
-										onChange: self.ownerChanged,
-										checked: checked
-									}),
-									React.DOM.label({
+							return React.DOM.div(
+								{
+									key: group,
+									className: checked ? "checked" : ""
+								},
+								React.DOM.input({
+									id: "group-" + group,
+									type: "radio",
+									name: "group",
+									value: group,
+									onChange: self.ownerChanged,
+									checked: checked
+								}),
+								React.DOM.label(
+									{
 										htmlFor: "group-" + group
-									}, group)
+									},
+									group
 								)
 							);
 						})
 					),
-					React.DOM.button({
-						type: "submit"
-					}, "Create")
+					React.DOM.button(
+						{
+							type: "submit"
+						},
+						"Create"
+					)
 				)
 			);
 		}
@@ -227,7 +247,7 @@ package("kb.Stage", function(exports) {
 		contextTypes: {
 			CurrentSelection: kb.react.object
 		},
-		toggleWidth: function() {
+		toggleWidth: function () {
 			if (this.props.stage.wide) {
 				this.props.stage.collapse();
 			} else {
@@ -236,19 +256,22 @@ package("kb.Stage", function(exports) {
 
 			window.setTimeout(this.activate, 100);
 		},
-		activate: function(ev) {
+		activate: function (ev) {
+			/** @type {Element} */
+			var node;
 			if (typeof ev === "undefined") {
-				var node = ReactDOM.findDOMNode(this);
+				node = ReactDOM.findDOMNode(this);
 				kb.util.SmoothScroll.to(node);
 			} else if (!ev.defaultPrevented) {
-				var node = ReactDOM.findDOMNode(this);
+				node = ReactDOM.findDOMNode(this);
 				kb.util.SmoothScroll.to(node);
 			}
 		},
-		render: function() {
+		render: function () {
 			var stage = this.props.stage;
 			if (stage.creating) {
-				return React.DOM.div({
+				return React.DOM.div(
+					{
 						className: "stage",
 						onClick: this.activate,
 						"data-id": stage.id,
@@ -260,7 +283,8 @@ package("kb.Stage", function(exports) {
 						isWide: stage.wide,
 						onToggleWidth: this.toggleWidth
 					}),
-					React.DOM.div({
+					React.DOM.div(
+						{
 							className: "stage-scroll round-scrollbar"
 						},
 						React.createElement(NewPage, {
@@ -275,7 +299,8 @@ package("kb.Stage", function(exports) {
 				customClassName = " " + customClassName;
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "stage" + customClassName,
 					onClick: this.activate,
 					"data-id": stage.id,
@@ -287,7 +312,8 @@ package("kb.Stage", function(exports) {
 					isWide: stage.wide,
 					onToggleWidth: this.toggleWidth
 				}),
-				React.DOM.div({
+				React.DOM.div(
+					{
 						className: "stage-scroll round-scrollbar"
 					},
 					React.createElement(kb.Page.View, {
@@ -298,14 +324,14 @@ package("kb.Stage", function(exports) {
 			);
 		},
 
-		getInitialState: function() {
+		getInitialState: function () {
 			return {
 				autoFocus: false,
 				autoFocused: false
 			};
 		},
 		// bindings to Stage
-		changed: function(ev) {
+		changed: function (ev) {
 			if (ev.loaded) {
 				this.setState({
 					autoFocus: true
@@ -313,7 +339,7 @@ package("kb.Stage", function(exports) {
 			}
 			this.forceUpdate();
 		},
-		componentDidUpdate: function() {
+		componentDidUpdate: function () {
 			if (!this.state.autoFocused && this.state.autoFocus) {
 				this.setState({
 					autoFocused: true,
@@ -324,10 +350,10 @@ package("kb.Stage", function(exports) {
 				if (loc.fragment !== "") {
 					var id = loc.fragment.substring(1);
 					var node = ReactDOM.findDOMNode(this);
-					var el = node.querySelector("[data-id=\"" + id + "\"]");
+					var el = node.querySelector('[data-id="' + id + '"]');
 					if (el === null) {
 						var id2 = loc.fragment.substring(loc.fragment.lastIndexOf("/") + 1);
-						el = node.querySelector("[data-id=\"" + id2 + "\"]");
+						el = node.querySelector('[data-id="' + id2 + '"]');
 						id = id2;
 					}
 					if (el) {
@@ -337,16 +363,16 @@ package("kb.Stage", function(exports) {
 				}
 			}
 		},
-		widthChanged: function() {
+		widthChanged: function () {
 			this.props.onWidthChanged();
 		},
-		componentDidMount: function() {
+		componentDidMount: function () {
 			this.props.stage.on("changed", this.changed, this);
 			this.props.stage.on("widthChanged", this.widthChanged, this);
 			this.props.stage.pull();
 			this.activate();
 		},
-		componentWillReceiveProps: function(nextprops) {
+		componentWillReceiveProps: function (nextprops) {
 			if (this.props.stage !== nextprops.stage) {
 				this.props.stage.remove(this);
 				nextprops.stage.on("changed", this.changed, this);
@@ -354,7 +380,7 @@ package("kb.Stage", function(exports) {
 				nextprops.stage.pull();
 			}
 		},
-		componentWillUnmount: function() {
+		componentWillUnmount: function () {
 			this.props.stage.remove(this);
 		}
 	});

@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	depends("Convert.js");
@@ -20,7 +20,7 @@ package("kb", function(exports) {
 		}
 
 		var refs = [];
-		hash.split("|").map(function(link) {
+		hash.split("|").map(function (link) {
 			if (link.trim() === "") {
 				return;
 			}
@@ -37,9 +37,9 @@ package("kb", function(exports) {
 	}
 
 	Crumbs.prototype = {
-		attach: function(defaultPages, home) {
+		attach: function (defaultPages, home) {
 			var hash = window.location.hash;
-			if ((hash === "") || (hash === "#")) {
+			if (hash === "" || hash === "#") {
 				if (defaultPages.length > 0) {
 					this.lineup_.openPages(defaultPages);
 				} else {
@@ -51,18 +51,18 @@ package("kb", function(exports) {
 			this.lineup_.on("changed", this.lineupChanged, this);
 
 			var self = this;
-			window.onhashchange = function( /*ev*/ ) {
+			window.onhashchange = function (/*ev*/) {
 				if (window.location.hash !== self.navigatingTo_) {
 					self.lineup_.updateRefs(hashToRefs(window.location.hash));
 				}
 			};
 		},
-		detach: function() {
+		detach: function () {
 			window.onhashchange = null;
 			this.lineup_.remove(this);
 		},
 
-		lineupChanged: function( /*ev*/ ) {
+		lineupChanged: function (/*ev*/) {
 			this.navigatingTo_ = stagesToHash(this.lineup_.stages);
 			window.location.hash = this.navigatingTo_;
 		}

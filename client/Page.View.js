@@ -1,4 +1,4 @@
-package("kb.Page", function(exports) {
+package("kb.Page", function (exports) {
 	"use strict";
 
 	depends("Page.js");
@@ -80,11 +80,10 @@ package("kb.Page", function(exports) {
 			y: ev.pageY
 		};
 
-
 		var child = list.firstChild;
 		if (child) {
 			var box = child.getBoundingClientRect();
-			if (child && (mouse.y < box.top)) {
+			if (child && mouse.y < box.top) {
 				return {
 					node: null,
 					rel: "before"
@@ -122,7 +121,7 @@ package("kb.Page", function(exports) {
 	exports.View = createReactClass({
 		displayName: "Page",
 
-		createReference: function(ev) {
+		createReference: function (ev) {
 			var stage = this.props.stage,
 				page = stage.page;
 			var item = {
@@ -139,8 +138,8 @@ package("kb.Page", function(exports) {
 			});
 		},
 
-		dragEnter: function( /*ev*/ ) {},
-		dragOver: function(ev) {
+		dragEnter: function (/*ev*/) {},
+		dragOver: function (ev) {
 			clearDropPosition();
 			if (!this.props.stage.canModify()) {
 				return;
@@ -166,7 +165,7 @@ package("kb.Page", function(exports) {
 				getClassList(story).add("drop-" + drop.rel);
 			}
 		},
-		dragDrop: function(ev) {
+		dragDrop: function (ev) {
 			ev.preventDefault();
 			ev.stopPropagation();
 
@@ -188,19 +187,19 @@ package("kb.Page", function(exports) {
 			if (data) {
 				var item = data.item;
 
-				if (data.url && (data.url !== page.url)) {
+				if (data.url && data.url !== page.url) {
 					item.origin = data.url;
 					item.originId = item.id;
 				}
 
 				// if we make a copy or move to another page
 				// we should update the id in the process
-				if ((dropEffect === "copy") || (data.url !== stage.url)) {
+				if (dropEffect === "copy" || data.url !== stage.url) {
 					item.id = GenerateID();
 				}
 
 				// are we moving on the same page?
-				if ((dropEffect === "move") && (data.url === stage.url)) {
+				if (dropEffect === "move" && data.url === stage.url) {
 					kb.item.DropCanceled = true;
 					stage.patch({
 						type: "move",
@@ -225,11 +224,11 @@ package("kb.Page", function(exports) {
 				kb.drop.ConvertUnknown(stage, after, ev.dataTransfer);
 			}
 		},
-		dragLeave: function( /*ev*/ ) {
+		dragLeave: function (/*ev*/) {
 			//TODO: fix glitchy rendering
 			clearDropPosition();
 		},
-		render: function() {
+		render: function () {
 			var stage = this.props.stage,
 				owner = kb.convert.LinkToOwner(stage.link || stage.slug || stage.url || ""),
 				page = this.props.page;
@@ -240,7 +239,8 @@ package("kb.Page", function(exports) {
 					className: "page-loading"
 				});
 			} else if (stage.state !== "loaded") {
-				status = React.DOM.div({
+				status = React.DOM.div(
+					{
 						className: "page-error"
 					},
 					React.DOM.h2(null, stage.lastStatusText),
@@ -248,7 +248,8 @@ package("kb.Page", function(exports) {
 				);
 			}
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "page",
 
 					onDragEnter: this.dragEnter,
@@ -256,18 +257,24 @@ package("kb.Page", function(exports) {
 					onDrop: this.dragDrop,
 					onDragLeave: this.dragLeave
 				},
-				React.DOM.h2({
-					className: "page-owner"
-				}, owner),
-				React.DOM.h1({
-					className: "page-title",
-					title: "Drag to create a page reference.",
-					draggable: true,
-					onDragStart: this.createReference,
-					style: {
-						cursor: "move"
-					}
-				}, page.title),
+				React.DOM.h2(
+					{
+						className: "page-owner"
+					},
+					owner
+				),
+				React.DOM.h1(
+					{
+						className: "page-title",
+						title: "Drag to create a page reference.",
+						draggable: true,
+						onDragStart: this.createReference,
+						style: {
+							cursor: "move"
+						}
+					},
+					page.title
+				),
 				status,
 				React.createElement(Story, {
 					ref: "story",
@@ -282,14 +289,15 @@ package("kb.Page", function(exports) {
 
 	var Story = createReactClass({
 		displayName: "Story",
-		render: function() {
+		render: function () {
 			var stage = this.props.stage,
 				story = this.props.story;
 
-			return React.DOM.div({
+			return React.DOM.div(
+				{
 					className: "page-story"
 				},
-				story.map(function(item, i) {
+				story.map(function (item, i) {
 					return React.createElement(kb.item.View, {
 						key: i,
 						stage: stage,

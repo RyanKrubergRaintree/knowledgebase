@@ -1,9 +1,9 @@
-package("kb.item", function(exports) {
+package("kb.item", function (exports) {
 	"use strict";
 
 	var iframe = document.createElement("iframe");
 	if (typeof iframe.sandbox === "undefined") {
-		exports.Sanitize = function(input) {
+		exports.Sanitize = function (input) {
 			return input;
 		};
 		return;

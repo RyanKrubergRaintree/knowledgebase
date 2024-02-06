@@ -43,9 +43,9 @@ type Rights string
 
 const (
 	Blocked   Rights = "blocked"
-	Reader           = "reader"
-	Editor           = "editor"
-	Moderator        = "moderator"
+	Reader    Rights = "reader"
+	Editor    Rights = "editor"
+	Moderator Rights = "moderator"
 )
 
 func (r Rights) Level() int {

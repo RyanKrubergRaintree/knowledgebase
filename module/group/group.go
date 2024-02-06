@@ -78,6 +78,7 @@ func (mod *Module) modulePages(w http.ResponseWriter, r *http.Request) {
 	page.Story = kb.StoryFromEntries(entries)
 	page.Story.Prepend(kb.Paragraph(info.Description))
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -110,6 +111,7 @@ func (mod *Module) pages(w http.ResponseWriter, r *http.Request) {
 	page.Story = kb.StoryFromEntries(entries)
 	page.Story.Prepend(kb.Paragraph(info.Description))
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -138,6 +140,7 @@ func (mod *Module) groups(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//nolint:errcheck
 	page.WriteResponse(w)
 }
 
@@ -165,5 +168,5 @@ func (mod *Module) modules(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	page.WriteResponse(w)
+	page.WriteResponse(w) //nolint:errcheck
 }

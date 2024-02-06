@@ -1,4 +1,4 @@
-package("kb", function(exports) {
+package("kb", function (exports) {
 	"use strict";
 
 	/*
@@ -39,12 +39,12 @@ package("kb", function(exports) {
 
 		this.currentSession = null;
 		if (initialSessionInfo) {
-			this.currentSession = new kb.Session(initialSessionInfo, function() {});
+			this.currentSession = new kb.Session(initialSessionInfo, function () {});
 		}
 	}
 
 	Auth.prototype = {
-		init: function() {
+		init: function () {
 			var self = this;
 			var toload = 1;
 
@@ -62,7 +62,7 @@ package("kb", function(exports) {
 			}
 
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				toload++;
@@ -73,7 +73,7 @@ package("kb", function(exports) {
 			loaded();
 		},
 
-		loginSuccess: function(response) {
+		loginSuccess: function (response) {
 			if (!response.ok) {
 				this.notifier_.handle({
 					type: "login-error",
@@ -83,10 +83,7 @@ package("kb", function(exports) {
 				return;
 			}
 
-			var session = new kb.Session(
-				response.json,
-				this.logoutProviders.bind(this)
-			);
+			var session = new kb.Session(response.json, this.logoutProviders.bind(this));
 
 			this.currentSession = session;
 			this.notifier_.handle({
@@ -94,7 +91,7 @@ package("kb", function(exports) {
 				session: session
 			});
 		},
-		loginError: function(error) {
+		loginError: function (error) {
 			this.logoutProviders();
 			this.notifier_.handle({
 				type: "login-error",
@@ -102,20 +99,20 @@ package("kb", function(exports) {
 			});
 		},
 
-		loginTo: function(url, user, code) {
+		loginTo: function (url, user, code) {
 			kb.Session.fetch({
 				url: url,
 				ondone: this.loginSuccess.bind(this),
 				onerror: this.loginError.bind(this),
 				body: {
-					"user": user,
-					"code": code
+					user: user,
+					code: code
 				}
 			});
 		},
-		tryAutoLogin: function() {
+		tryAutoLogin: function () {
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				var provider = this.providers[name];
@@ -125,7 +122,7 @@ package("kb", function(exports) {
 			}
 		},
 
-		logout: function() {
+		logout: function () {
 			if (this.currentSession) {
 				this.currentSession.logout();
 			} else {
@@ -134,9 +131,9 @@ package("kb", function(exports) {
 		},
 
 		// logs out from provider sessions, not from the session
-		logoutProviders: function() {
+		logoutProviders: function () {
 			for (var name in this.providers) {
-				if (!this.providers.hasOwnProperty(name)) {
+				if (!Object.prototype.hasOwnProperty.call(this.providers, name)) {
 					continue;
 				}
 				var provider = this.providers[name];
@@ -147,98 +144,138 @@ package("kb", function(exports) {
 		}
 	};
 
+	/**
+	 * @param {string} name name of the cookie
+	 * @returns {string | null}
+	 */
+	function getCookie(name) {
+		var cookieArr = document.cookie.split(";");
+
+		for (var i = 0; i < cookieArr.length; i++) {
+			var cookiePair = cookieArr[i].split("=");
+			var cookieKey = cookiePair[0].trim();
+			var cookieValue = cookiePair[1];
+
+			if (name == cookieKey) {
+				return decodeURIComponent(cookieValue);
+			}
+		}
+		return null;
+	}
+
+	function parseJwt(token) {
+		var base64Url = token.split(".")[1];
+		var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+		var jsonPayload = decodeURIComponent(
+			window
+				.atob(base64)
+				.split("")
+				.map(function (c) {
+					return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+				})
+				.join("")
+		);
+		return JSON.parse(jsonPayload);
+	}
+
 	var initializer = {
 		"*provider.CAS": cas,
-		"*provider.Google": google,
+		"*provider.Google": initializerGoogle,
 		"pgdb.GuestLogin": form
 	};
 
 	function cas(auth, name, data, onloaded) {
-		data.login = function(user, code) {
+		data.login = function (user, code) {
 			auth.loginTo("/system/auth/" + name, user, code);
 		};
 
 		onloaded();
 	}
 
-	function google(auth, name, data, onloaded) {
-		if (typeof gapi === "undefined") {
-			return;
+	/**
+	 *
+	 * @param {Auth} auth
+	 * @param {string} name
+	 * @param {*} data
+	 * @param {() => void} onloaded
+	 */
+	function initializerGoogle(auth, name, data, onloaded) {
+		var gsiInformationElement = document.getElementById("gsi_information");
+		if (!gsiInformationElement) {
+			console.error("No gsi information given by server");
+			return onloaded();
 		}
-		data.view = "button";
+		/** @type {import("./types/globals").GoogleSignInInformation} */
+		var gsiInformation = JSON.parse(gsiInformationElement.text);
+		if (!gsiInformation.client_id || !gsiInformation.login_uri) {
+			console.error("Missing required information for google authentication");
+			return onloaded();
+		}
+
+		if (
+			typeof google === "undefined" ||
+			!google.accounts ||
+			!google.accounts.id ||
+			!google.accounts.id.initialize
+		) {
+			console.error("Google sign-in library not loaded");
+			return onloaded();
+		}
+
+		data.view = "google-button";
 		data.title = "Google";
+		data.cookieName = "gsi_token";
 
-		gapi.load("auth2", function() {
-			if (typeof gapi === "undefined") {
-				console.error("Google authentication unavailable.");
+		var autoSelectCookieName = "auto_select";
+		var autoSelect = Boolean(JSON.parse(getCookie(autoSelectCookieName)));
 
-				data.login = function() {
-					console.error("Google authentication unavailable.");
-				}
-				data.logout = function() {
-					console.error("Google authentication unavailable.");
-				}
+		// https://developers.google.com/identity/gsi/web/reference/js-reference#IdConfiguration
+		google.accounts.id.initialize({
+			client_id: gsiInformation.client_id,
+			hd: gsiInformation.hd,
+			auto_select: autoSelect,
+			login_uri: gsiInformation.login_uri,
+			callback: function (response) {
+				/** @type {import("./types/globals").ParsedJwtCredentials} */
+				var parsedCredential = parseJwt(response.credential);
 
-				data.errored = true;
-				onloaded();
-				return;
+				auth.loginTo("/system/auth/" + name, parsedCredential.email, response.credential);
+				// to speed up consecutive logging
+				document.cookie =
+					data.cookieName +
+					"=" +
+					response.credential +
+					"; expires=" +
+					new Date(parsedCredential.exp * 1000).toUTCString() +
+					"; secure";
+				document.cookie = autoSelectCookieName + "=true";
 			}
-
-			var hosted_domain = null;
-			if (typeof GoogleHostedDomain !== "undefined") {
-				hosted_domain = GoogleHostedDomain;
-			}
-
-			var auth2 = gapi.auth2.init({
-				hosted_domain: hosted_domain,
-				authuser: -1
-			});
-
-			var trylogin = function() {
-				if (auth2.isSignedIn.get() === true) {
-					// check if not logged in
-					var user = auth2.currentUser.get();
-					var profile = user.getBasicProfile();
-					var token = user.getAuthResponse().id_token;
-
-					auth.loginTo("/system/auth/" + name,
-						profile.getEmail(),
-						token
-					);
-				}
-			};
-			auth2.isSignedIn.listen(trylogin);
-
-			data.autologin = function() {
-				trylogin();
-			};
-
-			data.login = function() {
-				if (auth2.isSignedIn.get() === true) {
-					trylogin();
-				} else {
-					auth2.signIn().then(
-						null,
-						auth.loginError.bind(auth)
-					);
-				}
-			};
-
-			data.logout = function() {
-				try {
-					auth2.signOut();
-				} catch (ex) {
-
-				}
-			};
-
-			onloaded();
 		});
+
+		data.autologin = function () {
+			var gsiCookie = getCookie(data.cookieName);
+			if (!gsiCookie) {
+				return google.accounts.id.prompt();
+			}
+
+			/** @type {import("./types/globals").ParsedJwtCredentials} */
+			var parsedCredential = parseJwt(gsiCookie);
+			auth.loginTo("/system/auth/" + name, parsedCredential.email, gsiCookie);
+		};
+
+		data.logout = function () {
+			var clearCookiePart = "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			document.cookie = data.cookieName + clearCookiePart;
+			document.cookie = autoSelectCookieName + clearCookiePart;
+			// to cancel the one-tap prompt
+			google.accounts.id.cancel();
+		};
+		onloaded();
 	}
 
 	function form(auth, name, data, onloaded) {
 		data.view = "form";
-		data.login = function(user, password) {
+		data.login = function (user, password) {
 			auth.loginTo("/system/auth/" + name, user, password);
 		};
 

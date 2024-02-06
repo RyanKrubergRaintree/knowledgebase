@@ -73,9 +73,9 @@ func main() {
 
 // filename with forward slashes
 func AddFile(filename string) {
-    if addedFiles[filename] {
-        return
-    }
+	if addedFiles[filename] {
+		return
+	}
 
 	fmt.Printf("  %-40s", filename)
 	defer fmt.Println("+")

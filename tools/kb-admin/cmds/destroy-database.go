@@ -17,6 +17,7 @@ func init() {
 }
 
 func DestroyDatabase(DB kb.Database, fs *flag.FlagSet, args []string) {
+	//nolint:errcheck
 	fs.Parse(args)
 
 	db := DB.(*pgdb.Database)
