@@ -65,7 +65,7 @@ jobs:
           aws_secret_key: ${{ steps.creds.outputs.aws-secret-access-key || secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{ vars.EB_APPLICATION_NAME }}
           environment_name: ${{ vars.EB_ENVIRONMENT_NAME }}
-          version_label: GitHub-PR-${{ github.event.number }}
+          version_label: GitHub-${{ github.SHA }}
           region: ${{ env.AWS_REGION }}
 
           aws_session_token: ${{ steps.creds.outputs.aws-session-token || secrets.AWS_SESSION_TOKEN }}

@@ -28,9 +28,6 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
-      # golangci-lint seems to also lint dependancies if this is used before
-      - name: install go dependencies
-        run: go mod download
 
       - name: set up node
         uses: actions/setup-node@v4
@@ -41,10 +38,12 @@ jobs:
       - name: node lint
         run: npm run lint
 
+      - name: install go dependencies
+        run: go mod download
       - name: build go project
         run: GOOS=linux GOARCH=amd64 go build -o .bin/run
       - name: package the project
-        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} .bin .platform client Dockerrun.aws.json Dockerfile rules.json .ebextensions
+        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} .bin .platform client Dockerrun.aws.json Dockerfile rules.json
 
       - name: configure aws credentials for DEV account to install packages
         id: creds
@@ -67,11 +66,10 @@ jobs:
           aws_secret_key: ${{ steps.creds.outputs.aws-secret-access-key || secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{ vars.EB_APPLICATION_NAME }}
           environment_name: ${{ vars.EB_ENVIRONMENT_NAME }}
-          version_label: GitHub-PR-${{ github.event.number }}
+          version_label: GitHub-PR-${{ github.event.number }}-${{ github.SHA }}
           region: ${{ env.AWS_REGION }}
 
           aws_session_token: ${{ steps.creds.outputs.aws-session-token || secrets.AWS_SESSION_TOKEN }}
           deployment_package: ${{ env.DEPLOY_ZIP_NAME }}
           version_description: 'GitHub SHA: "${{ github.SHA }}"'
           existing_bucket_name: ${{ vars.EB_AWS_BUCKET }}
-          use_existing_version_if_available: true
