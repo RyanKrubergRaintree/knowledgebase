@@ -45,9 +45,10 @@ jobs:
         id: creds
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           # role-session-name: GitHubActionSession
           # role-chaining: true
       - name: Deploy to EB
@@ -62,5 +63,5 @@ jobs:
 
           aws_session_token: ${{ steps.creds.outputs.aws-session-token }}
           deployment_package: ${{ env.DEPLOY_ZIP_NAME }}
-          version_description: GitHub SHA "${{ github.SHA }}"
+          version_description: 'GitHub SHA: "${{ github.SHA }}"'
           existing_bucket_name: ${{ vars.EB_AWS_BUCKET }}
