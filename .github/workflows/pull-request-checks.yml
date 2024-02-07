@@ -43,9 +43,10 @@ jobs:
       - name: install go dependencies
         run: go mod download
       - name: build go project
-        run: GOOS=linux GOARCH=amd64 go build -o .bin/run
-      - name: handle permissions before package
-        run: chmod -R 0755 ${{ env.PACKAGE_FILES }}
+        run: go build -o .bin/run
+        env:
+          GOOS: linux
+          GOARCH: amd64
       - name: package the project
         run: zip -r ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
 
