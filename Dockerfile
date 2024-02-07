@@ -16,4 +16,5 @@ RUN ["ls", "-a", "/kb"]
 RUN ["chmod", "+x", "/kb/.bin/run"]
 # TODO: remove \/
 RUN ["ls", "-l", "/kb/.bin/run"]
+RUN ["chmod", "0777", "/kb/.bin/run"]
 CMD ["/kb/.bin/run"]
