@@ -11,5 +11,9 @@ WORKDIR /kb/
 ENV PORT 80
 EXPOSE 80
 
+# TODO: remove \/
+RUN ["ls", "-a", "/kb"] 
 RUN ["chmod", "+x", "/kb/.bin/run"]
+# TODO: remove \/
+RUN ["ls", "-l", "/kb/.bin/run"]
 CMD ["/kb/.bin/run"]
