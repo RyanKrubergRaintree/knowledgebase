@@ -10,6 +10,8 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION != '' && vars.AWS_REGION || 'us-east-1' }}
   DEPLOY_ZIP_NAME: "deploy.zip"
+  # intended to be used recursively so folders should be good
+  PACKAGE_FILES: .bin .platform client Dockerrun.aws.json Dockerfile rules.json
 
 jobs:
   pull-request-checks:
@@ -42,8 +44,10 @@ jobs:
         run: go mod download
       - name: build go project
         run: GOOS=linux GOARCH=amd64 go build -o .bin/run
+      - name: handle permissions before package
+        run: chmod -R 0755 ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
       - name: package the project
-        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} .bin .platform client Dockerrun.aws.json Dockerfile rules.json
+        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
 
       - name: configure aws credentials for DEV account to install packages
         id: creds
