@@ -118,8 +118,8 @@ package("kb.boot", function (exports) {
 
 	//TODO: move this logic to server conf
 	var loginTitle = {
-		guest: "Customer Login:",
-		google: "Employee Login:"
+		guest: "Customer Login (DEV):",
+		google: "Employee Login (DEV):"
 	};
 
 	exports.Login = createReactClass({

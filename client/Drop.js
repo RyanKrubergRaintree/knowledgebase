@@ -31,6 +31,7 @@ package("kb.drop", function (exports) {
 		exports.Effect = effect;
 		try {
 			// TODO: understand if this is supposed to be undefined or something else
+			// eslint-disable-next-line no-undef
 			ev.dataTransfer.dropEffect = dropEffect;
 		} catch (e) {
 			/* empty */
