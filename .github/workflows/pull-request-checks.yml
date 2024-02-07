@@ -47,6 +47,7 @@ jobs:
         env:
           GOOS: linux
           GOARCH: amd64
+          CGO_ENABLED: 0
       - name: package the project
         run: zip -r ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
 

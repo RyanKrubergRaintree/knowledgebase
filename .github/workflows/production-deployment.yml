@@ -8,6 +8,8 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION != '' && vars.AWS_REGION || 'us-east-1' }}
   DEPLOY_ZIP_NAME: "deploy.zip"
+  # intended to be used recursively so folders should be good
+  PACKAGE_FILES: .bin .platform client Dockerrun.aws.json Dockerfile rules.json
 
 jobs:
   pull-request-checks:
@@ -26,9 +28,6 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.54
-      # golangci-lint seems to also lint dependancies if this is used before
-      - name: install go dependencies
-        run: go mod download
 
       - name: set up node
         uses: actions/setup-node@v4
@@ -39,10 +38,16 @@ jobs:
       - name: node lint
         run: npm run lint
 
+      - name: install go dependencies
+        run: go mod download
       - name: build go project
-        run: GOOS=linux GOARCH=amd64 go build -o .bin/run
+        run: go build -o .bin/run
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
       - name: package the project
-        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} .bin .platform client Dockerrun.aws.json Dockerfile rules.json .ebextensions
+        run: zip -r ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
 
       - name: configure aws credentials for DEV account to install packages
         id: creds
@@ -52,7 +57,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-      # TODO: remove this in the future
       - name: notify usage of secrets context
         run: |
           if [ -z "${{ steps.creds.outputs.aws-access-key-id }}" ]; then
