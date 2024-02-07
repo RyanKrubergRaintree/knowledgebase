@@ -45,7 +45,7 @@ jobs:
       - name: build go project
         run: GOOS=linux GOARCH=amd64 go build -o .bin/run
       - name: handle permissions before package
-        run: chmod -R 0755 ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
+        run: chmod -R 0755 ${{ env.PACKAGE_FILES }}
       - name: package the project
         run: zip -r ${{ env.DEPLOY_ZIP_NAME }} ${{ env.PACKAGE_FILES }}
 
